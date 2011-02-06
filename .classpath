@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="lib" path="lib/activation.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections.jar" sourcepath="lib/src/commons-collections_3.2_src.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io.jar" sourcepath="lib/src/commons-io-1.3.1_src.jar"/>
+	<classpathentry kind="lib" path="lib/commons-net.jar" sourcepath="lib/src/commons-net-1.4.1_src.jar"/>
+	<classpathentry kind="lib" path="lib/hsqldb.jar" sourcepath="lib/src/hsqldb_1.8.0.7_src.jar"/>
+	<classpathentry kind="lib" path="lib/mail.jar"/>
+	<classpathentry kind="lib" path="lib/jdom.jar" sourcepath="lib/src/jdom_1.0_src.jar"/>
+	<classpathentry kind="lib" path="lib/log4j.jar" sourcepath="lib/src/log4j_1.2.9_src.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
