@@ -14,8 +14,8 @@ import com.hlcl.rql.util.as.ProjectPage;
 /**
  * @author lejafr
  * 
- * This class represents hip navigation page (leaf * list page or enhanced list table block); encapsulates mainly operations regarding
- * content_pages_list.
+ *         This class represents hip navigation page (leaf * list page or enhanced list table block); encapsulates mainly operations
+ *         regarding content_pages_list.
  */
 public class NavigationPage extends ProjectPage {
 
@@ -104,25 +104,28 @@ public class NavigationPage extends ProjectPage {
 	}
 
 	/**
-	 * Returns the content_page from the list element content_pages_list or creates a new one, if this navigation page didn't have one before.
+	 * Returns the content_page from the list element content_pages_list or creates a new one, if this navigation page didn't have one
+	 * before.
 	 */
-	public ContentPage getOrCreateContentPage(String headline, boolean addAtBottom, String requesterUserId, boolean isResponsibleIdAPerson,
-			String responsibleId, String responsibleName, String responsibleDepartmentNumber) throws RQLException {
+	public ContentPage getOrCreateContentPage(String headline, boolean addAtBottom, String requesterUserId,
+			boolean isResponsibleIdAPerson, String responsibleId, String responsibleName, String responsibleDepartmentNumber)
+			throws RQLException {
 		ContentPage childOrNull = findContentPagesListChildByHeadline(headline);
 		// no one, create new
 		if (childOrNull == null) {
-			childOrNull = createContentPage(headline, addAtBottom, requesterUserId, isResponsibleIdAPerson, responsibleId, responsibleName,
-					responsibleDepartmentNumber);
+			childOrNull = createContentPage(headline, addAtBottom, requesterUserId, isResponsibleIdAPerson, responsibleId,
+					responsibleName, responsibleDepartmentNumber);
 		}
 		return childOrNull;
 	}
 
 	/**
-	 * Returns the first content page (filter by template) from the list element content_pages_list with the given headline or null, if no page found.
-	 * Uses {@link #equals(Object)}.
+	 * Returns the first content page (filter by template) from the list element content_pages_list with the given headline or null, if
+	 * no page found. Uses {@link #equals(Object)}.
 	 */
 	public ContentPage findContentPagesListChildByHeadline(String headline) throws RQLException {
-		return new ContentPage(getContentPagesList().getChildPagesForTemplate(getParameter("contentPageTmpltName")).findByHeadline(headline));
+		Page pageOrNull = getContentPagesList().getChildPagesForTemplate(getParameter("contentPageTmpltName"))
+				.findByHeadline(headline);
+		return pageOrNull == null ? null : new ContentPage(pageOrNull);
 	}
-
 }

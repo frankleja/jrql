@@ -36,7 +36,7 @@ public class PhysicalPage extends ProjectPage {
 	/**
 	 * Construct a physical page wrapping the given general page. Reuse template element names.
 	 */
-	private PhysicalPage(Page page, String isPhysicalPageTmpltElemName, String shadowElementsNameSuffix) throws RQLException {
+	protected PhysicalPage(Page page, String isPhysicalPageTmpltElemName, String shadowElementsNameSuffix) throws RQLException {
 		super(page);
 		// initialize
 		this.isPhysicalPageTmpltElemName = isPhysicalPageTmpltElemName;
@@ -251,5 +251,19 @@ public class PhysicalPage extends ProjectPage {
 	public int hashCode() {
 	
 		return getPageGuid().hashCode();
+	}
+
+	/**
+	 * @return the isPhysicalPageTmpltElemName
+	 */
+	protected String getIsPhysicalPageTmpltElemName() {
+		return isPhysicalPageTmpltElemName;
+	}
+
+	/**
+	 * @return the shadowElementsNameSuffix
+	 */
+	protected String getShadowElementsNameSuffix() {
+		return shadowElementsNameSuffix;
 	}
 }

@@ -93,17 +93,32 @@ public class HipStatisticsPageAction extends PageAction {
 		} 
 		file.append(respValues);
 		
+		// content audit fields
+		// n/a signals, that the content page did not have the audit elements, which is true for all fragment pages!
+		// an empty field in excel therefore signals, that the author didn't edited them 
+		String notApplicable = "n/a";
+		file.append(cp.getIsPageStillNeeded(notApplicable));
+		file.append(cp.getIsResponsiblePersonCorrect(notApplicable));
+		file.append(cp.getNewResponsiblePerson(notApplicable));
+		file.append(cp.getIsResponsibleDepartmentCorrect(notApplicable));
+		file.append(cp.getNewResponsibleDepartment(notApplicable));
+		
+		// content areas
+		file.append(cp.getContentAreasIfAvailable("n/a"));
+		
 		// end 
 		file.newLine();
 		numberOfPages++;
 	}
+
 	/**
 	 * Schreibt die Spaltenüberschriften in das Excelfile.
 	 */
 	public void writeHeader() throws RQLException {
 		String[] header = { "pageid", "headline", "template", "templateFolder", "createdOn", "createdBy", "changedOn", "changedBy", "filename", "responsibleName",
 				"responsibleId", "updatedOn", "workarea", "changeCommentDate", "changeCommentUser", "changeComment", 
-				"requester", "responsibleIdType", "responsibleDepartment", "responsibleDepartmentValid", "checkResponsibleId", "checkResponsibleName"};
+				"requester", "responsibleIdType", "responsibleDepartment", "responsibleDepartmentValid", "checkResponsibleId", "checkResponsibleName",
+				"pageStillNeeded", "respPersonCorrect", "newRespPerson", "respDepartCorrect", "newRespDepart", "contentAreas"};
 		file.append(header);
 		file.newLine();
 	}

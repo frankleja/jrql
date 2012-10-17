@@ -12,8 +12,7 @@ import com.hlcl.rql.util.as.PageListener;
 /**
  * @author lejafr
  * 
- * This class invokes a page action on all physical pages found in the tree
- * below the given start page.
+ * This class invokes a page action on all physical pages found in the tree below the given start page.
  * <p>
  * Double linked physical pages are not investigated twice.
  */
@@ -26,8 +25,7 @@ public class PhysicalPagesWalker {
 	private PageAction pageAction;
 
 	/**
-	 * Constructor. Feed with the page info set to be sure not to investigate
-	 * same page twice.
+	 * Constructor. Feed with the page info set to be sure not to investigate same page twice.
 	 */
 	public PhysicalPagesWalker(Connection connection, String setTableName) throws RQLException {
 		initialize(connection, setTableName);
@@ -43,8 +41,7 @@ public class PhysicalPagesWalker {
 	}
 
 	/**
-	 * For the start page (should be a physical page as well) and all physical
-	 * pages below invoke the page action.
+	 * For the start page (should be a physical page as well) and all physical pages below invoke the page action.
 	 */
 	public void walk(Page startPage, PageAction physicalPageAction) throws RQLException {
 		// remember
@@ -66,8 +63,8 @@ public class PhysicalPagesWalker {
 		// invoke configured page action
 		pageAction.invoke(physicalPage.getPage());
 
-		// search on all physical childs
-		// for all physical pages below do 
+		// search on all physical children
+		// for all physical pages below do
 		PageArrayList physicalChilds = physicalPage.getAllPhysicalChildPages(false);
 		for (int i = 0; i < physicalChilds.size(); i++) {
 			Page child = (Page) physicalChilds.get(i);
@@ -81,20 +78,21 @@ public class PhysicalPagesWalker {
 
 			// go deeper on this physical child
 			doRecursive(physicalPage.morphInto(child));
+			
+			// preserve heap space
+			child.freeOccupiedMemory();
 		}
 	}
 
 	/**
-	 * Bereitet das set vor, das verhindert, dass Teilbäume doppelt untersucht
-	 * werden.
+	 * Bereitet das set vor, das verhindert, dass Teilbäume doppelt untersucht werden.
 	 */
 	private void initialize(Connection connection, String setTableName) throws RQLException {
 		treePages = new PageInfoSet(connection, setTableName);
 	}
 
 	/**
-	 * Setzt den aghängigen listener, der über jede neue physical page
-	 * informiert wird, um einen fortschritt anzuzeigen.
+	 * Setzt den abhängigen listener, der über jede neue physical page informiert wird, um einen fortschritt anzuzeigen.
 	 */
 	public void setListener(PageListener dependentListener) {
 		dependent = dependentListener;

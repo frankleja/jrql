@@ -104,6 +104,51 @@ public class ContentPage extends ProjectPage {
 		// signal that given text block is not a child
 		return null;
 	}
+	/**
+	 * Sets the 3 given content audit attributes of this page in one step. If person or department is not correct the new proposals
+	 * should be set as well. TODO signature has to be extended.
+	 */
+	public void setAuditAttributes(boolean pageStillNeeded, boolean responsiblePersonCorrect, boolean responsibleDepartmentCorrect)
+			throws RQLException {
+		startSetElementValues();
+		setOptionListValue(getParameter("auditIsPageStillNeededTmpltElemName"), StringHelper.convertToYesNo(pageStillNeeded));
+		setOptionListValue(getParameter("auditIsResponsiblePersonCorrectTmpltElemName"),
+				StringHelper.convertToYesNo(responsiblePersonCorrect));
+		setOptionListValue(getParameter("auditIsResponsibleDepartmentCorrectTmpltElemName"),
+				StringHelper.convertToYesNo(responsibleDepartmentCorrect));
+		endSetElementValues();
+	}
+
+	/**
+	 * Confirm this page in the content audit. Sets this page still needed, responsible person correct and responsible department
+	 * correct all to true.
+	 */
+	public void setAuditAttributesToKeepPage() throws RQLException {
+		setAuditAttributes(true, true, true);
+	}
+
+	/**
+	 * Mark this page still needed (or not needed) for the content audit.
+	 */
+	public void setIsPageStillNeeded(boolean pageStillNeeded) throws RQLException {
+		setOptionListValue(getParameter("auditIsPageStillNeededTmpltElemName"), StringHelper.convertToYesNo(pageStillNeeded));
+	}
+
+	/**
+	 * Mark the responsible person of this page as correct or incorrect for the content audit.
+	 */
+	public void setIsResponsiblePersonCorrect(boolean responsiblePersonCorrect) throws RQLException {
+		setOptionListValue(getParameter("auditIsResponsiblePersonCorrectTmpltElemName"),
+				StringHelper.convertToYesNo(responsiblePersonCorrect));
+	}
+
+	/**
+	 * Mark the responsible department of this page as correct or incorrect for the content audit.
+	 */
+	public void setIsResponsibleDepartmentCorrect(boolean responsibleDepartmentCorrect) throws RQLException {
+		setOptionListValue(getParameter("auditIsResponsibleDepartmentCorrectTmpltElemName"),
+				StringHelper.convertToYesNo(responsibleDepartmentCorrect));
+	}
 
 	/**
 	 * Connects the given text block on this page's container blocks depending on given addAtBottom.
@@ -125,6 +170,20 @@ public class ContentPage extends ProjectPage {
 	 */
 	public String getInvisibleInfo() throws RQLException {
 		return getStandardFieldTextValue(getParameter("versionCodeTmpltElemName"));
+	}
+
+	/**
+	 * Publish this content page to HIP PROD for all needed project and language variants.
+	 */
+	public void publish2Prod(boolean withFollowingPages) throws RQLException {
+		getPage().publish(withFollowingPages, getParameter("projectVariantProdGuids"), ",", getParameter("languageVariantGuid"));
+	}
+
+	/**
+	 * Publish this content page to HIP TEST for all needed project and language variants.
+	 */
+	public void publish2Test(boolean withFollowingPages) throws RQLException {
+		getPage().publish(withFollowingPages, getParameter("projectVariantTestGuids"), ",", getParameter("languageVariantGuid"));
 	}
 
 	/**
@@ -680,6 +739,46 @@ public class ContentPage extends ProjectPage {
 	}
 
 	/**
+	 * Returns the value (yes or no) of audit field is page still needed (element audit_is_page_still_needed_opt).
+	 * Returns ifNotAvailable, if this content page didn't have this template element with given name.
+	 */
+	public String getIsPageStillNeeded(String ifNotAvailable) throws RQLException {
+		return getOptionListValueIfAvailable(getParameter("auditIsPageStillNeededTmpltElemName"), ifNotAvailable);
+	}
+
+	/**
+	 * Returns the value (yes or no) of audit field is responsible department correct (element audit_is_responsible_department_correct_opt).
+	 * Returns ifNotAvailable, if this content page didn't have this template element with given name.
+	 */
+	public String getIsResponsibleDepartmentCorrect(String ifNotAvailable) throws RQLException {
+		return getOptionListValueIfAvailable(getParameter("auditIsResponsibleDepartmentCorrectTmpltElemName"), ifNotAvailable);
+	}
+
+	/**
+	 * Returns the value (yes or no) of audit field is responsible person correct (element audit_is_responsible_person_correct_opt).
+	 * Returns ifNotAvailable, if this content page didn't have this template element with given name.
+	 */
+	public String getIsResponsiblePersonCorrect(String ifNotAvailable) throws RQLException {
+		return getOptionListValueIfAvailable(getParameter("auditIsResponsiblePersonCorrectTmpltElemName"), ifNotAvailable);
+	}
+
+	/**
+	 * Returns the value of audit field new responsible department (element audit_new_responsible_department_sft).
+	 * Returns ifNotAvailable, if this content page didn't have this template element with given name.
+	 */
+	public String getNewResponsibleDepartment(String ifNotAvailable) throws RQLException {
+		return getStandardFieldTextValueIfAvailable(getParameter("auditNewResponsibleDepartmentTmpltElemName"), ifNotAvailable);
+	}
+
+	/**
+	 * Returns the value of audit field new responsible person (element audit_new_responsible_person_sft).
+	 * Returns ifNotAvailable, if this content page didn't have this template element with given name.
+	 */
+	public String getNewResponsiblePerson(String ifNotAvailable) throws RQLException {
+		return getStandardFieldTextValueIfAvailable(getParameter("auditNewResponsiblePersionTmpltElemName"), ifNotAvailable);
+	}
+
+	/**
 	 * Returns the name of the responsible user or the title of group mailbox name shown as blue link text in page footer.
 	 */
 	public String getResponsibleName() throws RQLException {
@@ -934,6 +1033,23 @@ public class ContentPage extends ProjectPage {
 			if (rdDate != null) {
 				return rdDate.getAsyyyyMMdd();
 			}
+		}
+		return ifNotAvailable;
+	}
+
+	/**
+	 * Returns the list of content areas (separated with ;), if template element is available. 
+	 * 
+	 * @param ifNotAvailable returned, if either no template elemente found in page
+	 * @return the list of tree names, where this page is contained in
+	 * e.g. company;sales;customer_service;operations;business_administration
+	 * @throws RQLException
+	 */
+	public String getContentAreasIfAvailable(String ifNotAvailable) throws RQLException {
+		Page page = getPage();
+		String templateElementName = getParameter("contentAreasTmpltElemName");
+		if (page.contains(templateElementName)) {
+			return page.getTextValue(templateElementName);
 		}
 		return ifNotAvailable;
 	}

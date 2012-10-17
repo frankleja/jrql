@@ -11,6 +11,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
+import com.hlcl.rql.as.ElementNotFoundException;
 import com.hlcl.rql.as.Page;
 import com.hlcl.rql.as.RQLException;
 import com.hlcl.rql.as.StringHelper;
@@ -223,7 +224,18 @@ public class ChangeLogPage extends ProjectPage {
 	}
 
 	/**
-	 * Returns the list of changes sorted by date descending. Saved in xml in this order.
+	 * Returns the list of changes sorted by date descending. Saved in xml in this order.<p>
+	 * @return an empty list, if the page did not contain the text element hip_change_log. 
+	 */
+	public java.util.List<ChangeLogEntry> getChangesOrEmpty() throws RQLException {
+		if (hasChangeLogText()) {
+			return getChanges();
+		}
+		return new LinkedList<ChangeLogEntry>();
+	}
+	/**
+	 * Returns the list of changes sorted by date descending. Saved in xml in this order.<p>
+	 * @throws ElementNotFoundException if the page did not contain the text element hip_change_log. 
 	 */
 	public java.util.List<ChangeLogEntry> getChanges() throws RQLException {
 		if (changes == null) {
