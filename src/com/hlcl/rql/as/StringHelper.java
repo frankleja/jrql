@@ -4,6 +4,7 @@ import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -369,6 +370,38 @@ public class StringHelper {
 		char chars[] = s.toLowerCase().toCharArray();
 		chars[0] = Character.toUpperCase(chars[0]);
 		return new String(chars);
+	}
+
+	/**
+	 * @return the elements contained in both lists, the intersection.
+	 * @param list1
+	 *            a list of strings without a repetition
+	 * @param list2
+	 *            the second list to check
+	 * @param delimiter
+	 *            the common separator used to split both lists (only first char used)
+	 */
+	static public Set<String> intersection(String list1, String list2, String delimiter) {
+		Set<String> s1 = new HashSet<String>(StringHelper.split(list1, delimiter.charAt(0)));
+		Set<String> s2 = new HashSet<String>(StringHelper.split(list2, delimiter.charAt(0)));
+		s1.retainAll(s2);
+		return s1;
+	}
+
+	/**
+	 * @return the elements of list1 removed by the elements of list2.
+	 * @param list1
+	 *            a list of strings without a repetition, minuend
+	 * @param list2
+	 *            the second list, subtrahend
+	 * @param delimiter
+	 *            the common separator used to split both lists (only first char used)
+	 */
+	static public Set<String> difference(String list1, String list2, String delimiter) {
+		Set<String> s1 = new HashSet<String>(StringHelper.split(list1, delimiter.charAt(0)));
+		Set<String> s2 = new HashSet<String>(StringHelper.split(list2, delimiter.charAt(0)));
+		s1.removeAll(s2);
+		return s1;
 	}
 
 	/**
@@ -783,8 +816,10 @@ public class StringHelper {
 	 * <p>
 	 * Replaces: &nbsp to blank,
 	 * <p>
-	 * Removes: <BR>,
-	 * <P>,
+	 * Removes: <BR>
+	 * ,
+	 * <P>
+	 * ,
 	 * </P>
 	 */
 	static public String convertFormattedText2Plain(String htmlCode) {
@@ -1383,7 +1418,7 @@ public class StringHelper {
 	}
 
 	/**
-	 * Enclose the given source with the reddot block mark for SmartEdit mode: <!IoRangeRedDotMode>source<!/IoRangeRedDotMode> 
+	 * Enclose the given source with the reddot block mark for SmartEdit mode: <!IoRangeRedDotMode>source<!/IoRangeRedDotMode>
 	 */
 	public static String surroundIoRangeRedDotMode(String source) {
 		return surroundReddotBlockMark(source, "IoRangeRedDotMode");

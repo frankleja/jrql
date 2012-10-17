@@ -9,12 +9,23 @@ public class PageNotFoundException extends RQLException {
 
 	private static final long serialVersionUID = -2100431268931899035L;
 
-/**
- * PageNotFoundException constructor comment.
- *
- * @param s java.lang.String
- */
-public PageNotFoundException(String s) {
-	super(s);
-}
+	/**
+	 * PageNotFoundException constructor comment.
+	 * 
+	 * @param s
+	 *            java.lang.String
+	 */
+	public PageNotFoundException(String s) {
+		super(s);
+	}
+
+	/**
+	 * PageNotFoundException constructor comment.
+	 * 
+	 * @param s
+	 *            java.lang.String
+	 */
+	public PageNotFoundException(String s, RQLException ex) {
+		super(s, ex);
+	}
 }

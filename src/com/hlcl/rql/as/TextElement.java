@@ -3,12 +3,17 @@ package com.hlcl.rql.as;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.hlcl.rql.util.as.PageArrayList;
+
 /**
- * Diese Klasse beschreibt ein RedDot Textelement (type=31 oder type=32). Folgende Konvertierungsmöglichkeiten werden nicht unterstützt:
+ * Diese Klasse beschreibt ein RedDot Textelement (type=31 oder type=32). Folgende Konvertierungsmöglichkeiten werden nicht
+ * unterstützt:
  * <ul>
  * <li>Do not convert characters to HTML</li>
  * <li>CRLF -> &lt;BR&gt;</li>
@@ -24,7 +29,7 @@ public class TextElement implements PageContainer, ContentElement {
 	private final String EMPTY_VALUE = "&nbsp;&nbsp;";
 	// pattern zur Suche nach verlinkten page GUIDs im Source; matcher.group(1) liefert nur die GUID
 	private final String LINK_GUID_PATTERN = "\\[ioID\\](\\w+)[\"#]";
-
+	private final String EXTERNAL_LINK_PATTERN = "href=\"(http.+?)[ \"]";
 	private String name;
 	private Page page;
 	private TemplateElement templateElement;
@@ -63,14 +68,16 @@ public class TextElement implements PageContainer, ContentElement {
 	}
 
 	/**
-	 * Senden eine Anfrage an das CMS und liefert eine ungeparste Antwort zurueck. Erforderlich für die Ermittlung des Werts eines Textelements.
+	 * Senden eine Anfrage an das CMS und liefert eine ungeparste Antwort zurueck. Erforderlich für die Ermittlung des Werts eines
+	 * Textelements.
 	 */
 	public String callCmsWithoutParsing(String rqlRequest) throws RQLException {
 		return getCmsClient().callCmsWithoutParsing(rqlRequest);
 	}
 
 	/**
-	 * Liefert eine liste aller find strings aus findList, die in s vorkommen. Ist die zurückgegebene Liste leer, wurde nichts in s gefunden.
+	 * Liefert eine liste aller find strings aus findList, die in s vorkommen. Ist die zurückgegebene Liste leer, wurde nichts in s
+	 * gefunden.
 	 * <p>
 	 * Checked case sensitive with indexOf().
 	 * 
@@ -88,8 +95,8 @@ public class TextElement implements PageContainer, ContentElement {
 	}
 
 	/**
-	 * Konvertiert einen durch linkMarkerStart und linkMarkerEnd markierten Text in einen Texteditor-Link.\n Der Link zeigt auf die targetPage an den
-	 * Anchor targetAnchorPage.
+	 * Konvertiert einen durch linkMarkerStart und linkMarkerEnd markierten Text in einen Texteditor-Link.\n Der Link zeigt auf die
+	 * targetPage an den Anchor targetAnchorPage.
 	 */
 	public void convertToLink(String linkMarkerStart, String linkMarkerEnd, Page targetPg, Page targetAnchorPg) throws RQLException {
 
@@ -101,7 +108,8 @@ public class TextElement implements PageContainer, ContentElement {
 		String link = MessageFormat.format(TEXT_EDITOR_LINK, args);
 
 		// fill in link HTML source code + save it
-		String newValue = StringHelper.replaceText(getText(), StringHelper.escapeHTML(linkMarkerStart), StringHelper.escapeHTML(linkMarkerEnd), link);
+		String newValue = StringHelper.replaceText(getText(), StringHelper.escapeHTML(linkMarkerStart),
+				StringHelper.escapeHTML(linkMarkerEnd), link);
 		setText(newValue);
 	}
 
@@ -122,8 +130,8 @@ public class TextElement implements PageContainer, ContentElement {
 
 		// call CMS
 		String sessionKey = getSessionKey();
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + sessionKey + "'>" + "<ELT action='save' guid='"
-				+ getElementGuid() + "' value='#" + sessionKey + "'/>" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + sessionKey + "'>"
+				+ "<ELT action='save' guid='" + getElementGuid() + "' value='#" + sessionKey + "'/>" + "</IODATA>";
 		callCms(rqlRequest);
 
 		// force new read with default value
@@ -131,8 +139,8 @@ public class TextElement implements PageContainer, ContentElement {
 	}
 
 	/**
-	 * Schreibt für ASCII Elemente genau den gegebenen Wert; genau gleich wie <code>setText</code>. Erhält für HTML Elemente alle eingegebenen
-	 * Zeichen (< wird zu &lt;). Ein einzelnes blank (space) wird als Textwert geschrieben (zu &nbsp;).
+	 * Schreibt für ASCII Elemente genau den gegebenen Wert; genau gleich wie <code>setText</code>. Erhält für HTML Elemente alle
+	 * eingegebenen Zeichen (< wird zu &lt;). Ein einzelnes blank (space) wird als Textwert geschrieben (zu &nbsp;).
 	 * 
 	 * @see #setText(String)
 	 */
@@ -150,9 +158,63 @@ public class TextElement implements PageContainer, ContentElement {
 	}
 
 	/**
-	 * Liefert eine Liste von GUIDs der Seiten, die im Quelltext als Ziel im href auftauchen, z.B. href="[ioID]0C5BFE26441D437599F613195538CC67"
+	 * Returns all hard coded links by searching for href="http. Images are not included. Makes only sense, if this text element is a
+	 * html text.
+	 * 
+	 * @see #isHtmlText()
+	 */
+	public List<String> getAllExternalLinks() throws RQLException {
+		List<String> result = new ArrayList<String>();
+		// prepare regex
+		Pattern p = Pattern.compile(EXTERNAL_LINK_PATTERN);
+		Matcher m = p.matcher(getText());
+		// collect
+		while (m.find()) {
+			result.add(m.group(1));
+		}
+		return result;
+	}
+
+	/**
+	 * Returns all valid pages which are linked within this text element. Page GUID found within text, but not existing anymore are not
+	 * returned. All pages reside in same project as the page with this text element. Makes only sense, if this text element is a html
+	 * text.
+	 * 
+	 * @see #getAllHrefPageGuids()
+	 * @throws InvalidGuidException
+	 *             and delivers only the pages found until that time
+	 * @see #isHtmlText()
+	 * @param includeInvalidPages
+	 *            if true, even invalid page objects are returned (check is up to the receiver). if false, non-existing pages for the
+	 *            found page GUIDs are not returned.
+	 */
+	public PageArrayList getAllLinkedPages(boolean includeInvalidPages) throws RQLException {
+		List<String> pageGuids = getAllHrefPageGuids();
+		PageArrayList result = new PageArrayList(pageGuids.size());
+
+		// wrap into pages
+		Project project = getProject();
+		for (Iterator iterator = pageGuids.iterator(); iterator.hasNext();) {
+			String pageGuid = (String) iterator.next();
+			Page page = project.getPageByGuid(pageGuid);
+			if (includeInvalidPages) {
+				result.add(page);
+			} else if (page.isValid()) {
+				// add only pages for valid GUIDs
+				result.add(page);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Liefert eine Liste von GUIDs der Seiten, die im Quelltext als Ziel im href auftauchen, z.B.
+	 * href="[ioID]0C5BFE26441D437599F613195538CC67"
 	 * 
 	 * @return java.util.List of Page GUIDs
+	 * @throws InvalidGuidException
+	 *             if page GUID length is not 32
+	 * @see Page.PAGE_GUID_LENGTH
 	 */
 	public java.util.List<String> getAllHrefPageGuids() throws RQLException {
 		Pattern pattern = Pattern.compile(LINK_GUID_PATTERN);
@@ -162,8 +224,8 @@ public class TextElement implements PageContainer, ContentElement {
 		while (matcher.find()) {
 			String guid = matcher.group(1);
 			if (guid.length() != Page.PAGE_GUID_LENGTH) {
-				throw new RQLException("Found page GUID " + guid + " has wrong length " + guid.length() + ", but should be " + Page.PAGE_GUID_LENGTH
-						+ ". Text element is " + getName() + " in page  " + getPage().getHeadlineAndId() + ".");
+				throw new InvalidGuidException("Found page GUID " + guid + " has wrong length " + guid.length() + ", but should be "
+						+ Page.PAGE_GUID_LENGTH + ". Text element is " + getName() + " in page  " + getPage().getHeadlineAndId() + ".");
 			}
 			guids.add(guid);
 		}
@@ -182,7 +244,8 @@ public class TextElement implements PageContainer, ContentElement {
 	 */
 	public String getConvertableLinkText(String linkMarkerStart, String linkMarkerEnd) throws RQLException {
 
-		return StringHelper.getTextBetween(getText(), StringHelper.escapeHTML(linkMarkerStart), StringHelper.escapeHTML(linkMarkerEnd));
+		return StringHelper
+				.getTextBetween(getText(), StringHelper.escapeHTML(linkMarkerStart), StringHelper.escapeHTML(linkMarkerEnd));
 	}
 
 	/**
@@ -274,8 +337,8 @@ public class TextElement implements PageContainer, ContentElement {
 	}
 
 	/**
-	 * Liefert den Quellcode des Textelements für HTML Texte. Eingegebene <> werden als &lt;&gt; geliefert (wie gespeichert), Klammern wie < für Tags
-	 * als <. Liefert genau den eingegebenen Text für ASCII Texte zurück.
+	 * Liefert den Quellcode des Textelements für HTML Texte. Eingegebene <> werden als &lt;&gt; geliefert (wie gespeichert), Klammern
+	 * wie < für Tags als <. Liefert genau den eingegebenen Text für ASCII Texte zurück.
 	 * 
 	 * @return java.lang.String
 	 */
@@ -367,8 +430,8 @@ public class TextElement implements PageContainer, ContentElement {
 	}
 
 	/**
-	 * Ersetzt den Text im Tag mit dem gegebenen Namen mit einem neuen Text, der auch Tags mit Formatierungen enthalten kann. Wir das gegebene Tag
-	 * nicht gefunden, bleibt der Text unverändert.
+	 * Ersetzt den Text im Tag mit dem gegebenen Namen mit einem neuen Text, der auch Tags mit Formatierungen enthalten kann. Wir das
+	 * gegebene Tag nicht gefunden, bleibt der Text unverändert.
 	 * 
 	 * @see StringHelper#replaceTagValue(String, String, String)
 	 */
@@ -449,12 +512,14 @@ public class TextElement implements PageContainer, ContentElement {
 
 	/**
 	 * Liefert den Quellcode des Textelements für HTML Texte. Liefert genau den eingegebenen Text für ASCII Texte zurück.
-	 * @throws RQLException 
+	 * 
+	 * @throws RQLException
 	 * @see #getText()
 	 */
 	public String getValueAsString() throws RQLException {
 		return getText();
 	}
+
 	/**
 	 * Überschreibt den Standardwert für bequemes Debugging.
 	 * 

@@ -268,9 +268,9 @@ public class Project implements CmsClientContainer {
 
 		// call CMS
 		String tag = requestTagName.toUpperCase();
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<AUTHORIZATION>"
-				+ "<" + tag + " guid='" + guid + "'>" + "<AUTHORIZATIONPACKET action='assign' guid='"
-				+ authorizationPackage.getAuthorizationPackageGuid() + "'/>" + "	</" + tag + ">" + "</AUTHORIZATION>" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<AUTHORIZATION>" + "<" + tag
+				+ " guid='" + guid + "'>" + "<AUTHORIZATIONPACKET action='assign' guid='" + authorizationPackage.getAuthorizationPackageGuid()
+				+ "'/>" + "	</" + tag + ">" + "</AUTHORIZATION>" + "</IODATA>";
 		callCmsWithoutParsing(rqlRequest);
 	}
 
@@ -420,8 +420,8 @@ public class Project implements CmsClientContainer {
 	 */
 	private PublishingTarget buildPublishingTarget(RQLNode targetNode) throws RQLException {
 
-		return new PublishingTarget(this, targetNode.getAttribute("guid"), targetNode.getAttribute("name"), targetNode
-				.getAttribute("path"), targetNode.getAttribute("type"));
+		return new PublishingTarget(this, targetNode.getAttribute("guid"), targetNode.getAttribute("name"), targetNode.getAttribute("path"),
+				targetNode.getAttribute("type"));
 	}
 
 	/**
@@ -457,8 +457,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Senden eine Anfrage an das CMS und liefert eine ungeparste Antwort zurueck. Erforderlich für die Ermittlung des Werts eines
-	 * Textelements.
+	 * Senden eine Anfrage an das CMS und liefert eine ungeparste Antwort zurueck. Erforderlich für die Ermittlung des Werts eines Textelements.
 	 */
 	public String callCmsWithoutParsing(String rqlRequest) throws RQLException {
 		return getCmsClient().callCmsWithoutParsing(rqlRequest);
@@ -534,8 +533,7 @@ public class Project implements CmsClientContainer {
 	 * Löscht Jobreports älter als die gegebene Anzahl von Tagen.
 	 * 
 	 * @param daysToKeep
-	 *            number of days for that job reports will not be deleted; = 2 means, that all reports older than 2 days will be
-	 *            deleted
+	 *            number of days for that job reports will not be deleted; = 2 means, that all reports older than 2 days will be deleted
 	 * @return number of deleted reports
 	 */
 	public int deletePublishingJobReports(int daysToKeep) throws RQLException {
@@ -557,11 +555,9 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Setzt in allen FTP publishing targets dieses Projekts, die namePart (check with contains=case sensitive) im Namen haben den FTP
-	 * user name und Passwort = unknown.
+	 * Setzt in allen FTP publishing targets dieses Projekts, die namePart (check with contains=case sensitive) im Namen haben den FTP user name und Passwort = unknown.
 	 * <p>
-	 * Eine Publizierung über diese Publizierungsziele ist danach nicht mehr möglich. Liefert die deaktivierten Ziele zurück. Benötigt
-	 * den session key!
+	 * Eine Publizierung über diese Publizierungsziele ist danach nicht mehr möglich. Liefert die deaktivierten Ziele zurück. Benötigt den session key!
 	 */
 	public java.util.List<PublishingTarget> disableFtpPublishingTargetsByNameContains(String namePart) throws RQLException {
 		return disableFtpPublishingTargetsByNameContains(namePart, false);
@@ -570,11 +566,9 @@ public class Project implements CmsClientContainer {
 	/**
 	 * Setzt in allen FTP publishing targets dieses Projekts, die namePart im Namen haben den FTP user name und Passwort = unknown.
 	 * <p>
-	 * Eine Publizierung über diese Publizierungsziele ist danach nicht mehr möglich. Liefert die deaktivierten Ziele zurück. Benötigt
-	 * den session key!
+	 * Eine Publizierung über diese Publizierungsziele ist danach nicht mehr möglich. Liefert die deaktivierten Ziele zurück. Benötigt den session key!
 	 */
-	public java.util.List<PublishingTarget> disableFtpPublishingTargetsByNameContains(String namePart, boolean ignoreCase)
-			throws RQLException {
+	public java.util.List<PublishingTarget> disableFtpPublishingTargetsByNameContains(String namePart, boolean ignoreCase) throws RQLException {
 		java.util.List<PublishingTarget> result = new ArrayList<PublishingTarget>();
 		for (PublishingTarget target : getPublishingTargets()) {
 			// skip non ftp target
@@ -607,8 +601,7 @@ public class Project implements CmsClientContainer {
 	/**
 	 * Liefert eine Liste von Seiten zurück, die von einem Benutzer der gegebenen Gruppe erstellt wurde.
 	 */
-	private PageArrayList filterAndWrapPageNodesInWorkflow(RQLNodeList pagesInWorkflowNodeList, UserGroup userGroup)
-			throws RQLException {
+	private PageArrayList filterAndWrapPageNodesInWorkflow(RQLNodeList pagesInWorkflowNodeList, UserGroup userGroup) throws RQLException {
 		PageArrayList pages = new PageArrayList();
 		if (pagesInWorkflowNodeList != null) {
 			for (int i = 0; i < pagesInWorkflowNodeList.size(); i++) {
@@ -631,8 +624,7 @@ public class Project implements CmsClientContainer {
 	 * @see AuthorizationPackage
 	 * @throws ElementNotFoundException
 	 */
-	private AuthorizationPackage findAuthorizationPackageByGuid(String packageType, String authorizationPackageGuid)
-			throws RQLException {
+	private AuthorizationPackage findAuthorizationPackageByGuid(String packageType, String authorizationPackageGuid) throws RQLException {
 
 		RQLNodeList packagesNodeList = getAuthorizationPackageNodeList(packageType);
 
@@ -658,15 +650,14 @@ public class Project implements CmsClientContainer {
 	 * @see AuthorizationPackage
 	 * @throws ElementNotFoundException
 	 */
-	private AuthorizationPackage findAuthorizationPackageByName(String packageType, String authorizationPackageName)
-			throws RQLException {
+	private AuthorizationPackage findAuthorizationPackageByName(String packageType, String authorizationPackageName) throws RQLException {
 
 		RQLNodeList packagesNodeList = getAuthorizationPackageNodeList(packageType);
 
 		// not found
 		if (packagesNodeList == null) {
-			throw new ElementNotFoundException("Authorization package for type " + packageType + " and named "
-					+ authorizationPackageName + " could not be found in the project.");
+			throw new ElementNotFoundException("Authorization package for type " + packageType + " and named " + authorizationPackageName
+					+ " could not be found in the project.");
 		}
 
 		// find authorization package
@@ -748,8 +739,7 @@ public class Project implements CmsClientContainer {
 				return targetNode;
 			}
 		}
-		throw new ElementNotFoundException("Publishing target with guid " + publishingTargetGuid
-				+ " could not be found in the project.");
+		throw new ElementNotFoundException("Publishing target with guid " + publishingTargetGuid + " could not be found in the project.");
 	}
 
 	/**
@@ -933,8 +923,8 @@ public class Project implements CmsClientContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + " <ADMINISTRATION>"
-				+ "<USERS action='connectlist' projectguid='" + getProjectGuid() + "' /></ADMINISTRATION>" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + " <ADMINISTRATION>" + "<USERS action='connectlist' projectguid='"
+				+ getProjectGuid() + "' /></ADMINISTRATION>" + "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		return rqlResponse.getNodes("USER");
@@ -979,8 +969,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert die Rfc language id (en,de) aller Sprachvarianten zurück. Die Hauptsprache ist immer die erste, die weiteren entsprechen
-	 * der nativen Reihenfolge des MSs.
+	 * Liefert die Rfc language id (en,de) aller Sprachvarianten zurück. Die Hauptsprache ist immer die erste, die weiteren entsprechen der nativen Reihenfolge des MSs.
 	 * 
 	 * @see LanguageVariant#getRfcLanguageId()
 	 */
@@ -1167,8 +1156,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Gibt alle Seiten zurück, die auf dem gegebenen Template basieren. Das Ergebnis könnte sehr groß werden. Benötigt den session
-	 * key!
+	 * Gibt alle Seiten zurück, die auf dem gegebenen Template basieren. Das Ergebnis könnte sehr groß werden. Benötigt den session key!
 	 * 
 	 * @param templateFolderName
 	 *            content class folder name
@@ -1182,8 +1170,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Gibt alle Seiten zurück, die auf dem gegebenen Template basieren. Das Ergebnis könnte sehr groß werden. Benötigt den session
-	 * key!
+	 * Gibt alle Seiten zurück, die auf dem gegebenen Template basieren. Das Ergebnis könnte sehr groß werden. Benötigt den session key!
 	 * 
 	 * @param template
 	 *            Template, dessen Instanzen gesucht sind
@@ -1202,8 +1189,7 @@ public class Project implements CmsClientContainer {
 		// convert result
 		for (int i = 0; i < pageNodes.size(); i++) {
 			RQLNode pageNode = (RQLNode) pageNodes.get(i);
-			pages.add(new Page(this, template, pageNode.getAttribute("guid"), pageNode.getAttribute("id"), pageNode
-					.getAttribute("headline")));
+			pages.add(new Page(this, template, pageNode.getAttribute("guid"), pageNode.getAttribute("id"), pageNode.getAttribute("headline")));
 		}
 
 		return pages;
@@ -1235,8 +1221,7 @@ public class Project implements CmsClientContainer {
 
 		// call CMS
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ "<PAGE action='search' templateguid='" + template.getTemplateGuid() + "'  maxrecords='" + maxPages + "'/>"
-				+ "</IODATA>";
+				+ "<PAGE action='search' templateguid='" + template.getTemplateGuid() + "'  maxrecords='" + maxPages + "'/>" + "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 		RQLNodeList pageNodes = rqlResponse.getNodes("PAGE");
 		return pageNodes;
@@ -1253,8 +1238,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert alle Seiten dieses Projektes (global) im Status Entwurf und die von einem Autor der gegebenen Benutzergruppe erstellt
-	 * wurde.
+	 * Liefert alle Seiten dieses Projektes (global) im Status Entwurf und die von einem Autor der gegebenen Benutzergruppe erstellt wurde.
 	 * 
 	 * @return List of Pages
 	 */
@@ -1275,8 +1259,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert alle Seiten dieses Projektes (global), die auf Korrektur stehen und die von einem Autor der gegebenen Benutzergruppe
-	 * erstellt wurde.
+	 * Liefert alle Seiten dieses Projektes (global), die auf Korrektur stehen und die von einem Autor der gegebenen Benutzergruppe erstellt wurde.
 	 * 
 	 * @return List of Pages
 	 */
@@ -1436,8 +1419,7 @@ public class Project implements CmsClientContainer {
 		// wrap result into job report objects
 		for (int i = 0; i < nodesOrNull.size(); i++) {
 			RQLNode node = nodesOrNull.get(i);
-			reports.add(new PublishingJobReport(this, node.getAttribute("guid"), node.getAttribute("value"), node
-					.getAttribute("col2value")));
+			reports.add(new PublishingJobReport(this, node.getAttribute("guid"), node.getAttribute("value"), node.getAttribute("col2value")));
 		}
 		return reports;
 	}
@@ -1549,8 +1531,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Gibt alle freien (unverlinkten) Seiten zurück. Das Ergebnis wird nach dem Modifikationsdatum (orderby=2) aufsteigend sortiert
-	 * geliefert. ACHTUNG: Die Sortierung ist in V6.5.0.41 nicht korrekt. Es wird augenscheinlich nach creation date sortiert.
+	 * Gibt alle freien (unverlinkten) Seiten zurück. Das Ergebnis wird nach dem Modifikationsdatum (orderby=2) aufsteigend sortiert geliefert. ACHTUNG: Die Sortierung ist in V6.5.0.41 nicht korrekt. Es wird augenscheinlich nach creation date sortiert.
 	 * 
 	 * Das Ergebnis könnte sehr groß werden. Benötigt den session key!
 	 * 
@@ -1618,8 +1599,7 @@ public class Project implements CmsClientContainer {
 		}
 		for (int i = 0; i < pageNodes.size(); i++) {
 			RQLNode segmentNode = (RQLNode) pageNodes.get(i);
-			pages.add(new Page(this, segmentNode.getAttribute("guid"), segmentNode.getAttribute("pageid"), segmentNode
-					.getAttribute("col1value")));
+			pages.add(new Page(this, segmentNode.getAttribute("guid"), segmentNode.getAttribute("pageid"), segmentNode.getAttribute("col1value")));
 		}
 		return pages;
 	}
@@ -1726,8 +1706,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert den AssetManager-Ordner mit dem gegebenen Namen oder null, falls kein AssetManager für den Namen gefunden wurde.
-	 * Benötigt den session key!
+	 * Liefert den AssetManager-Ordner mit dem gegebenen Namen oder null, falls kein AssetManager für den Namen gefunden wurde. Benötigt den session key!
 	 * 
 	 * @param name
 	 *            Name des AssetManager-Ordners.
@@ -1738,15 +1717,14 @@ public class Project implements CmsClientContainer {
 
 		RQLNode folderNode = findFolderNodeByName(assetManagerFolderName);
 		if (folderNode.getAttribute("catalog").equals("1")) {
-			return new AssetManagerFolder(this, folderNode.getAttribute("name"), folderNode.getAttribute("guid"), folderNode
-					.getAttribute("hideintexteditor"), folderNode.getAttribute("savetype"), folderNode.getAttribute("path"));
+			return new AssetManagerFolder(this, folderNode.getAttribute("name"), folderNode.getAttribute("guid"),
+					folderNode.getAttribute("hideintexteditor"), folderNode.getAttribute("savetype"), folderNode.getAttribute("path"));
 		}
 		return null;
 	}
 
 	/**
-	 * Liefert den AssetManager-Subfolder für die gegebenen Foldernamen. Liefert null, falls kein AssetManagerFolder gefunden wurde.
-	 * Benötigt den session key!
+	 * Liefert den AssetManager-Subfolder für die gegebenen Foldernamen. Liefert null, falls kein AssetManagerFolder gefunden wurde. Benötigt den session key!
 	 * 
 	 * @param name
 	 *            Name des AssetManager-Ordners/Name des Unterordners; e.g. view_pdf/orga_charts_pdf
@@ -1961,8 +1939,7 @@ public class Project implements CmsClientContainer {
 				return buildLanguageVariant(node);
 			}
 		}
-		throw new ElementNotFoundException(
-				"There seems to be no language variant choosen in the current project, what is impossible in fact.");
+		throw new ElementNotFoundException("There seems to be no language variant choosen in the current project, what is impossible in fact.");
 	}
 
 	/**
@@ -2031,8 +2008,8 @@ public class Project implements CmsClientContainer {
 		 */
 		if (detailsNodeCache == null) {
 			// call CMS
-			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "  <ADMINISTRATION>"
-					+ "   <PROJECT action='load' guid='" + getProjectGuid() + "'/>" + "  </ADMINISTRATION>" + "</IODATA>";
+			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "  <ADMINISTRATION>" + "   <PROJECT action='load' guid='"
+					+ getProjectGuid() + "'/>" + "  </ADMINISTRATION>" + "</IODATA>";
 			RQLNode rqlResponse = callCms(rqlRequest);
 
 			detailsNodeCache = rqlResponse.getNode("PROJECT");
@@ -2042,8 +2019,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert den Dateiordner für die GUID folderGuid vom CMS zurück. Dieser Zugriff benutzt einen Objektcache. Benötigt den session
-	 * key!
+	 * Liefert den Dateiordner für die GUID folderGuid vom CMS zurück. Dieser Zugriff benutzt einen Objektcache. Benötigt den session key!
 	 * 
 	 * @param folderGuid
 	 *            GUID des Dateiordners.
@@ -2063,8 +2039,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert den Dateiordner mit dem gegebenen Namen vom CMS zurück. Dieser Zugriff liefert immer neue Objekte. Benötigt den session
-	 * key!
+	 * Liefert den Dateiordner mit dem gegebenen Namen vom CMS zurück. Dieser Zugriff liefert immer neue Objekte. Benötigt den session key!
 	 * 
 	 * @param name
 	 *            Name des Dateiordners.
@@ -2091,8 +2066,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Returns all cms internal file folders of this project. Includes AssetManagers, but excludes templates folders and all other
-	 * folder types.
+	 * Returns all cms internal file folders of this project. Includes AssetManagers, but excludes templates folders and all other folder types.
 	 * 
 	 * @see #getAllTemplateFolders()
 	 */
@@ -2213,8 +2187,8 @@ public class Project implements CmsClientContainer {
 							String pageId = name.substring(start + 3, end).trim();
 							jobStartPgOrNull = getPageById(pageId);
 						}
-						jobs.add(new PublishingJob(this, jobStartPgOrNull, name, jobNode.getAttribute("guid"), category, status,
-								jobNode.getAttribute("jobguid"), jobNode.getAttribute("username")));
+						jobs.add(new PublishingJob(this, jobStartPgOrNull, name, jobNode.getAttribute("guid"), category, status, jobNode
+								.getAttribute("jobguid"), jobNode.getAttribute("username")));
 					}
 				}
 			}
@@ -2298,8 +2272,7 @@ public class Project implements CmsClientContainer {
 				return buildLanguageVariant(node);
 			}
 		}
-		throw new ElementNotFoundException("Language variant for RFC language ID " + rfcLanguageId
-				+ " could not be found in the project.");
+		throw new ElementNotFoundException("Language variant for RFC language ID " + rfcLanguageId + " could not be found in the project.");
 	}
 
 	/**
@@ -2415,9 +2388,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert einen Iterator über alle MultiLinks zurück, die auf die gegebene Seiten- oder Link-GUID (auch Frame) verweisen.
-	 * Templateelemente, die ebenfalls diese Seite (oder Link) referenzieren werden nicht geliefert (fehlen bereits im RQL). Sie werden
-	 * auch nicht durch die RD Funktion show reference list geliefert!
+	 * Liefert einen Iterator über alle MultiLinks zurück, die auf die gegebene Seiten- oder Link-GUID (auch Frame) verweisen. Templateelemente, die ebenfalls diese Seite (oder Link) referenzieren werden nicht geliefert (fehlen bereits im RQL). Sie werden auch nicht durch die RD Funktion show reference list geliefert!
 	 * <p>
 	 * 
 	 * @see MultiLink#referenceTo(Page)
@@ -2464,8 +2435,8 @@ public class Project implements CmsClientContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ "<TEMPLATES action='list' />" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<TEMPLATES action='list' />"
+				+ "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 		return rqlResponse.getNodes("TEMPLATE").size();
 	}
@@ -2473,8 +2444,7 @@ public class Project implements CmsClientContainer {
 	/**
 	 * Liefert alle Berechtigungspaket (Typ=Normal=0, an Seiten), deren Nmae mit dem gegebenen suffix enden zurück.
 	 */
-	public java.util.List<AuthorizationPackage> getAuthorizationPackagesForPageByNameSuffix(String packageNameSuffix)
-			throws RQLException {
+	public java.util.List<AuthorizationPackage> getAuthorizationPackagesForPageByNameSuffix(String packageNameSuffix) throws RQLException {
 		java.util.List<AuthorizationPackage> result = new ArrayList<AuthorizationPackage>();
 		for (AuthorizationPackage authorizationPackage : getAllPageAuthorizationPackages()) {
 			if (authorizationPackage.isNameEndsWith(packageNameSuffix)) {
@@ -2487,8 +2457,7 @@ public class Project implements CmsClientContainer {
 	/**
 	 * Liefert alle Berechtigungspaket (Typ=Normal=0, an Seiten), deren Nmae mit dem gegebenen prefix beginnen zurück.
 	 */
-	public java.util.List<AuthorizationPackage> getAuthorizationPackagesForPageByNamePrefix(String packageNamePrefix)
-			throws RQLException {
+	public java.util.List<AuthorizationPackage> getAuthorizationPackagesForPageByNamePrefix(String packageNamePrefix) throws RQLException {
 		java.util.List<AuthorizationPackage> result = new ArrayList<AuthorizationPackage>();
 		for (AuthorizationPackage authorizationPackage : getAllPageAuthorizationPackages()) {
 			if (authorizationPackage.isNameStartsWith(packageNamePrefix)) {
@@ -2499,8 +2468,21 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Erzeugt eine Page für die gegebene pageGuid. Benötigt den session key!
+	 * Try to create a page for the given pageGUID. Checks, if the given page GUID points to an active and valid page.
 	 * 
+	 * @return null, if page does not exists or a Page, if an active page (not in recycle bin) could be found
+	 */
+	public Page getPageByGuidWithCheck(String pageGuid) throws RQLException {
+		Page p = getPageByGuid(pageGuid);
+		return p.isValid() ? p : null;
+	}
+
+	/**
+	 * Erzeugt eine Page für die gegebene pageGuid. Benötigt den session key!
+	 * <p>
+	 * No check, if the page GUID is still valid or maybe deleted. First access an attribute will cause {@link PageNotFoundException} in that case.
+	 * 
+	 * @see #getPageByGuidWithCheck(String)
 	 * @param pageGuid
 	 *            RedDot GUID der Seite
 	 * @return Page
@@ -2578,8 +2560,8 @@ public class Project implements CmsClientContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ "<LINK action='load' guid='" + linkGuid + "' />" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<LINK action='load' guid='"
+				+ linkGuid + "' />" + "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		// wrap into page
@@ -2598,9 +2580,8 @@ public class Project implements CmsClientContainer {
 	 * 
 	 * @param workflowState
 	 *            eine Konstante von WF_STATE_*
-	 * @param userOrNull ==
-	 *            null => alle Seiten im Status für das gesamte Projekt (nur WF_STATE_PAGES_SAVED_AS_DRAFT und
-	 *            WF_STATE_PAGES_WAITING_FOR_RELEASE) != null => alle Seiten des gegebenen Users im Status für dieses Projekt
+	 * @param userOrNull
+	 *            == null => alle Seiten im Status für das gesamte Projekt (nur WF_STATE_PAGES_SAVED_AS_DRAFT und WF_STATE_PAGES_WAITING_FOR_RELEASE) != null => alle Seiten des gegebenen Users im Status für dieses Projekt
 	 * @return List of Pages
 	 */
 	PageArrayList getPagesByState(String workflowState, User userOrNull) throws RQLException {
@@ -2620,14 +2601,12 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert eine RQL node list aller Seiten des gegebenen Benutzers oder des gesamten Projektes im gegebenen Status. Achtung: Diese
-	 * Anfrage liefert nicht alle globalen Seiten (user=null) im Entwurf, einige fehlen!
+	 * Liefert eine RQL node list aller Seiten des gegebenen Benutzers oder des gesamten Projektes im gegebenen Status. Achtung: Diese Anfrage liefert nicht alle globalen Seiten (user=null) im Entwurf, einige fehlen!
 	 * 
 	 * @param workflowState
 	 *            eine Konstante von WF_STATE_*
-	 * @param userOrNull ==
-	 *            null => alle Seiten im Status für das gesamte Projekt (nur WF_STATE_PAGES_SAVED_AS_DRAFT und
-	 *            WF_STATE_PAGES_WAITING_FOR_RELEASE) != null => alle Seiten des gegebenen Users im Status für dieses Projekt
+	 * @param userOrNull
+	 *            == null => alle Seiten im Status für das gesamte Projekt (nur WF_STATE_PAGES_SAVED_AS_DRAFT und WF_STATE_PAGES_WAITING_FOR_RELEASE) != null => alle Seiten des gegebenen Users im Status für dieses Projekt
 	 */
 	private RQLNodeList getPagesByStateNodeList(String workflowState, User userOrNull) throws RQLException {
 		/*
@@ -2652,8 +2631,8 @@ public class Project implements CmsClientContainer {
 
 		// call CMS
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<AUTHORIZATION>"
-				+ "   <PAGES action='list' actionflag='" + workflowState
-				+ (userOrNull != null ? "' userguid='" + userOrNull.getUserGuid() : "") + "'/>" + " </AUTHORIZATION>" + "</IODATA>";
+				+ "   <PAGES action='list' actionflag='" + workflowState + (userOrNull != null ? "' userguid='" + userOrNull.getUserGuid() : "")
+				+ "'/>" + " </AUTHORIZATION>" + "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 		return rqlResponse.getNodes("PAGE");
 	}
@@ -2714,9 +2693,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert den Treesegment RQLNode des Projectknotens im Baum für den gegebenen type (z.B. 'project.1700') zurück. Liefert null,
-	 * falls keine globalen Pakete für den gegebenen Typ existieren. Genutzt, um die globalen Pakete lesen zu können. Attention: Did
-	 * not work in V7.5.0.33. Deliver same attributes within same segment tag.
+	 * Liefert den Treesegment RQLNode des Projectknotens im Baum für den gegebenen type (z.B. 'project.1700') zurück. Liefert null, falls keine globalen Pakete für den gegebenen Typ existieren. Genutzt, um die globalen Pakete lesen zu können. Attention: Did not work in V7.5.0.33. Deliver same attributes within same segment tag.
 	 * 
 	 * @return <code>RQLNode</code>
 	 */
@@ -2919,14 +2896,12 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Returns all publication folders matching the given path prefixes separated by separator of the current project with the real
-	 * path included.
+	 * Returns all publication folders matching the given path prefixes separated by separator of the current project with the real path included.
 	 * 
 	 * <p>
 	 * Benötigt den session key!
 	 */
-	public java.util.List<PublicationFolder> getPublicationFoldersPathStartWith(String prefixList, String separator)
-			throws RQLException {
+	public java.util.List<PublicationFolder> getPublicationFoldersPathStartWith(String prefixList, String separator) throws RQLException {
 		java.util.List<PublicationFolder> result = new ArrayList<PublicationFolder>();
 		String[] prefixes = StringHelper.split(prefixList, separator);
 		for (int i = 0; i < prefixes.length; i++) {
@@ -2958,8 +2933,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert den Publication Folder mit dem gegebenen Namen, oder null, falls keiner mit dem Namen existiert aus den children des
-	 * folder der gegebenen GUID.
+	 * Liefert den Publication Folder mit dem gegebenen Namen, oder null, falls keiner mit dem Namen existiert aus den children des folder der gegebenen GUID.
 	 * <p>
 	 * Benötigt den session key! Checks with equalsIgnoreCase().
 	 * <p>
@@ -2990,8 +2964,7 @@ public class Project implements CmsClientContainer {
 	 * <p>
 	 * 
 	 * @param publicationFolderGuid
-	 *            kann auch die feste TreeGUID des TreeNodes 'Publication Structure' sein! TODO anderen RQL verwenden, es gibt einen
-	 *            eigenen: exports action=list!
+	 *            kann auch die feste TreeGUID des TreeNodes 'Publication Structure' sein! TODO anderen RQL verwenden, es gibt einen eigenen: exports action=list!
 	 */
 	RQLNodeList getPublicationFolderNodeList(String publicationFolderGuid) throws RQLException {
 
@@ -3014,8 +2987,8 @@ public class Project implements CmsClientContainer {
 
 		// call CMS
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ "<TREESEGMENT action='load' type='" + PublicationFolder.TREESEGMENT_TYPE + "' guid='" + publicationFolderGuid
-				+ "'/>" + "</IODATA>";
+				+ "<TREESEGMENT action='load' type='" + PublicationFolder.TREESEGMENT_TYPE + "' guid='" + publicationFolderGuid + "'/>"
+				+ "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 		return rqlResponse.getNodes("SEGMENT");
 	}
@@ -3168,8 +3141,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert den Publication Folder mit dem gegebenen Namen, oder null, falls keiner mit dem Namen existiert aus den children der
-	 * Publication Structure (=root folder).
+	 * Liefert den Publication Folder mit dem gegebenen Namen, oder null, falls keiner mit dem Namen existiert aus den children der Publication Structure (=root folder).
 	 * <p>
 	 * Benötigt den session key! Checks with equalsIgnoreCase().
 	 * <p>
@@ -3179,8 +3151,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert den RQLNode für die Exporteinstellungen dieses Projekt. Zu finden unter Administer Publication / Project / Edit general
-	 * settings.
+	 * Liefert den RQLNode für die Exporteinstellungen dieses Projekt. Zu finden unter Administer Publication / Project / Edit general settings.
 	 */
 	private RQLNode getPublicationSettingsNode() throws RQLException {
 		/*
@@ -3223,8 +3194,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert den RQLNode für die Projekteinstellungen dieses Projekts. Zu finden unter Administer Project Settings / Project /
-	 * General Settings/ Edit settings settings.
+	 * Liefert den RQLNode für die Projekteinstellungen dieses Projekts. Zu finden unter Administer Project Settings / Project / General Settings/ Edit settings settings.
 	 */
 	private RQLNode getProjectSettingsNode() throws RQLException {
 		/*
@@ -3251,16 +3221,14 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert die Standard Extension aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer Publication / Project /
-	 * Edit general settings).
+	 * Liefert die Standard Extension aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer Publication / Project / Edit general settings).
 	 */
 	public String getPublicationSettingStandardExtension() throws RQLException {
 		return getPublicationSettingsNode().getAttribute("standard");
 	}
 
 	/**
-	 * Liefert true, falls die im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer
-	 * Publication / Project / Edit general settings).
+	 * Liefert true, falls die im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer Publication / Project / Edit general settings).
 	 * <p>
 	 * Pages displayed in target containers use page file names only.
 	 */
@@ -3289,8 +3257,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert true, falls die im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer
-	 * Publication / Project / Edit general settings).
+	 * Liefert true, falls die im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer Publication / Project / Edit general settings).
 	 * <p>
 	 * Use default separators (_) for pages in target containers
 	 */
@@ -3299,24 +3266,21 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert true, falls die GUID im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt
-	 * (Administer Publication / Project / Edit general settings).
+	 * Liefert true, falls die GUID im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer Publication / Project / Edit general settings).
 	 */
 	public boolean isPublicationSettingUseGuidInFilename() throws RQLException {
 		return getPublicationSettingsNode().getAttribute("usepageid").equals("0");
 	}
 
 	/**
-	 * Liefert true, falls die page ID im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt
-	 * (Administer Publication / Project / Edit general settings).
+	 * Liefert true, falls die page ID im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer Publication / Project / Edit general settings).
 	 */
 	public boolean isPublicationSettingUsePageIdInFilename() throws RQLException {
 		return getPublicationSettingsNode().getAttribute("usepageid").equals("1");
 	}
 
 	/**
-	 * Liefert true, falls die im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer
-	 * Publication / Project / Edit general settings).
+	 * Liefert true, falls die im Dateinamen verwendet wird. Aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer Publication / Project / Edit general settings).
 	 * <p>
 	 * Use this separator for pages in target containers.
 	 * <p>
@@ -3329,8 +3293,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert den Separator zwischen den IDs für Targetcontainerseiten. Aus dem Bereich File der Exporteinstellungen dieses Projekt
-	 * (Administer Publication / Project / Edit general settings). Sollte nur benutzt werden, wenn
+	 * Liefert den Separator zwischen den IDs für Targetcontainerseiten. Aus dem Bereich File der Exporteinstellungen dieses Projekt (Administer Publication / Project / Edit general settings). Sollte nur benutzt werden, wenn
 	 * 
 	 * @see #isPublicationSettingUseThisSeparatorInTargetContainers() = true ist
 	 */
@@ -3370,8 +3333,8 @@ public class Project implements CmsClientContainer {
 
 		// call CMS
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ "<PROJECT><EXPORTJOB action='load' >" + "<PROJECTVARIANTS action='listall' includerights='1' />"
-				+ "</EXPORTJOB></PROJECT>" + "</IODATA>";
+				+ "<PROJECT><EXPORTJOB action='load' >" + "<PROJECTVARIANTS action='listall' includerights='1' />" + "</EXPORTJOB></PROJECT>"
+				+ "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		// prepare wrap
@@ -3404,8 +3367,7 @@ public class Project implements CmsClientContainer {
 				return new PublishingJob(this, node.getAttribute("name"), node.getAttribute("guid"));
 			}
 		}
-		throw new ElementNotFoundException("Defined publishing job with guid " + publishingJobGuid
-				+ " could not be found in the project.");
+		throw new ElementNotFoundException("Defined publishing job with guid " + publishingJobGuid + " could not be found in the project.");
 	}
 
 	/**
@@ -3422,8 +3384,7 @@ public class Project implements CmsClientContainer {
 				return new PublishingJob(this, node.getAttribute("name"), node.getAttribute("guid"));
 			}
 		}
-		throw new ElementNotFoundException("Defined publishing job with name " + publishingJobName
-				+ " could not be found in the project.");
+		throw new ElementNotFoundException("Defined publishing job with name " + publishingJobName + " could not be found in the project.");
 	}
 
 	/**
@@ -3478,6 +3439,100 @@ public class Project implements CmsClientContainer {
 	public PublishingTarget getPublishingTargetByNameStartsWith(String publishingTargetNamePrefix) throws RQLException {
 
 		return buildPublishingTarget(findPublishingTargetNodeByNameStartsWith(publishingTargetNamePrefix));
+	}
+
+	/**
+	 * Returns all FTP publishing targets from this project.
+	 * 
+	 * @see #getFtpPublishingTargets()
+	 * @see PublishingTarget#isFtpTarget()
+	 */
+	public java.util.List<PublishingTarget> getPublishingTargetsFtp() throws RQLException {
+		return getFtpPublishingTargets();
+	}
+
+	/**
+	 * Returns all FTP publishing targets from this project.
+	 * 
+	 * @see PublishingTarget#isFtpTarget()
+	 */
+	public java.util.List<PublishingTarget> getFtpPublishingTargets() throws RQLException {
+		List<PublishingTarget> result = new ArrayList<PublishingTarget>();
+		for (PublishingTarget target : getPublishingTargets()) {
+			if (target.isFtpTarget()) {
+				result.add(target);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Empties the reference directories of ftp publishing targets in this project which matching name part. Needs the session key!
+	 * 
+	 * Attention: Needs to run locally on a publishing server cms instance!
+	 * 
+	 * @return the list of reset ftp publishing targets
+	 * @see PublishingTarget#isFtpTarget()
+	 * @see PublishingTarget#emptyReferenceDirectory()
+	 */
+	public List<PublishingTarget> emptyFtpPublishingTargetsReferenceDirectories(String namePart, boolean ignoreCase) throws RQLException {
+		java.util.List<PublishingTarget> result = new ArrayList<PublishingTarget>();
+		for (PublishingTarget target : getFtpPublishingTargets()) {
+			// check namePart case dependent on given value
+			if (StringHelper.contains(target.getName(), namePart, ignoreCase)) {
+				target.emptyReferenceDirectory();
+				result.add(target);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Empties the reference directories of all ftp publishing targets in this project.
+	 * Needs the session key!
+	 * 
+	 * Attention: Needs to run locally on a publishing server cms instance!
+	 * 
+	 * @return the list of reset ftp publishing targets
+	 * @see PublishingTarget#isFtpTarget()
+	 * @see PublishingTarget#emptyReferenceDirectory()
+	 */
+	public List<PublishingTarget> emptyFtpPublishingTargetsReferenceDirectories() throws RQLException {
+		java.util.List<PublishingTarget> result = new ArrayList<PublishingTarget>();
+		for (PublishingTarget target : getFtpPublishingTargets()) {
+			target.emptyReferenceDirectory();
+			result.add(target);
+		}
+		return result;
+	}
+
+	/**
+	 * Returns from all FTP publishing targets the FTP root URL as entered in reddot from this project.
+	 * 
+	 * @see PublishingTarget#isFtpTarget()
+	 */
+	public java.util.List<String> getFtpPublishingTargetsPaths() throws RQLException {
+		List<String> result = new ArrayList<String>();
+		List<PublishingTarget> targets = getFtpPublishingTargets();
+		for (PublishingTarget target : targets) {
+			result.add(target.getPath());
+		}
+		return result;
+	}
+
+	/**
+	 * Returns from all FTP publishing targets the server name (extracted from FTP path) from this project.
+	 * 
+	 * @see PublishingTarget#isFtpTarget()
+	 * @see PublishingTarget#getFtpServerName()
+	 */
+	public java.util.List<String> getFtpPublishingTargetsServerNames() throws RQLException {
+		List<String> result = new ArrayList<String>();
+		List<PublishingTarget> targets = getFtpPublishingTargets();
+		for (PublishingTarget target : targets) {
+			result.add(target.getFtpServerName());
+		}
+		return result;
 	}
 
 	/**
@@ -3566,8 +3621,7 @@ public class Project implements CmsClientContainer {
 	/**
 	 * Liefert die ungeparste Antwort für die Elemente im SmartTree beim Öffnen zurück.
 	 * <p>
-	 * ACHTUNG. Das gelieferte RQL ist seit V7.5 nicht mehr gültig. Es tauchen doppelte Attribute innerhalb eines Tags auf. Das parsen
-	 * muss daher per Hand erfolgen.
+	 * ACHTUNG. Das gelieferte RQL ist seit V7.5 nicht mehr gültig. Es tauchen doppelte Attribute innerhalb eines Tags auf. Das parsen muss daher per Hand erfolgen.
 	 * 
 	 * @see #StringHelper.getStartTag()
 	 * @see #StringHelper.getAttributeValue()
@@ -3589,15 +3643,13 @@ public class Project implements CmsClientContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ " <TREESEGMENT type='" + type + "' action='load' guid='" + guid + "'/>" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + " <TREESEGMENT type='" + type
+				+ "' action='load' guid='" + guid + "'/>" + "</IODATA>";
 		return callCmsWithoutParsing(rqlRequest);
 	}
 
 	/**
-	 * Liefert die Startseite dieses Projektes, falls mit Username und Passwort angemeldet wurde. Nutzt dieses Projekt den sessionKey
-	 * des Users mit, wird null geliefert. Aus dem sessionKey kann ein normaler Autor die Startseite nicht ermitteln, das kann nur ein
-	 * Admin.
+	 * Liefert die Startseite dieses Projektes, falls mit Username und Passwort angemeldet wurde. Nutzt dieses Projekt den sessionKey des Users mit, wird null geliefert. Aus dem sessionKey kann ein normaler Autor die Startseite nicht ermitteln, das kann nur ein Admin.
 	 * 
 	 * @return Page
 	 */
@@ -3614,8 +3666,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert die GUID der Startseite dieses Projektes, falls Anmeldung über user name and password. Wird der sessionKey mitbenutzt,
-	 * wird hier null geliefert.
+	 * Liefert die GUID der Startseite dieses Projektes, falls Anmeldung über user name and password. Wird der sessionKey mitbenutzt, wird hier null geliefert.
 	 */
 	public String getStartPageGuid() throws RQLException {
 
@@ -3659,8 +3710,8 @@ public class Project implements CmsClientContainer {
 			RQLNode templateNode = rqlResponse.getNode("TEMPLATE");
 
 			// wrap template data
-			template = new Template(getTemplateFolderByGuid(templateNode.getAttribute("folderguid")), templateNode
-					.getAttribute("name"), templateNode.getAttribute("guid"), templateNode.getAttribute("description"));
+			template = new Template(getTemplateFolderByGuid(templateNode.getAttribute("folderguid")), templateNode.getAttribute("name"),
+					templateNode.getAttribute("guid"), templateNode.getAttribute("description"));
 
 			// add to cache
 			templatesCache.put(templateGuid, template);
@@ -3786,8 +3837,7 @@ public class Project implements CmsClientContainer {
 
 		for (int i = 0; i < userGroupsNodeList.size(); i++) {
 			node = (RQLNode) userGroupsNodeList.get(i);
-			userGroups.add(new UserGroup(getCmsClient(), node.getAttribute("guid"), node.getAttribute("name"), node
-					.getAttribute("email")));
+			userGroups.add(new UserGroup(getCmsClient(), node.getAttribute("guid"), node.getAttribute("name"), node.getAttribute("email")));
 		}
 		return userGroups;
 	}
@@ -3868,9 +3918,9 @@ public class Project implements CmsClientContainer {
 
 		// call CMS
 		if (userGroupNodeListCache == null) {
-			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-					+ " <ADMINISTRATION>" + "  <PROJECT guid='" + getProjectGuid() + "'>" + "   <GROUPS action='list'/>"
-					+ "  </PROJECT>" + " </ADMINISTRATION>" + "</IODATA>";
+			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + " <ADMINISTRATION>"
+					+ "  <PROJECT guid='" + getProjectGuid() + "'>" + "   <GROUPS action='list'/>" + "  </PROJECT>" + " </ADMINISTRATION>"
+					+ "</IODATA>";
 			userGroupNodeListCache = callCms(rqlRequest).getNodes("GROUP");
 		}
 
@@ -3923,8 +3973,8 @@ public class Project implements CmsClientContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ " <WORKFLOWS action='list' />" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + " <WORKFLOWS action='list' />"
+				+ "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 		return rqlResponse.getNodes("WORKFLOW");
 	}
@@ -3956,18 +4006,16 @@ public class Project implements CmsClientContainer {
 			User user = (User) users.get(i);
 			if (!user.hasMoreRightsAsAnAuthor(this)) {
 				// call CMS
-				String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "<ADMINISTRATION>" + "<USER guid='"
-						+ user.getUserGuid() + "'>" + " <PROJECT guid='" + getProjectGuid() + "'>"
-						+ "  <LICENSE action='save' level='" + User.LICENSE_AUTHOR + "'/>" + " </PROJECT>" + "</USER>"
-						+ "</ADMINISTRATION>" + "</IODATA>";
+				String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "<ADMINISTRATION>" + "<USER guid='" + user.getUserGuid()
+						+ "'>" + " <PROJECT guid='" + getProjectGuid() + "'>" + "  <LICENSE action='save' level='" + User.LICENSE_AUTHOR + "'/>"
+						+ " </PROJECT>" + "</USER>" + "</ADMINISTRATION>" + "</IODATA>";
 				callCms(rqlRequest);
 			}
 		}
 	}
 
 	/**
-	 * Deaktivert alle (aktuell aktiven) vordefinierten Publishing jobs und liefert die geänderten Jobs zurück. Benötigt den
-	 * sessionKey!
+	 * Deaktivert alle (aktuell aktiven) vordefinierten Publishing jobs und liefert die geänderten Jobs zurück. Benötigt den sessionKey!
 	 */
 	public java.util.List<PublishingJob> inactivateAllPublishingJobs() throws RQLException {
 		java.util.List<PublishingJob> result = getAllActivePublishingJobs();
@@ -3987,8 +4035,7 @@ public class Project implements CmsClientContainer {
 	}
 
 	/**
-	 * Macht dieses Project ungültig. D.h. es kann nach Aufruf dieser Methode nicht mehr für Zugriffe benutzt werden. Wird am
-	 * <code>CmsClient</code> das Project gewechselt, wird diese Methode aufgerufen.
+	 * Macht dieses Project ungültig. D.h. es kann nach Aufruf dieser Methode nicht mehr für Zugriffe benutzt werden. Wird am <code>CmsClient</code> das Project gewechselt, wird diese Methode aufgerufen.
 	 */
 	void invalidate() {
 
@@ -4017,8 +4064,7 @@ public class Project implements CmsClientContainer {
 	 * Sperrt das Projekt für alle Benutzer inkl. Administratoren.
 	 * 
 	 * @param level
-	 *            Art der Sperre -1= entire project 0 = unlock project 1 = below administrator 2 = below site builder 3 = below editor
-	 *            4 = below author 5 = visitor
+	 *            Art der Sperre -1= entire project 0 = unlock project 1 = below administrator 2 = below site builder 3 = below editor 4 = below author 5 = visitor
 	 * @param lockInformationMessage
 	 *            Nachricht für Benutzer, die sich versuchen anzumelden. should be null if level = 0
 	 */
@@ -4036,8 +4082,8 @@ public class Project implements CmsClientContainer {
 
 		// call CMS
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "  <ADMINISTRATION>" + "   <PROJECT action='save' guid='"
-				+ getProjectGuid() + "' inhibitlevel='" + level + "' lockinfo='" + (level == 0 ? " " : message) + "'/>"
-				+ "  </ADMINISTRATION>" + "</IODATA>";
+				+ getProjectGuid() + "' inhibitlevel='" + level + "' lockinfo='" + (level == 0 ? " " : message) + "'/>" + "  </ADMINISTRATION>"
+				+ "</IODATA>";
 		callCms(rqlRequest);
 	}
 
@@ -4101,9 +4147,8 @@ public class Project implements CmsClientContainer {
 
 		// create the reference using the given target element guid als clipboard entry guid
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ "<CLIPBOARD action='ReferenceToElement' guid='" + sourceElementGuid + "' type='" + referenceType
-				+ "' descent='unknown'>" + "<ENTRY guid='" + targetElementGuid + "'  type='element' descent='unknown' />"
-				+ "</CLIPBOARD></IODATA>";
+				+ "<CLIPBOARD action='ReferenceToElement' guid='" + sourceElementGuid + "' type='" + referenceType + "' descent='unknown'>"
+				+ "<ENTRY guid='" + targetElementGuid + "'  type='element' descent='unknown' />" + "</CLIPBOARD></IODATA>";
 		callCmsWithoutParsing(rqlRequest);
 	}
 
@@ -4130,9 +4175,8 @@ public class Project implements CmsClientContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ " <LINK action='assign' guid='" + sourceLinkGuid + "'>" + "  <LINK guid='" + targetLinkGuid + "' />"
-				+ "</LINK></IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + " <LINK action='assign' guid='"
+				+ sourceLinkGuid + "'>" + "  <LINK guid='" + targetLinkGuid + "' />" + "</LINK></IODATA>";
 		callCmsWithoutParsing(rqlRequest);
 	}
 
@@ -4180,9 +4224,8 @@ public class Project implements CmsClientContainer {
 
 		// set user's clipboard new
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<ADMINISTRATION>"
-				+ " <USER guid='" + getCmsClient().getConnectedUser().getUserGuid() + "'>"
-				+ "  <CLIPBOARDDATA action='save' projectguid='" + getProjectGuid() + "' value='" + clipboard + "' />"
-				+ "</USER></ADMINISTRATION></IODATA>";
+				+ " <USER guid='" + getCmsClient().getConnectedUser().getUserGuid() + "'>" + "  <CLIPBOARDDATA action='save' projectguid='"
+				+ getProjectGuid() + "' value='" + clipboard + "' />" + "</USER></ADMINISTRATION></IODATA>";
 		callCmsWithoutParsing(rqlRequest);
 	}
 
@@ -4242,13 +4285,11 @@ public class Project implements CmsClientContainer {
 	 * ACHTUNG: RedDot liefert nicht immer Fehlermeldungen, manchmal eine Errormail, aber selten was in LOG\Export!
 	 * 
 	 * @param targetPath
-	 *            der lokale pfad des Exportverzeichnisses. Er muss leer sein, wird, falls nicht da, angelegt! Bei einem Cluster immer
-	 *            in UNC Notation, z.b. \\kswfrd01\cms_data\project_exports\
+	 *            der lokale pfad des Exportverzeichnisses. Er muss leer sein, wird, falls nicht da, angelegt! Bei einem Cluster immer in UNC Notation, z.b. \\kswfrd01\cms_data\project_exports\
 	 * @param includeUsersAndGroups
 	 *            bei true werden die User und Gruppen dieses Projektes mit exportiert, sonst nicht
 	 * @param sendMailToConnectedUserWhenFinished
-	 *            =true, sendet dem gerade angemeldeten Benutzer eine Mail, wenn der Exporjob beendet ist; =false, kein Mailversand;
-	 *            Mailadresse muss konfiguriert sein!
+	 *            =true, sendet dem gerade angemeldeten Benutzer eine Mail, wenn der Exporjob beendet ist; =false, kein Mailversand; Mailadresse muss konfiguriert sein!
 	 */
 	public void startExportJob(String targetPath, boolean includeUsersAndGroups, boolean sendMailToConnectedUserWhenFinished)
 			throws RQLException {
@@ -4264,9 +4305,9 @@ public class Project implements CmsClientContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "<ADMINISTRATION>"
-				+ "<PROJECT action='export' projectguid='" + getProjectGuid() + "' logoutusers='1' includeadmindata='"
-				+ StringHelper.convertTo01(includeUsersAndGroups) + "' targetpath='" + targetPath + "' ";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "<ADMINISTRATION>" + "<PROJECT action='export' projectguid='"
+				+ getProjectGuid() + "' logoutusers='1' includeadmindata='" + StringHelper.convertTo01(includeUsersAndGroups) + "' targetpath='"
+				+ targetPath + "' ";
 		if (sendMailToConnectedUserWhenFinished) {
 			String message = "Export of project " + getName() + " finished";
 			rqlRequest += "emailnotification='1' to='" + getCmsClient().getConnectedUser().getUserGuid() + "' subject='" + message
@@ -4361,8 +4402,8 @@ public class Project implements CmsClientContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "<ADMINISTRATION action='validate' guid='"
-				+ getLogonGuid() + "'>" + "   <PROJECT guid='" + getProjectGuid() + "'/>" + " </ADMINISTRATION>" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "<ADMINISTRATION action='validate' guid='" + getLogonGuid() + "'>"
+				+ "   <PROJECT guid='" + getProjectGuid() + "'/>" + " </ADMINISTRATION>" + "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		// store

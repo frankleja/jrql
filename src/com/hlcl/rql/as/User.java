@@ -168,21 +168,18 @@ public class User implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert genau die Projektvarianten zurück, die der angemeldete Benutzer auch publizieren kann.
-	 */
-	public java.util.List<ProjectVariant> getPublishableProjectVariants() throws RQLException {
-		if (publishableProjectVariantsCache == null) {
-			publishableProjectVariantsCache = getCurrentProject().getPublishableProjectVariants(); 
-		}
-		return publishableProjectVariantsCache;
-	}
-
-	/**
 	 * Liefert die Beschreibung dieses Benutzers zurück.
 	 */
 	public String getDescription() throws RQLException {
 
 		return getDetailsNode().getAttribute("description");
+	}
+
+	/**
+	 * Liefert die aktuell eingestellte OberflächensprachenID (ENG, DEU) dieses Benutzers.
+	 */
+	private String getDetailsDialogLanguageId() throws RQLException {
+		return getDetailsNode().getAttribute("dialoglanguageid");
 	}
 
 	/**
@@ -225,13 +222,6 @@ public class User implements CmsClientContainer {
 		}
 
 		return detailsNode;
-	}
-
-	/**
-	 * Liefert die aktuell eingestellte OberflächensprachenID (ENG, DEU) dieses Benutzers.
-	 */
-	private String getDetailsDialogLanguageId() throws RQLException {
-		return getDetailsNode().getAttribute("dialoglanguageid");
 	}
 
 	/**
@@ -435,17 +425,6 @@ public class User implements CmsClientContainer {
 	}
 
 	/**
-	 * Bestätigt alle Seiten dieses Benutzers im Status Entwurf.
-	 * 
-	 * @return Number of submitted pages
-	 */
-	public int submitPagesSavedAsDraft(Project project) throws RQLException {
-		PageArrayList draftPages = project.getPagesByState(Project.WF_LIST_STATE_PAGES_SAVED_AS_DRAFT, this);
-		draftPages.submitAllToWorkflow();
-		return draftPages.size();
-	}
-
-	/**
 	 * Liefert alle Seiten dieses Benutzers, die er zu korrigieren hat.
 	 * 
 	 * @return List of Pages
@@ -477,7 +456,7 @@ public class User implements CmsClientContainer {
 	/**
 	 * Liefert eine Liste aller für diesen User zugelassenen Projekte.
 	 */
-	public java.util.List getProjects() throws RQLException {
+	public java.util.List<Project> getProjects() throws RQLException {
 
 		CmsClient client = getCmsClient();
 
@@ -485,10 +464,20 @@ public class User implements CmsClientContainer {
 	}
 
 	/**
-	 * Liefert alle Benutzergruppen passend zum gegebenen Prefix, denen dieser Benutzer im aktuellen Projekt zugeordnet ist.
+	 * Liefert genau die Projektvarianten zurück, die der angemeldete Benutzer auch publizieren kann.
 	 */
-	public List<UserGroup> getUserGroupsInCurrentProject(String groupPrefix) throws RQLException {
+	public java.util.List<ProjectVariant> getPublishableProjectVariants() throws RQLException {
+		if (publishableProjectVariantsCache == null) {
+			publishableProjectVariantsCache = getCurrentProject().getPublishableProjectVariants(); 
+		}
+		return publishableProjectVariantsCache;
+	}
 
+	/**
+	 * Return the user groups matching the given prefix of this user assigned to the given project. 
+	 * @throws RQLException 
+	 */
+	public List<UserGroup> getUserGroups(String groupPrefix, Project project) throws RQLException {
 		/*
 		 V6.5 request
 		 <IODATA loginguid="[!guid_login!]">
@@ -530,7 +519,7 @@ public class User implements CmsClientContainer {
 		RQLNode projectNode = null;
 		for (int i = 0; i < projectNodes.size(); i++) {
 			projectNode = projectNodes.get(i);
-			if (projectNode.getAttribute("guid").equals(getCurrentProject().getProjectGuid())) {
+			if (projectNode.getAttribute("guid").equals(project.getProjectGuid())) {
 				break;
 			}
 		}
@@ -550,12 +539,34 @@ public class User implements CmsClientContainer {
 		for (int i = 0; i < groupNodes.size(); i++) {
 			RQLNode node = groupNodes.get(i);
 			String name = node.getAttribute("name");
-			if (node.getAttribute("checked").equals("1") && name.startsWith(groupPrefix)) {
-				UserGroup group = new UserGroup(getCmsClient(), node.getAttribute("guid"), name);
-				groups.add(group);
+			// user not in group
+			if (!node.getAttribute("checked").equals("1")) {
+				continue;
 			}
+			// prefix check
+			if (groupPrefix != null && !name.startsWith(groupPrefix)) {
+				continue;
+			}
+			// group of this user found
+			UserGroup group = new UserGroup(getCmsClient(), node.getAttribute("guid"), name);
+			groups.add(group);
 		}
 		return groups;
+
+	}
+
+	/**
+	 * Liefert alle Benutzergruppen passend zum gegebenen Prefix, denen dieser Benutzer im aktuellen Projekt zugeordnet ist.
+	 */
+	public List<UserGroup> getUserGroupsInCurrentProject(String groupPrefix) throws RQLException {
+		return getUserGroups(groupPrefix, getCurrentProject());
+	}
+	
+	/**
+	 * Return the user groups this user is assigned to in the given project. 
+	 */
+	public List<UserGroup> getUserGroups(Project project) throws RQLException {
+		return getUserGroups(null, project);
 	}
 
 	/**
@@ -747,6 +758,17 @@ public class User implements CmsClientContainer {
 	 */
 	public void setUserInterfaceLanguage(UserInterfaceLanguage userInterfaceLanguage) throws RQLException {
 		update("dialoglanguageid='" + userInterfaceLanguage.getLanguageId() + "'");
+	}
+
+	/**
+	 * Bestätigt alle Seiten dieses Benutzers im Status Entwurf.
+	 * 
+	 * @return Number of submitted pages
+	 */
+	public int submitPagesSavedAsDraft(Project project) throws RQLException {
+		PageArrayList draftPages = project.getPagesByState(Project.WF_LIST_STATE_PAGES_SAVED_AS_DRAFT, this);
+		draftPages.submitAllToWorkflow();
+		return draftPages.size();
 	}
 
 	/**

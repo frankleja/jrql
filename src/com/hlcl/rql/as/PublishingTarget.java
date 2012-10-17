@@ -1,5 +1,10 @@
 package com.hlcl.rql.as;
 
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Diese Klasse beschreibt ein Exportziel.
  * 
@@ -41,7 +46,8 @@ public class PublishingTarget implements ProjectContainer {
 	}
 
 	/**
-	 * Senden eine Anfrage an das CMS und liefert eine ungeparste Antwort zurueck. Erforderlich für die Ermittlung des Werts eines Textelements.
+	 * Senden eine Anfrage an das CMS und liefert eine ungeparste Antwort zurueck. Erforderlich für die Ermittlung des Werts eines
+	 * Textelements.
 	 */
 	public String callCmsWithoutParsing(String rqlRequest) throws RQLException {
 		return getCmsClient().callCmsWithoutParsing(rqlRequest);
@@ -111,8 +117,9 @@ public class PublishingTarget implements ProjectContainer {
 	 */
 	public String getFtpPassword() throws RQLException {
 		if (!isFtpTarget()) {
-			throw new WrongPublishingTargetTypeException("You try to get the FTP user's password from the non FTP publishing target with name "
-					+ getName() + ". Correct your program.");
+			throw new WrongPublishingTargetTypeException(
+					"You try to get the FTP user's password from the non FTP publishing target with name " + getName()
+							+ ". Correct your program.");
 		}
 		return getDetailsNode().getAttribute("password");
 	}
@@ -124,21 +131,26 @@ public class PublishingTarget implements ProjectContainer {
 	 */
 	public String getFtpUserName() throws RQLException {
 		if (!isFtpTarget()) {
-			throw new WrongPublishingTargetTypeException("You try to get the FTP user name from the non FTP publishing target with name " + getName()
-					+ ". Correct your program.");
+			throw new WrongPublishingTargetTypeException(
+					"You try to get the FTP user name from the non FTP publishing target with name " + getName()
+							+ ". Correct your program.");
 		}
 		return getDetailsNode().getAttribute("username");
 	}
 
 	/**
-	 * Setzt den Benutzernamen und das Passwort des FTP users auf 'unknown'.<p> Über dieses FTP Ziel kann danach nicht mehr publiziert werden. 
+	 * Setzt den Benutzernamen und das Passwort des FTP users auf 'unknown'.
+	 * <p>
+	 * Über dieses FTP Ziel kann danach nicht mehr publiziert werden.
 	 * 
-	 * @throws WrongPublishingTargetTypeException	falls kein FTP publishing target vorliegt
+	 * @throws WrongPublishingTargetTypeException
+	 *             falls kein FTP publishing target vorliegt
 	 */
 	public void disableFtpUser() throws RQLException {
 		if (!isFtpTarget()) {
-			throw new WrongPublishingTargetTypeException("You try to disalbe the FTP publishing on the non FTP publishing target with name " + getName()
-					+ ". Correct your program.");
+			throw new WrongPublishingTargetTypeException(
+					"You try to disalbe the FTP publishing on the non FTP publishing target with name " + getName()
+							+ ". Correct your program.");
 		}
 		save("password='unknown' username", "unknown");
 	}
@@ -174,7 +186,49 @@ public class PublishingTarget implements ProjectContainer {
 			return path;
 		}
 		// cannot be used for live server targets
-		throw new WrongPublishingTargetTypeException("This LiveServer publishing target has no path. Filter targets with offered methods.");
+		throw new WrongPublishingTargetTypeException(
+				"This LiveServer publishing target has no path. Filter targets with offered methods.");
+	}
+
+	/**
+	 * Return the server name from this ftp publishing target's path. If the path would be
+	 * ftP://khh30015.ad.hl.lan/hl/fis/deve/web/portal/publishRoot, khh30015.ad.hl.lan is returned. The default regex used is
+	 * ^[fF][tT][pP]://(.+?)/, but you can adjust in rql_fw.properties with key ftpPublishingTargetServerNameRegex.
+	 * 
+	 * @throws WrongPublishingTargetTypeException
+	 * @throws RQLException
+	 *             if no server name could be found in path with regex
+	 * @see #isDirectoryTarget()
+	 * @see #isFtpTarget()
+	 * @see #isLiveServerTarget()
+	 */
+	public String getFtpServerName() throws RQLException {
+		if (!isFtpTarget()) {
+			throw new WrongPublishingTargetTypeException(
+					"You tried to extract the FTP target server name from a non FTP publishing target with name " + getName()
+							+ ", what is not possible. Please correct your program.");
+		}
+
+		// get regex, possible to adjust in rql_fw.properties
+		String regex = "^[fF][tT][pP]://(.+?)/";
+		ResourceBundle b = ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw");
+		try {
+			regex = b.getString("ftpPublishingTargetServerNameRegex");
+		} catch (MissingResourceException mrex) {
+			// ignore, use default above
+		}
+
+		// extract with regex from path
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(getPath());
+		if (m.find()) {
+			return m.group(1);
+		}
+
+		// no server name with regex found
+		throw new RQLException("Could not extract ftp server name with regex " + regex + " from ftp publishing target with name "
+				+ getName()
+				+ ". Your configured FTP path within RedDot seems to be invalid. You can adjust the regex in rql_fw.properties key ftpPublishingTargetServerNameRegex.");
 	}
 
 	/**
@@ -193,7 +247,8 @@ public class PublishingTarget implements ProjectContainer {
 			return SEPARATOR_DIRECTORY;
 		}
 		// cannot be used for live server targets
-		throw new WrongPublishingTargetTypeException("This LiveServer publishing target has no path. Filter targets with offered methods.");
+		throw new WrongPublishingTargetTypeException(
+				"This LiveServer publishing target has no path. Filter targets with offered methods.");
 	}
 
 	/**
@@ -315,14 +370,43 @@ public class PublishingTarget implements ProjectContainer {
 	}
 
 	/**
+	 * Deletes the reference directory for a FTP or Live Server publising target.
+	 * Could take a while, if there are many files within folder.
+	 * 
+	 * ATTENTION: In a cluster environment this method has no effects on authoring servers. 
+	 * Has only an effect if you run this code local on publishing server machine.
+	 * @throws WrongPublishingTargetTypeException if you use it for a directory target 
+	 */
+	public void emptyReferenceDirectory() throws RQLException {
+		/* 
+		 V7.5 request
+		<IODATA loginguid="[!guid_login!]" sessionkey="[!key!]">
+		  <PROJECT>
+		    <EXPORT action="clear" guid="[!guid_export!]"/>
+		  </PROJECT>
+		</IODATA> 
+		 V7.5 response
+		<IODATA>ok
+		</IODATA>
+		 */
+
+		// call CMS
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'><PROJECT>"
+				+ "<EXPORT action='clear' guid='" + getPublishingTargetGuid() + "' />"
+				+ "</PROJECT></IODATA>";
+		callCmsWithoutParsing(rqlRequest);
+	}
+
+	/**
 	 * Ändert für dieses FTP Publizierungsziel das Passwort des verwendeten FTP users.
 	 * 
 	 * @throws WrongPublishingTargetTypeException
 	 */
 	public void setFtpPassword(String newPassword) throws RQLException {
 		if (!isFtpTarget()) {
-			throw new WrongPublishingTargetTypeException("You tried to change the FTP user's password at the non FTP publishing target with name "
-					+ getName() + ", what is not possible. Please correct your program.");
+			throw new WrongPublishingTargetTypeException(
+					"You tried to change the FTP user's password at the non FTP publishing target with name " + getName()
+							+ ", what is not possible. Please correct your program.");
 		}
 		save("password", newPassword);
 	}
@@ -334,8 +418,9 @@ public class PublishingTarget implements ProjectContainer {
 	 */
 	public void setFtpUserName(String newUserName) throws RQLException {
 		if (!isFtpTarget()) {
-			throw new WrongPublishingTargetTypeException("You tried to change the FTP user name at the non FTP publishing target with name "
-					+ getName() + ", what is not possible. Please correct your program.");
+			throw new WrongPublishingTargetTypeException(
+					"You tried to change the FTP user name at the non FTP publishing target with name " + getName()
+							+ ", what is not possible. Please correct your program.");
 		}
 		save("username", newUserName);
 	}

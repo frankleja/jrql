@@ -295,6 +295,41 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
+	 * Add the change of given string value to page element with given templateElementName. All string value (and numeric) element
+	 * types are supported, but not date (missing parse pattern).
+	 * <p>
+	 * Text elements are immediately stored; the value is the source code of a HTML text element.
+	 * <p>
+	 * Es werden nur die folgende TemplateElement Typen unterstützt: all subclasses of {@link Element} and {@link TextElement}.
+	 */
+	public void addSetContentElementStringValue(String templateElementName, String value) throws RQLException {
+		TemplateElement tmpltElem = getTemplateElementByName(templateElementName);
+		// special handling depending on type
+		// immediate update on this page
+		if (tmpltElem.isText()) {
+			setTextValue(templateElementName, value);
+		} else if (tmpltElem.isImage()) {
+			setImageValue(templateElementName, value);
+		} else if (tmpltElem.isMedia()) {
+			setMediaValue(templateElementName, value);
+		} else
+		// use combined update possibility
+		if (tmpltElem.isOptionList()) {
+			addSetOptionListValue(templateElementName, value);
+		} else if (tmpltElem.isStandardFieldNumeric()) {
+			addSetStandardFieldNumericValue(templateElementName, value);
+		} else if (tmpltElem.isStandardFieldText()) {
+			addSetStandardFieldTextValue(templateElementName, value);
+		} else if (tmpltElem.isStandardFieldUserDefined()) {
+			addSetStandardFieldUserDefinedValue(templateElementName, value);
+		} else {
+			// type hot handled appropriately
+			throw new RQLException("You try to set an element of the unsupported type " + tmpltElem.getTypeName()
+					+ ". Allowed are only all subclasses of Element (except standard field date) and TextElement.");
+		}
+	}
+
+	/**
 	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
 	 * <p>
 	 * Der gegebenen Wert value wird dem Autor angezeigt. Es ist nicht die GUID der OptionListSelection.
@@ -427,8 +462,8 @@ public class Page implements ProjectContainer {
 	private Container buildContainer(RQLNode containerLinkNode, TemplateElement templateElement, Page existsOnPage)
 			throws RQLException {
 
-		return new Container(existsOnPage, templateElement, containerLinkNode.getAttribute("name"), containerLinkNode
-				.getAttribute("guid"), containerLinkNode.getAttribute("islink").equals("10"));
+		return new Container(existsOnPage, templateElement, containerLinkNode.getAttribute("name"),
+				containerLinkNode.getAttribute("guid"), containerLinkNode.getAttribute("islink").equals("10"));
 	}
 
 	/**
@@ -442,9 +477,9 @@ public class Page implements ProjectContainer {
 	private com.hlcl.rql.as.List buildList(RQLNode listLinkNode, TemplateElement templateElement, Page existsOnPage)
 			throws RQLException {
 
-		return new com.hlcl.rql.as.List(existsOnPage, templateElement, listLinkNode.getAttribute("name"), listLinkNode
-				.getAttribute("guid"), listLinkNode.getAttribute("islink").equals("10"), listLinkNode
-				.getAttribute("targetcontainerguid"));
+		return new com.hlcl.rql.as.List(existsOnPage, templateElement, listLinkNode.getAttribute("name"),
+				listLinkNode.getAttribute("guid"), listLinkNode.getAttribute("islink").equals("10"),
+				listLinkNode.getAttribute("targetcontainerguid"));
 	}
 
 	/**
@@ -491,8 +526,10 @@ public class Page implements ProjectContainer {
 
 	/**
 	 * Macht den daft-Status dieser Seite rückgängig:
-	 * <p> - löscht eine neu angelegte Seite oder
-	 * <p> - macht die Änderungen daran rückgängig
+	 * <p>
+	 * - löscht eine neu angelegte Seite oder
+	 * <p>
+	 * - macht die Änderungen daran rückgängig
 	 */
 	public void cancelDraftState() throws RQLException {
 
@@ -505,8 +542,10 @@ public class Page implements ProjectContainer {
 
 	/**
 	 * Ändert die Überschrift dieser Seite, um sie wieder publizieren zu können.
-	 * <p> - hängt ein blank an oder
-	 * <p> - entfernt an bereits angehängtes blank von der Überschrift wieder
+	 * <p>
+	 * - hängt ein blank an oder
+	 * <p>
+	 * - entfernt an bereits angehängtes blank von der Überschrift wieder
 	 * <p>
 	 * Seite wird nicht geändert, falls diese Seite ein GUID page ist, also gar keine Überschrift hat.
 	 */
@@ -517,7 +556,7 @@ public class Page implements ProjectContainer {
 			// change
 			int length = headline.length();
 			if (headline.charAt(length - 1) == ' ') {
-				headline = headline.substring(0, length - 2);
+				headline = headline.substring(0, length - 1);
 			} else {
 				headline += " ";
 			}
@@ -572,13 +611,13 @@ public class Page implements ProjectContainer {
 	/**
 	 * Check if the page node has an attribute id. if not throw an exception, because the page guid is missing.
 	 * 
-	 * @throws InvalidGuidException
+	 * @throws PageNotFoundException
 	 */
-	private void checkDetailsNode() throws InvalidGuidException {
+	private void checkDetailsNode() throws RQLException {
 		// page GUID invalid if page ID attribute not found
 		if (detailsNode.getAttribute("id") == null) {
-			throw new InvalidGuidException("No page can be found for page GUID " + pageGuid
-					+ ". Maybe the page was deleted in between");
+			throw new PageNotFoundException("No page can be found for page GUID " + pageGuid
+					+ ". Maybe the page was deleted in between. Page details node without pageId found.");
 		}
 	}
 
@@ -802,41 +841,6 @@ public class Page implements ProjectContainer {
 		}
 		// update combined
 		endSetElementValues();
-	}
-
-	/**
-	 * Add the change of given string value to page element with given templateElementName. All string value (and numeric) element
-	 * types are supported, but not date (missing parse pattern).
-	 * <p>
-	 * Text elements are immediately stored; the value is the source code of a HTML text element.
-	 * <p>
-	 * Es werden nur die folgende TemplateElement Typen unterstützt: all subclasses of {@link Element} and {@link TextElement}.
-	 */
-	public void addSetContentElementStringValue(String templateElementName, String value) throws RQLException {
-		TemplateElement tmpltElem = getTemplateElementByName(templateElementName);
-		// special handling depending on type
-		// immediate update on this page
-		if (tmpltElem.isText()) {
-			setTextValue(templateElementName, value);
-		} else if (tmpltElem.isImage()) {
-			setImageValue(templateElementName, value);
-		} else if (tmpltElem.isMedia()) {
-			setMediaValue(templateElementName, value);
-		} else
-		// use combined update possibility
-		if (tmpltElem.isOptionList()) {
-			addSetOptionListValue(templateElementName, value);
-		} else if (tmpltElem.isStandardFieldNumeric()) {
-			addSetStandardFieldNumericValue(templateElementName, value);
-		} else if (tmpltElem.isStandardFieldText()) {
-			addSetStandardFieldTextValue(templateElementName, value);
-		} else if (tmpltElem.isStandardFieldUserDefined()) {
-			addSetStandardFieldUserDefinedValue(templateElementName, value);
-		} else {
-			// type hot handled appropriately
-			throw new RQLException("You try to set an element of the unsupported type " + tmpltElem.getTypeName()
-					+ ". Allowed are only all subclasses of Element (except standard field date) and TextElement.");
-		}
 	}
 
 	/**
@@ -1454,14 +1458,6 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
-	 * Löscht diese Seite in der augenblicklichen Sprachvariante aus dem Papierkorb. Dieses Page Objekt darf danach nicht mehr benutzt
-	 * werden. Achtung: Diese Seite kann nicht wieder hergestellt werden. Vielleicht noch aus alten Versionen?
-	 */
-	public void deleteFromRecycleBinInCurrentLanguageVariant() throws RQLException {
-		deleteFromRecycleBin(Arrays.asList(getProject().getCurrentLanguageVariant()));
-	}
-
-	/**
 	 * Löscht diese Seite für die gegebenen Sprachvarianten aus dem Papierkorb. Dieses Page Objekt darf danach nicht mehr benutzt
 	 * werden. Achtung: Diese Seite kann nicht wieder hergestellt werden. Vielleicht noch aus alten Versionen?
 	 */
@@ -1497,6 +1493,14 @@ public class Page implements ProjectContainer {
 		detailsNode = null;
 		elementsNodeList = null;
 		linksNodeList = null;
+	}
+
+	/**
+	 * Löscht diese Seite in der augenblicklichen Sprachvariante aus dem Papierkorb. Dieses Page Objekt darf danach nicht mehr benutzt
+	 * werden. Achtung: Diese Seite kann nicht wieder hergestellt werden. Vielleicht noch aus alten Versionen?
+	 */
+	public void deleteFromRecycleBinInCurrentLanguageVariant() throws RQLException {
+		deleteFromRecycleBin(Arrays.asList(getProject().getCurrentLanguageVariant()));
 	}
 
 	/**
@@ -1615,6 +1619,13 @@ public class Page implements ProjectContainer {
 	 */
 	public void deletePageCacheinCurrentLanguageVariant() throws RQLException {
 		deletePageCache(Arrays.asList(getProject().getCurrentLanguageVariant()));
+	}
+
+	/**
+	 * Deletes the publication package cache of this page.
+	 */
+	void deletePublicationPackageCache() throws RQLException {
+		publicationPackage = null;
 	}
 
 	/**
@@ -1949,6 +1960,19 @@ public class Page implements ProjectContainer {
 	public boolean equals(Object obj) {
 		Page second = (Page) obj;
 		return this.getPageGuid().equals(second.getPageGuid());
+	}
+
+	/**
+	 * Returns true, if this page exists in the current language variant.
+	 * <p>
+	 * Returns false, if this page does not exists in the language variant so far.
+	 */
+	public boolean existsInCurrentLanguageVariant() throws RQLException {
+		String na = getDetailsNode().getAttribute("notavailable");
+		if (na == null) {
+			return true;
+		}
+		return na.equals("0");
 	}
 
 	/**
@@ -2398,27 +2422,6 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
-	 * Returns the date (no time), when this page was deleted. Returns null, if page is not deleted.
-	 * 
-	 * @throws RecycleBinPageNotFoundByHeadlineException
-	 *             if the page is in recycle bin, but could not be found via the headline in recycle bin to determine the deleted date
-	 */
-	public ReddotDate getDeletedOn() throws RQLException {
-		return getProject().getRecycleBin().getDeletedDate(this);
-	}
-
-	/**
-	 * Returns true, if the given date when is after the deletion date of this page.
-	 * 
-	 * @see ReddotDate#after(java.util.Date)
-	 * @throws RecycleBinPageNotFoundByHeadlineException
-	 *             if the page is in recycle bin, but could not be found via the headline in recycle bin to determine the deleted date
-	 */
-	public boolean isDeletedOnAfter(ReddotDate when) throws RQLException {
-		return getDeletedOn().after(when);
-	}
-
-	/**
 	 * Liefert den Zeitpunkt der Erstellung dieser Seite im Format 27 Aug 1967.
 	 */
 	public String getCreatedOnAsddMMyyyy() throws RQLException {
@@ -2469,6 +2472,16 @@ public class Page implements ProjectContainer {
 			databaseQueryCache = callCms(rqlRequest).getNode("SQL").getAttribute("value");
 		}
 		return databaseQueryCache;
+	}
+
+	/**
+	 * Returns the date (no time), when this page was deleted. Returns null, if page is not deleted.
+	 * 
+	 * @throws RecycleBinPageNotFoundByHeadlineException
+	 *             if the page is in recycle bin, but could not be found via the headline in recycle bin to determine the deleted date
+	 */
+	public ReddotDate getDeletedOn() throws RQLException {
+		return getProject().getRecycleBin().getDeletedDate(this);
 	}
 
 	/**
@@ -2533,7 +2546,25 @@ public class Page implements ProjectContainer {
 			// call CMS
 			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
 					+ " <PAGE action='load' guid='" + getPageGuid() + "'>" + "<ELEMENTS action='load'/></PAGE></IODATA>";
-			RQLNode rqlResponse = callCms(rqlRequest);
+			RQLNode rqlResponse;
+			try {
+				rqlResponse = callCms(rqlRequest);
+			} catch (RQLException ex) {
+				// transform into more specialized exceptions
+				if (!isPageGuidLengthValid()) {
+					throw new InvalidGuidException("Page GUID has not correct length of " + PAGE_GUID_LENGTH + " characters.");
+				}
+				// check for the RD error PageGUID missing
+				ResourceBundle b = ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw");
+				String pgmt = b.getString("pageGuidMissingErrorText");
+				if (ex.getMessage().startsWith(pgmt)) {
+					throw new PageNotFoundException("Page for GUID " + getPageGuid() + " could not be found, maybe deleted.", ex);
+				} else {
+					// throw as it is
+					throw ex;
+				}
+
+			}
 			// cache page details
 			setDetailsNode(rqlResponse.getNode("PAGE"));
 			setElementsNodeList(rqlResponse.getNodes("ELEMENT"));
@@ -2660,8 +2691,8 @@ public class Page implements ProjectContainer {
 		for (int i = 0; i < linkNodes.size(); i++) {
 			linkNode = linkNodes.get(i);
 			if (linkNode.getAttribute("templateelementguid").equals(guid) && linkNode.getAttribute("elttype").equals("26")) {
-				dynTextAnchor.set(Integer.parseInt(linkNode.getAttribute("orderid")), linkNode.getAttribute("value"), linkNode
-						.getAttribute("guid"));
+				dynTextAnchor.set(Integer.parseInt(linkNode.getAttribute("orderid")), linkNode.getAttribute("value"),
+						linkNode.getAttribute("guid"));
 			}
 		}
 
@@ -3023,8 +3054,8 @@ public class Page implements ProjectContainer {
 		RQLNode elementNode = findElementNode(templateElement);
 
 		// wrap page element data
-		return new ImageElement(this, templateElement, elementNode.getAttribute("name"), elementNode.getAttribute("guid"), elementNode
-				.getAttribute("value"), elementNode.getAttribute("folderguid"));
+		return new ImageElement(this, templateElement, elementNode.getAttribute("name"), elementNode.getAttribute("guid"),
+				elementNode.getAttribute("value"), elementNode.getAttribute("folderguid"));
 	}
 
 	/**
@@ -3351,8 +3382,8 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert die GUID des Hauptlinks zurück an der diese Seite hängt.
 	 * 
-	 * @throws UnlinkedPageException,
-	 *             MissingMainLinkException
+	 * @throws UnlinkedPageException
+	 *             , MissingMainLinkException
 	 */
 	public String getMainLinkGuid() throws RQLException {
 
@@ -3362,8 +3393,8 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert den Link-Node des Hauptlinks zurück an der diese Seite hängt.
 	 * 
-	 * @throws UnlinkedPageException,
-	 *             MissingMainLinkException
+	 * @throws UnlinkedPageException
+	 *             , MissingMainLinkException
 	 */
 	private RQLNode getMainLinkNode() throws RQLException {
 
@@ -3436,8 +3467,8 @@ public class Page implements ProjectContainer {
 
 		// wrap page element data
 		// add templateElement too?
-		return new MediaElement(this, templateElement, elementNode.getAttribute("name"), elementNode.getAttribute("guid"), elementNode
-				.getAttribute("value"), elementNode.getAttribute("folderguid"), elementNode.getAttribute("suffix"));
+		return new MediaElement(this, templateElement, elementNode.getAttribute("name"), elementNode.getAttribute("guid"),
+				elementNode.getAttribute("value"), elementNode.getAttribute("folderguid"), elementNode.getAttribute("suffix"));
 	}
 
 	/**
@@ -3764,21 +3795,6 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
-	 * Liefert alle OptionsListen aus dieser Seite, deren Templateelementname zu dem gegebenen namePattern (muss {0} enthalten) passt.
-	 * 
-	 * @see #getOptionList(String)
-	 */
-	public java.util.List<OptionList> getOptionLists(String templateElementNamePattern) throws RQLException {
-		List<TemplateElement> templateElements = getTemplate().getOptionListTemplateElements(templateElementNamePattern);
-		java.util.List<OptionList> result = new ArrayList<OptionList>(templateElements.size());
-		// collect page elements
-		for (TemplateElement te : templateElements) {
-			result.add(getOptionList(te));
-		}
-		return result;
-	}
-
-	/**
 	 * Liefert die OptionsListe aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
 	 * @param templateElement
@@ -3798,8 +3814,9 @@ public class Page implements ProjectContainer {
 
 		// wrap option list data
 		// add listTemplateElement too?
-		OptionList optionList = new OptionList(this, listTemplateElement, elementNode.getAttribute("name"), elementNode
-				.getAttribute("guid"), elementNode.getAttribute("value"), elementNode.getAttribute("eltdefaultselectionguid"));
+		OptionList optionList = new OptionList(this, listTemplateElement, elementNode.getAttribute("name"),
+				elementNode.getAttribute("guid"), elementNode.getAttribute("value"),
+				elementNode.getAttribute("eltdefaultselectionguid"));
 
 		// add possible selections to the option list
 		RQLNodeList selectionNodeList = elementNode.getNodes("SELECTION");
@@ -3807,10 +3824,25 @@ public class Page implements ProjectContainer {
 
 		for (int i = 0; i < selectionNodeList.size(); i++) {
 			selectionNode = selectionNodeList.get(i);
-			optionList.addSelection(selectionNode.getAttribute("guid"), selectionNode.getAttribute("description"), selectionNode
-					.getAttribute("value"));
+			optionList.addSelection(selectionNode.getAttribute("guid"), selectionNode.getAttribute("description"),
+					selectionNode.getAttribute("value"));
 		}
 		return optionList;
+	}
+
+	/**
+	 * Liefert alle OptionsListen aus dieser Seite, deren Templateelementname zu dem gegebenen namePattern (muss {0} enthalten) passt.
+	 * 
+	 * @see #getOptionList(String)
+	 */
+	public java.util.List<OptionList> getOptionLists(String templateElementNamePattern) throws RQLException {
+		List<TemplateElement> templateElements = getTemplate().getOptionListTemplateElements(templateElementNamePattern);
+		java.util.List<OptionList> result = new ArrayList<OptionList>(templateElements.size());
+		// collect page elements
+		for (TemplateElement te : templateElements) {
+			result.add(getOptionList(te));
+		}
+		return result;
 	}
 
 	/**
@@ -3819,10 +3851,32 @@ public class Page implements ProjectContainer {
 	 * 
 	 * @param templateElementName
 	 *            Name der OptionList im Template
+	 * @return the current option list value or null, if no default selection exists
 	 */
 	public String getOptionListValue(String templateElementName) throws RQLException {
 
 		return getOptionList(templateElementName).getCurrentSelectionValue();
+	}
+
+	/**
+	 * Liefert den Wert der Optionsliste dieser Seite, das auf dem gegebenen templateElement basiert 
+	 * oder ifNotAvailable, falls das Template dieser Seite keine Optionslistenelement mit dem gegebenen Namen hat.
+	 * Liefert auch ifNotAvailable, falls das Optionslistenelement keinen default Selektionswert hat (der option list value ist dann null).
+	 * 
+	 * @param templateElementName
+	 *            Name des Templateelements der Optionsliste
+	 * @param ifNotAvailable the return value, if this page does not have a template element with the given name
+	 * @return the value of the option list element with given name, or ifNotAvailable, if an element with that name does not exists or no selection is present
+	 * @throws RQLException
+	 */
+	public String getOptionListValueIfAvailable(String templateElementName, String ifNotAvailable) throws RQLException {
+		if (contains(templateElementName)) {
+			String valueOrNull = getOptionListValue(templateElementName);
+			if (valueOrNull != null) {
+				return valueOrNull;
+			}
+		}
+		return ifNotAvailable;
 	}
 
 	/**
@@ -4010,8 +4064,8 @@ public class Page implements ProjectContainer {
 	 * 
 	 * @param templateElementName
 	 *            Name des Templateelementes das gesucht wird
-	 * @param startOnThisPage =
-	 *            false beginnt Suche erst im Parent dieser Seite startOnThisPage = true beginnt Suche bereits mit dieser Seite
+	 * @param startOnThisPage
+	 *            = false beginnt Suche erst im Parent dieser Seite startOnThisPage = true beginnt Suche bereits mit dieser Seite
 	 */
 	public Page getPredecessorPageContainingElement(String templateElementName, boolean startOnThisPage) throws RQLException {
 
@@ -4123,15 +4177,17 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
-	 * Returns the published path (incl. the filename and extender) of this page for the given project variant and language.
-	 * <p>
-	 * FTP Server, determined by the publishing target, is not included.
-	 * 
-	 * @see #getPublishedPath(String, String, String)
+	 * Liefert für diese Seite die Page ID oder die GUID, je nach Einstellung der PublicationSettings.
 	 */
-	public String getPublishedPath(String projectVariantGuid, LanguageVariant languageVariant, String folderSeparator)
-			throws RQLException {
-		return getPublishedPath(projectVariantGuid, languageVariant.getRfcLanguageId(), folderSeparator);
+	protected String getPublishedFilenameId() throws RQLException {
+		Project project = getProject();
+		if (project.isPublicationSettingUsePageIdInFilename()) {
+			return getPageId();
+		}
+		if (project.isPublicationSettingUseGuidInFilename()) {
+			return getPageGuid();
+		}
+		return null;
 	}
 
 	/**
@@ -4144,6 +4200,39 @@ public class Page implements ProjectContainer {
 	public String getPublishedPath(ProjectVariant projectVariant, LanguageVariant languageVariant, String folderSeparator)
 			throws RQLException {
 		return getPublishedPath(projectVariant.getProjectVariantGuid(), languageVariant.getRfcLanguageId(), folderSeparator);
+	}
+
+	/**
+	 * Returns the published path (incl. the filename and extender) of this page for the given project variant and language.
+	 * <p>
+	 * Attention: There is no check, if the given publication setting is one from the publication package of this' page.
+	 * <p>
+	 * FTP Server, determined by the publishing target, is not included.
+	 * 
+	 * @param publicationSetting
+	 *            the publication setting from the publication package on the main link of this page for which the published path
+	 *            should be determined;
+	 * @param folderSeparator
+	 *            separates the folder names in the returned path; usually \ or /
+	 * @see #getFilename()
+	 * @see #getPublishedFilename(String)
+	 */
+	public String getPublishedPath(PublicationSetting publicationSetting, String folderSeparator) throws RQLException {
+		PublicationFolder publicationFolder = publicationSetting.getPublishedPages();
+		return publicationFolder.getPublishingPathFromPublishingRoot(folderSeparator) + folderSeparator
+				+ getPublishedFilename(publicationSetting.getProjectVariantGuid());
+	}
+
+	/**
+	 * Returns the published path (incl. the filename and extender) of this page for the given project variant and language.
+	 * <p>
+	 * FTP Server, determined by the publishing target, is not included.
+	 * 
+	 * @see #getPublishedPath(String, String, String)
+	 */
+	public String getPublishedPath(String projectVariantGuid, LanguageVariant languageVariant, String folderSeparator)
+			throws RQLException {
+		return getPublishedPath(projectVariantGuid, languageVariant.getRfcLanguageId(), folderSeparator);
 	}
 
 	/**
@@ -4167,41 +4256,6 @@ public class Page implements ProjectContainer {
 		PublicationFolder publicationFolder = setting.getPublishedPages();
 		return publicationFolder.getPublishingPathFromPublishingRoot(folderSeparator) + folderSeparator
 				+ getPublishedFilename(projectVariantGuid);
-	}
-
-	/**
-	 * Returns the published path (incl. the filename and extender) of this page for the given project variant and language.
-	 * <p>
-	 * Attention: There is no check, if the given publication setting is one from the publication package of this' page.
-	 * <p>
-	 * FTP Server, determined by the publishing target, is not included.
-	 * 
-	 * @param publicationSetting
-	 *            the publication setting from the publication package on the main link of this page for which the published path
-	 *            should be determined; 
-	 * @param folderSeparator
-	 *            separates the folder names in the returned path; usually \ or /
-	 * @see #getFilename()
-	 * @see #getPublishedFilename(String)
-	 */
-	public String getPublishedPath(PublicationSetting publicationSetting, String folderSeparator) throws RQLException {
-		PublicationFolder publicationFolder = publicationSetting.getPublishedPages();
-		return publicationFolder.getPublishingPathFromPublishingRoot(folderSeparator) + folderSeparator
-				+ getPublishedFilename(publicationSetting.getProjectVariantGuid());
-	}
-
-	/**
-	 * Liefert für diese Seite die Page ID oder die GUID, je nach Einstellung der PublicationSettings.
-	 */
-	protected String getPublishedFilenameId() throws RQLException {
-		Project project = getProject();
-		if (project.isPublicationSettingUsePageIdInFilename()) {
-			return getPageId();
-		}
-		if (project.isPublicationSettingUseGuidInFilename()) {
-			return getPageGuid();
-		}
-		return null;
 	}
 
 	/**
@@ -4346,8 +4400,8 @@ public class Page implements ProjectContainer {
 
 		// wrap page element data
 		// add templateElement too?
-		return new StandardFieldNumericElement(this, templateElement, elementNode.getAttribute("name"), elementNode
-				.getAttribute("guid"), elementNode.getAttribute("value"));
+		return new StandardFieldNumericElement(this, templateElement, elementNode.getAttribute("name"),
+				elementNode.getAttribute("guid"), elementNode.getAttribute("value"));
 	}
 
 	/**
@@ -4450,6 +4504,23 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
+	 * Liefert den Wert des Standardfeld Textelements dieser Seite, das auf dem gegebenen templateElement basiert 
+	 * oder ifNotAvailable, falls das Template dieser Seite keine StandardFieldText Element mit dem gegebenen Namen hat.
+	 * 
+	 * @param templateElementName
+	 *            TemplateElement muss vom Typ 1 sein
+	 * @param ifNotAvailable the return value, if this page does not have a template elemtn with the given name
+	 * @return the value of the standard field text element with given name, or ifNotAvailable, if an element with that name does not exists
+	 * @throws RQLException
+	 */
+	public String getStandardFieldTextValueIfAvailable(String templateElementName, String ifNotAvailable) throws RQLException {
+		if (contains(templateElementName)) {
+			return getStandardFieldTextValue(templateElementName);
+		}
+		return ifNotAvailable;
+	}
+
+	/**
 	 * Liefert Standardfeld user defined elements dieser Seite, das auf dem gegebenen templateElement basiert.
 	 * 
 	 * @param templateElementName
@@ -4478,8 +4549,8 @@ public class Page implements ProjectContainer {
 		RQLNode elementNode = findElementNode(templateElement);
 
 		// wrap page element data
-		return new StandardFieldUserDefinedElement(this, templateElement, elementNode.getAttribute("name"), elementNode
-				.getAttribute("guid"), elementNode.getAttribute("value"));
+		return new StandardFieldUserDefinedElement(this, templateElement, elementNode.getAttribute("name"),
+				elementNode.getAttribute("guid"), elementNode.getAttribute("value"));
 	}
 
 	/**
@@ -4568,35 +4639,6 @@ public class Page implements ProjectContainer {
 	public String getTemplateGuid() throws RQLException {
 
 		return getTemplate().getTemplateGuid();
-	}
-
-	/**
-	 * Liefert true, falls die gegebenen content class GUID gleich des Templates dieser Seite ist.
-	 */
-	public boolean isTemplateGuidEquals(String templateGuid) throws RQLException {
-		return getTemplateGuid().equals(templateGuid);
-	}
-
-	/**
-	 * Liefert true, falls der Name des content class folders des Templates dieser Seite den gegebenen namePart beinhaltet, case
-	 * sensitive.
-	 */
-	public boolean isTemplateFolderNameContains(String namePart) throws RQLException {
-		return getTemplate().isTemplateFolderNameContains(namePart);
-	}
-
-	/**
-	 * Liefert true, falls der Name der content class dieser Seite auf den gegebenen suffix endet, case sensitive.
-	 */
-	public boolean isTemplateNameEndsWith(String suffix) throws RQLException {
-		return getTemplate().isNameEndsWith(suffix);
-	}
-
-	/**
-	 * Liefert true, falls der Name des content class folders des Templates dieser Seite den gegebenen namePart beinhaltet.
-	 */
-	public boolean isTemplateFolderNameContains(String namePart, boolean ignoreCase) throws RQLException {
-		return getTemplate().isTemplateFolderNameContains(namePart, ignoreCase);
 	}
 
 	/**
@@ -4806,8 +4848,8 @@ public class Page implements ProjectContainer {
 	 * method must consistently return the same integer, provided no information used in <tt>equals</tt> comparisons on the object is
 	 * modified. This integer need not remain consistent from one execution of an application to another execution of the same
 	 * application.
-	 * <li>If two objects are equal according to the <tt>equals(Object)</tt> method, then calling the <code>hashCode</code> method
-	 * on each of the two objects must produce the same integer result.
+	 * <li>If two objects are equal according to the <tt>equals(Object)</tt> method, then calling the <code>hashCode</code> method on
+	 * each of the two objects must produce the same integer result.
 	 * <li>It is <em>not</em> required that if two objects are unequal according to the
 	 * {@link java.lang.Object#equals(java.lang.Object)} method, then calling the <tt>hashCode</tt> method on each of the two objects
 	 * must produce distinct integer results. However, the programmer should be aware that producing distinct integer results for
@@ -4941,6 +4983,17 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
+	 * Returns true, if the given date when is after the deletion date of this page.
+	 * 
+	 * @see ReddotDate#after(java.util.Date)
+	 * @throws RecycleBinPageNotFoundByHeadlineException
+	 *             if the page is in recycle bin, but could not be found via the headline in recycle bin to determine the deleted date
+	 */
+	public boolean isDeletedOnAfter(ReddotDate when) throws RQLException {
+		return getDeletedOn().after(when);
+	}
+
+	/**
 	 * Liefert true, falls die Überschrift dieser Seite mit dem gegebenen Suffix endet.
 	 */
 	public boolean isHeadlineEndsWith(String suffix) throws RQLException {
@@ -4991,19 +5044,6 @@ public class Page implements ProjectContainer {
 	public boolean isInRecycleBin() throws RQLException {
 
 		return getProject().getRecycleBin().containsPageById(getPageId());
-	}
-
-	/**
-	 * Returns true, if this page exists in the current language variant.
-	 * <p>
-	 * Returns false, if this page does not exists in the language variant so far.
-	 */
-	public boolean existsInCurrentLanguageVariant() throws RQLException {
-		String na = getDetailsNode().getAttribute("notavailable");
-		if (na == null) {
-			return true;
-		}
-		return na.equals("0");
 	}
 
 	/**
@@ -5188,6 +5228,13 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
+	 * Checks the length of this page' page GUID for the correct length of 32.
+	 */
+	public boolean isPageGuidLengthValid() throws RQLException {
+		return getPageGuid().length() == PAGE_GUID_LENGTH;
+	}
+
+	/**
 	 * Liefert true, falls diese Seite die Startseite des Projektes ist. Man muss kein Administrator sein, um diese Info zu erhalten.
 	 */
 	public boolean isProjectStartPage() throws RQLException {
@@ -5314,6 +5361,35 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
+	 * Liefert true, falls der Name des content class folders des Templates dieser Seite den gegebenen namePart beinhaltet, case
+	 * sensitive.
+	 */
+	public boolean isTemplateFolderNameContains(String namePart) throws RQLException {
+		return getTemplate().isTemplateFolderNameContains(namePart);
+	}
+
+	/**
+	 * Liefert true, falls der Name des content class folders des Templates dieser Seite den gegebenen namePart beinhaltet.
+	 */
+	public boolean isTemplateFolderNameContains(String namePart, boolean ignoreCase) throws RQLException {
+		return getTemplate().isTemplateFolderNameContains(namePart, ignoreCase);
+	}
+
+	/**
+	 * Liefert true, falls die gegebenen content class GUID gleich des Templates dieser Seite ist.
+	 */
+	public boolean isTemplateGuidEquals(String templateGuid) throws RQLException {
+		return getTemplateGuid().equals(templateGuid);
+	}
+
+	/**
+	 * Liefert true, falls der Name der content class dieser Seite auf den gegebenen suffix endet, case sensitive.
+	 */
+	public boolean isTemplateNameEndsWith(String suffix) throws RQLException {
+		return getTemplate().isNameEndsWith(suffix);
+	}
+
+	/**
 	 * Liefert true, falls das Textelement leer ist, das auf dem gegebenen templateElement basiert.
 	 * 
 	 * @param templateElementName
@@ -5341,6 +5417,23 @@ public class Page implements ProjectContainer {
 	public boolean isUnlinked() throws RQLException {
 
 		return getLinkedFromNodeList() == null;
+	}
+
+	/**
+	 * Checks if the page created by an page GUID is still existing and valid.
+	 */
+	public boolean isValid() throws RQLException {
+		try {
+			// force read of page ID from system to check
+			getPageId();
+		} catch (PageNotFoundException ex) {
+			// signal not valid page guid
+			return false;
+		} catch (InvalidGuidException ex) {
+			// signal not valid page guid
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -5433,8 +5526,8 @@ public class Page implements ProjectContainer {
 
 		PublishingJob publishingJob = new PublishingJob(this, withFollowingPages);
 		Project project = getProject();
-		publishingJob.addToPublish(project.getProjectVariantByGuid(projectVariantGuid), project
-				.getLanguageVariantByGuid(languageVariantGuid));
+		publishingJob.addToPublish(project.getProjectVariantByGuid(projectVariantGuid),
+				project.getLanguageVariantByGuid(languageVariantGuid));
 		publishingJob.start();
 
 		return publishingJob;
@@ -5949,14 +6042,6 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
-	 * Changes the headline of this page by adding the given suffix to the current headline. There will be no blank added
-	 * automatically.
-	 */
-	public void setHeadlineAddSuffix(String suffix) throws RQLException {
-		setHeadline(getHeadline() + suffix);
-	}
-
-	/**
 	 * Changes the headline of this page to the given one.
 	 */
 	public void setHeadline(String headline) throws RQLException {
@@ -5985,6 +6070,14 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
+	 * Changes the headline of this page by adding the given suffix to the current headline. There will be no blank added
+	 * automatically.
+	 */
+	public void setHeadlineAddSuffix(String suffix) throws RQLException {
+		setHeadline(getHeadline() + suffix);
+	}
+
+	/**
 	 * Aendert den Wert des ImageElementes dieser Seite, das auf dem gegebenen templateElement basiert.
 	 * 
 	 * @param templateElementName
@@ -5996,13 +6089,6 @@ public class Page implements ProjectContainer {
 
 		// force new read of elements node list
 		deleteElementsNodeListCache();
-	}
-
-	/**
-	 * Deletes the publication package cache of this page.
-	 */
-	void deletePublicationPackageCache() throws RQLException {
-		publicationPackage = null;
 	}
 
 	/**
@@ -6420,8 +6506,10 @@ public class Page implements ProjectContainer {
 	/**
 	 * Ändert die Überschrift dieser Seite, um sie wieder publizieren zu können. Sie wird auf jeden Fall geändert und ist danach wieder
 	 * released.
-	 * <p> - hängt ein blank an oder
-	 * <p> - entfernt an bereits angehängtes blank von der Überschrift wieder
+	 * <p>
+	 * - hängt ein blank an oder
+	 * <p>
+	 * - entfernt an bereits angehängtes blank von der Überschrift wieder
 	 * <p>
 	 * Seite wird nicht geändert, falls diese Seite ein GUID page ist, also gar keine Überschrift hat.
 	 */
