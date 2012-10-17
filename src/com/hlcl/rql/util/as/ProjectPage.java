@@ -23,9 +23,9 @@ import com.hlcl.rql.as.User;
 /**
  * @author lejafr
  * 
- * This class is an abstract super class for all project related page, which wraps the general page and provide specialized interface.
- * This project page acts as a normal page and is superclass for all content class implementations. An interface for the common page
- * functions is needed to synchronize between Page and ProjectPage.
+ *         This class is an abstract super class for all project related page, which wraps the general page and provide specialized
+ *         interface. This project page acts as a normal page and is superclass for all content class implementations. An interface for
+ *         the common page functions is needed to synchronize between Page and ProjectPage.
  */
 public abstract class ProjectPage {
 
@@ -42,6 +42,38 @@ public abstract class ProjectPage {
 	}
 
 	/**
+	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
+	 * <p>
+	 * Der gegebenen Wert value wird dem Autor angezeigt. Es ist nicht die GUID der OptionListSelection.
+	 * 
+	 * @see #startSetElementValues()
+	 * @see #endSetElementValues()
+	 */
+	public void addSetOptionListValue(String templateElementName, String value) throws RQLException {
+		getPage().addSetOptionListValue(templateElementName, value);
+	}
+
+	/**
+	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
+	 * 
+	 * @see #startSetElementValues()
+	 * @see #endSetElementValues()
+	 */
+	public void addSetStandardFieldDateValue(String templateElementName, ReddotDate value) throws RQLException {
+		getPage().addSetStandardFieldDateValue(templateElementName, value);
+	}
+
+	/**
+	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
+	 * 
+	 * @see #startSetElementValues()
+	 * @see #endSetElementValues()
+	 */
+	public void addSetStandardFieldTextValue(String templateElementName, String value) throws RQLException {
+		getPage().addSetStandardFieldTextValue(templateElementName, value);
+	}
+
+	/**
 	 * Ordnet dieser Seite das gegebene Berechtigungspaket zu.
 	 */
 	public void assignAuthorizationPackage(AuthorizationPackage authorizationPackage, boolean inherit) throws RQLException {
@@ -49,10 +81,37 @@ public abstract class ProjectPage {
 	}
 
 	/**
-	 * Liefert das Template mit dem gegebenen Namen aus dem gegebenen template folder. Benötigt den session key!
+	 * Liefert true genau dann, wenn die Seite ein Element hat, das auf dem gegebenen TemplateElement basiert.
 	 */
-	public Template getTemplateByName(String templateFolderName, String templateName) throws RQLException {
-		return getProject().getTemplateByName(templateFolderName, templateName);
+	public boolean contains(String templateElementName) throws RQLException {
+
+		return getPage().contains(templateElementName);
+	}
+
+	/**
+	 * Kopiert den Wert des Imageelements der gegebenen Seite sourcePage, das auf dem gegebenen templateElement basiert in das
+	 * gleichnamige Element dieser Seite.
+	 */
+	public void copyImageValueFrom(String templateElementName, Page sourcePage) throws RQLException {
+		getPage().copyImageValueFrom(templateElementName, sourcePage);
+	}
+
+	/**
+	 * Kopiert die Werte der Optionsliste passend zu namePattern (muss ein {0} enthalten) der gegebenen Seite sourcePage in
+	 * gleichnamige Elemete dieser Seite.
+	 * <p>
+	 * Kopie erfolgt nur, wenn das Element einen eingegebenen Wert besitzt. Der Vorgabewert aus dem Template wird nicht kopiert!
+	 */
+	public void copyOptionListValuesFrom(Page sourcePage, String namePattern) throws RQLException {
+		getPage().copyOptionListValuesFrom(sourcePage, namePattern);
+	}
+
+	/**
+	 * Kopiert den Wert des Textelements der gegebenen Seite sourcePage, das auf dem gegebenen templateElement basiert in das
+	 * gleichnamige Element dieser Seite.
+	 */
+	public void copyTextValueFrom(String templateElementName, Page sourcePage) throws RQLException {
+		getPage().copyTextValueFrom(templateElementName, sourcePage);
 	}
 
 	/**
@@ -74,6 +133,53 @@ public abstract class ProjectPage {
 	}
 
 	/**
+	 * Deletes this project page. This oject cannot be userd afterwards.
+	 */
+	public void delete() throws RQLException {
+		getPage().delete();
+
+		// deactivate this object
+		this.page = null;
+		this.parms = null;
+	}
+
+	/**
+	 * Returns the number of changed elements. Call immediately before end set elements.
+	 * <p>
+	 * Even it returns 0 call {@link #endSetElementValues()}
+	 * 
+	 * @see #startSetElementValues()
+	 * @see #endSetElementValues()
+	 */
+	public int endNumberOfSetElements() throws RQLException {
+		return getPage().endNumberOfSetElements();
+	}
+
+	/**
+	 * Stops the mode to add elements which values should be changed. Updates the page with the values for all added elements.
+	 * <p>
+	 * Ändert Inhaltselemente dieser Seite mit nur einem RQL request. Es werden nur die folgenden Elementtypen unterstützt:
+	 * <p>
+	 * StandardFieldText, StandardFieldNumeric, StandardFieldDate, StandardFieldUserDefined, OptionsList
+	 * <p>
+	 * 
+	 * Folgende Elementtypen werden nicht unterstützt, da für diese spezielle Updatemethoden benutzt werden müssen:
+	 * <p>
+	 * ImageElement, MediaElement, TextElement
+	 * <p>
+	 * 
+	 * @see #startSetElementValues()
+	 * @see #addSetOptionListValue(String, String)
+	 * @see #addSetStandardFieldNumericValue(String, int)
+	 * @see #addSetStandardFieldNumericValue(String, ReddotDate)
+	 * @see #addSetStandardFieldTextValue(String, String)
+	 * @see #endSetElementValues()
+	 */
+	public void endSetElementValues() throws RQLException {
+		getPage().endSetElementValues();
+	}
+
+	/**
 	 * Erhält für HTML Elemente alle eingegebenen Zeichen (< wird zu &lt;). Ein einzelnes blank (space) wird als Textwert geschrieben
 	 * (zu &nbsp;).
 	 * 
@@ -82,6 +188,87 @@ public abstract class ProjectPage {
 	public void enterText(String templateElementName, String value) throws RQLException {
 
 		getPage().enterText(templateElementName, value);
+	}
+
+	/**
+	 * Zwei Seitenobjekte werden als identisch interpretiert, falls beide die gleiche GUID haben.
+	 * 
+	 * @return <code>true</code> if this object is the same as the obj argument; <code>false</code> otherwise.
+	 * @see java.lang.Boolean#hashCode()
+	 * @see java.util.Hashtable
+	 */
+	public boolean equals(ProjectPage page2) {
+		return getPage().equals(page2.getPage());
+	}
+
+	/**
+	 * Gibt den Speicher aller Caches wieder frei für die GC. Dieses Seitenobjekt bleibt voll funktionsfähig! Folgende Zugriffe auf
+	 * diese Seite füllen die Caches einfach wieder.
+	 * 
+	 * @see #clearLanguageVariantDependentCaches()
+	 */
+	public void freeOccupiedMemory() {
+		getPage().freeOccupiedMemory();
+	}
+
+	/**
+	 * Liefert das Berechtigungspaket (vom Typ=normal=page) dieser Seite, niemals das globale. Liefert null, falls diese Seite kein
+	 * Berechtigungspaket hat.
+	 */
+	public AuthorizationPackage getAuthorizationPackage() throws RQLException {
+		return getPage().getAuthorizationPackage();
+	}
+
+	/**
+	 * Returns the name of the authorization package's name (used to identify the user group able to edit this page).
+	 * <p>
+	 * Returns an empty string, if page didn't have a package.
+	 */
+	public String getAuthorizationPackageName() throws RQLException {
+		return getPage().getAuthorizationPackageName();
+	}
+
+	/**
+	 * Liefert den Namen des User, der diese Seite erstellt hat. Liefert 'Unknown author', falls der User bereits gelöscht wurde.
+	 * 
+	 * @see Page#hasCreatedUser()
+	 */
+	public String getCreatedByUserName() throws RQLException {
+
+		return getPage().getCreatedByUserName();
+	}
+
+	/**
+	 * Liefert den Zeitpunkt der Erstellung dieser Seite.
+	 */
+	public ReddotDate getCreatedOn() throws RQLException {
+
+		return getPage().getCreatedOn();
+	}
+
+	/**
+	 * Liefert den Dateinamen dieser Seite unter Properties vom CMS zurück. Liefert null oder leeren string, falls keiner gesetzt ist.
+	 * <p>
+	 * Dies ist nicht der generierte Dateiname auf der site.
+	 * 
+	 * @see #getPublishedFilename(String)
+	 */
+	public String getFilename() throws RQLException {
+		return getPage().getFilename();
+	}
+
+	/**
+	 * Returns the page headline
+	 */
+	public String getHeadline() throws RQLException {
+		return getPage().getHeadline();
+	}
+
+	/**
+	 * Returns the page headline and ID
+	 */
+	public String getHeadlineAndId() throws RQLException {
+		return getPage().getHeadlineAndId();
 	}
 
 	/**
@@ -123,6 +310,44 @@ public abstract class ProjectPage {
 	}
 
 	/**
+	 * Liefert die Liste aus dieser Seite, der auf dem gegebenen templateElement basiert.
+	 * 
+	 * @param listTemplateElementName
+	 *            TemplateElement muss vom Typ 13 (Liste) sein.
+	 * @return <code>List</code>
+	 * @see <code>List</code>
+	 */
+	public com.hlcl.rql.as.List getList(String listTemplateElementName) throws RQLException {
+		return getPage().getList(listTemplateElementName);
+	}
+
+	/**
+	 * Liefert die Kindseiten der Liste aus dieser Seite, der auf dem gegebenen templateElement basiert.
+	 * 
+	 * @param listTemplateElementName
+	 *            TemplateElement muss vom Typ 13 (Liste) sein.
+	 * @return <code>PageArrayList</code>
+	 * @see <code>PageArrayList</code>
+	 */
+	public PageArrayList getListChildPages(String listTemplateElementName) throws RQLException {
+
+		return getPage().getListChildPages(listTemplateElementName);
+	}
+
+	/**
+	 * Liefert die Kindseiten der Liste aus dieser Seite, der auf dem gegebenen templateElement basiert und dem gegebenen Template
+	 * entspricht.
+	 * 
+	 * @param listTemplateElementName
+	 *            TemplateElement muss vom Typ 13 (Liste) sein.
+	 * @return <code>PageArrayList</code>
+	 * @see <code>PageArrayList</code>
+	 */
+	public PageArrayList getListChildPages(String listTemplateElementName, String childTemplateName) throws RQLException {
+		return getPage().getListChildPages(listTemplateElementName, childTemplateName);
+	}
+
+	/**
 	 * Liefert die E-Mailadresse des Users, der die Seite sperrt oder zuletzt gesperrt hat. Kann auch der angemeldete sein.
 	 * 
 	 * @see #isLocked()
@@ -150,6 +375,87 @@ public abstract class ProjectPage {
 	}
 
 	/**
+	 * Liefert den Wert des OptionList Elements dieser Seite, das auf dem gegebenen templateElement basiert oder null,
+	 * <p>
+	 * falls weder diese Optionsliste einen Wert hat noch im Templateelement ein default gesetzt ist.
+	 */
+	public String getOptionListValue(String templateElementName) throws RQLException {
+
+		return getPage().getOptionListValue(templateElementName);
+	}
+
+	/**
+	 * Liefert den Wert der Optionsliste dieser Seite, das auf dem gegebenen templateElement basiert oder ifNotAvailable, falls das
+	 * Template dieser Seite keine Optionslistenelement mit dem gegebenen Namen hat.
+	 * 
+	 * @param templateElementName
+	 *            Name des Templateelements der Optionsliste
+	 * @param ifNotAvailable
+	 *            the return value, if this page does not have a template element with the given name
+	 * @return the value of the option list element with given name, or ifNotAvailable, if an element with that name does not exists
+	 * @throws RQLException
+	 */
+	public String getOptionListValueIfAvailable(String templateElementName, String ifNotAvailable) throws RQLException {
+		return getPage().getOptionListValueIfAvailable(templateElementName, ifNotAvailable);
+	}
+
+	/**
+	 * Returns a list of option list element values of this page.
+	 * 
+	 * @param templateElementNamePattern
+	 *            Pattern of the template elementn name containing exactly one argument {0}
+	 * @param arguments
+	 *            each argument number will be converted into a string and inserted into {0} and the value of this option list element
+	 *            will be collected
+	 * @param skipEmptyValues
+	 *            if true, values of empty option list elements (=null) are not included into result
+	 *            <p>
+	 *            if false, null values are included into result (size of arguments is equal to size of result list)
+	 * @throws RQLException
+	 * 
+	 * @see #getOptionListValue(String)
+	 */
+	public java.util.List<String> getOptionListValues(String templateElementNamePattern, boolean skipEmptyValues, int... arguments)
+			throws RQLException {
+		return getPage().getOptionListValues(templateElementNamePattern, skipEmptyValues, arguments);
+	}
+
+	/**
+	 * Returns a list of option list element values of this page.
+	 * 
+	 * @param templateElementNamePattern
+	 *            Pattern of the template elementn name containing exactly one argument {0}
+	 * @param arguments
+	 *            each argument string will be inserted into {0} and the value of this option list element will be collected
+	 * @param skipEmptyValues
+	 *            if true, values of empty option list elements (=null) are not included into result
+	 *            <p>
+	 *            if false, null values are included into result (size of arguments is equal to size of result list)
+	 * 
+	 * @see #getOptionListValue(String)
+	 */
+	public java.util.List<String> getOptionListValues(String templateElementNamePattern, boolean skipEmptyValues, String... arguments)
+			throws RQLException {
+		return getPage().getOptionListValues(templateElementNamePattern, skipEmptyValues, arguments);
+	}
+
+	/**
+	 * Returns a list of option list element values of this page. Some entries might be null.
+	 * <p>
+	 * Size of returned list is equal to size of given arguments.
+	 * 
+	 * @param templateElementNamePattern
+	 *            Pattern of the template elementn name containing exactly one argument {0}
+	 * @param arguments
+	 *            each argument string will be inserted into {0} and the value of this option list element will be collected
+	 * 
+	 * @see #getOptionListValue(String)
+	 */
+	public java.util.List<String> getOptionListValues(String templateElementNamePattern, String... arguments) throws RQLException {
+		return getPage().getOptionListValues(templateElementNamePattern, arguments);
+	}
+
+	/**
 	 * Returns the encapsulated page.
 	 */
 	public Page getPage() {
@@ -157,17 +463,10 @@ public abstract class ProjectPage {
 	}
 
 	/**
-	 * Returns the page headline
+	 * Liefert die RedDot GUID der Seite.
 	 */
-	public String getHeadline() throws RQLException {
-		return getPage().getHeadline();
-	}
-
-	/**
-	 * Returns the page headline and ID
-	 */
-	public String getHeadlineAndId() throws RQLException {
-		return getPage().getHeadlineAndId();
+	public String getPageGuid() {
+		return getPage().getPageGuid();
 	}
 
 	/**
@@ -217,6 +516,26 @@ public abstract class ProjectPage {
 	}
 
 	/**
+	 * Return the parent page of this project page.
+	 * 
+	 * @throws MultiLinkedPageException
+	 * @throws UnlinkedPageException
+	 * @see Page#getParentPage()
+	 */
+	public Page getParentPage() throws RQLException {
+		return getPage().getParentPage();
+	}
+
+	/**
+	 * Return the parent pages of this project page.
+	 * 
+	 * @see Page#getParentPage()
+	 */
+	public PageArrayList getParentPages() throws RQLException {
+		return getPage().getParentPages();
+	}
+
+	/**
 	 * Return the script parameters always from the cached parameters in project to speed up.
 	 */
 	private ScriptParameters getParms() throws RQLException {
@@ -227,10 +546,34 @@ public abstract class ProjectPage {
 	}
 
 	/**
+	 * Liefert diese oder die Vorgängerseite (über MainLink) zurück, die das gegebene Templateelement besitzt.
+	 */
+	public Page getPredecessorPageContainingElement(String templateElementName) throws RQLException {
+		return getPage().getPredecessorPageContainingElement(templateElementName);
+	}
+
+	/**
 	 * Returns the project from the given page.
 	 */
 	public Project getProject() {
 		return page.getProject();
+	}
+
+	/**
+	 * /** Liefert das Exportpaket über das diese Seite generiert werden muss. Liefert gegebenenfalls das globale Exportpaket zurück.
+	 * Liefert null, falls kein Exportpaket bestimmt werden kann. This method is quite slow, because of the underlaying RQL, if the
+	 * publicatoin packet is comprehensive.
+	 * <p>
+	 * The main link publication package is cached within this page to speed up publishing path calculation.
+	 * <p>
+	 * <b>Attention:</b> Do not use this method in same program together with functions to update/change the publication package. The
+	 * cache in this page might not be reset accordingly. So it is possible to get an publication package object with the old
+	 * (unchanged) data!
+	 * 
+	 * @see Page#getPublicationPackage()
+	 */
+	public PublicationPackage getPublicationPackage() throws RQLException {
+		return getPage().getPublicationPackage();
 	}
 
 	/**
@@ -300,10 +643,48 @@ public abstract class ProjectPage {
 	}
 
 	/**
+	 * Liefert den Wert des Standardfeld Textelements dieser Seite, das auf dem gegebenen templateElement basiert oder ifNotAvailable,
+	 * falls das Template dieser Seite keine StandardFieldText Element mit dem gegebenen Namen hat.
+	 * 
+	 * @param templateElementName
+	 *            TemplateElement muss vom Typ 1 sein
+	 * @param ifNotAvailable
+	 *            the return value, if this page does not have a template elemtn with the given name
+	 * @return the value of the standard field text element with given name, or ifNotAvailable, if an element with that name does not
+	 *         exists
+	 * @throws RQLException
+	 */
+	public String getStandardFieldTextValueIfAvailable(String templateElementName, String ifNotAvailable) throws RQLException {
+		return getPage().getStandardFieldTextValueIfAvailable(templateElementName, ifNotAvailable);
+	}
+
+	/**
+	 * Liefert einen Text, der den Status dieser Seite beschreibt.
+	 */
+	public String getStateInfo() throws RQLException {
+
+		return getPage().getStateInfo();
+	}
+
+	/**
 	 * Liefert das Template mit der gegebenen GUID vom Project.
 	 */
 	public Template getTemplateByGuid(String templateGuid) throws RQLException {
 		return getProject().getTemplateByGuid(templateGuid);
+	}
+
+	/**
+	 * Liefert das Template mit dem gegebenen Namen aus dem gegebenen template folder. Benötigt den session key!
+	 */
+	public Template getTemplateByName(String templateFolderName, String templateName) throws RQLException {
+		return getProject().getTemplateByName(templateFolderName, templateName);
+	}
+
+	/**
+	 * Liefert den Namen des Templates auf diese Seite basiert.
+	 */
+	public String getTemplateName() throws RQLException {
+		return getPage().getTemplateName();
 	}
 
 	/**
@@ -315,16 +696,6 @@ public abstract class ProjectPage {
 	public TextElement getTextElement(String templateElementName) throws RQLException {
 
 		return getPage().getTextElement(templateElementName);
-	}
-
-	/**
-	 * Liefert den Wert des OptionList Elements dieser Seite, das auf dem gegebenen templateElement basiert oder null,
-	 * <p>
-	 * falls weder diese Optionsliste einen Wert hat noch im Templateelement ein default gesetzt ist.
-	 */
-	public String getOptionListValue(String templateElementName) throws RQLException {
-
-		return getPage().getOptionListValue(templateElementName);
 	}
 
 	/**
@@ -369,11 +740,37 @@ public abstract class ProjectPage {
 	}
 
 	/**
+	 * @return true, if this recycling table block is multi linked, otherwise false
+	 * @see Page#isMultiLinked()
+	 */
+	public boolean isMultiLinked() throws RQLException {
+		return getPage().isMultiLinked();
+	}
+
+	/**
 	 * Liefert true, falls das Textelements dieser Seite, das auf dem gegebenen templateElement basiert, leer ist.
 	 */
 	public boolean isTextEmpty(String templateElementName) throws RQLException {
 
 		return getPage().isTextEmpty(templateElementName);
+	}
+
+	/**
+	 * Startet eine Generierung beginnend bei dieser Seite für mehrere Projektvarianten.
+	 * 
+	 * @param withFollowingPages
+	 *            nur diese Seite, oder auch folgende? (without related pages)
+	 * @param projectVariantGuids
+	 *            Liste der GUIDs
+	 * @param separator
+	 *            Trennzeichen für die GUIDs der Projektvarianten
+	 * @param languageVariantGuid
+	 *            GUID der Sprachvariante die generiert werden soll
+	 * @see <code>PublishingJob</code>
+	 */
+	public PublishingJob publish(boolean withFollowingPages, String projectVariantGuids, String separator, String languageVariantGuid)
+			throws RQLException {
+		return getPage().publish(withFollowingPages, projectVariantGuids, separator, languageVariantGuid);
 	}
 
 	/**
@@ -398,6 +795,17 @@ public abstract class ProjectPage {
 	 */
 	public void setHeadline(String headline) throws RQLException {
 		getPage().setHeadline(headline);
+	}
+
+	/**
+	 * Aendert den Wert der Optionsliste dieser Seite, das auf dem gegebenen templateElement basiert. Der gegebenen Wert value wird dem
+	 * Autor angezeigt. Es ist nicht die GUID der OptionListSelection.
+	 * 
+	 * @param templateElementName
+	 *            TemplateElement muss Typ 8 sein
+	 */
+	public void setOptionListValue(String templateElementName, String value) throws RQLException {
+		getPage().setOptionListValue(templateElementName, value);
 	}
 
 	/**
@@ -443,182 +851,6 @@ public abstract class ProjectPage {
 	}
 
 	/**
-	 * Workflow: Übergibt eine Seite im Entwurf zur Prüfung an den Workflow. Vom aktuell angemeldeten User aus gesehen. Oder ohne
-	 * Workflow, wird die Änderung des Autors an dieser Seite gespeichert, so dass sie für alle sichtbar ist.
-	 * 
-	 * @return null, falls submit erfolgreich war java.util.List of TemplateElement, mit den fehlenden Pflichtfeldern
-	 */
-	public java.util.List<TemplateElement> submitToWorkflow() throws RQLException {
-		return getPage().submitToWorkflow();
-	}
-
-	/**
-	 * Liefert true genau dann, wenn die Seite ein Element hat, das auf dem gegebenen TemplateElement basiert.
-	 */
-	public boolean contains(String templateElementName) throws RQLException {
-
-		return getPage().contains(templateElementName);
-	}
-
-	/**
-	 * Liefert einen Text, der den Status dieser Seite beschreibt.
-	 */
-	public String getStateInfo() throws RQLException {
-
-		return getPage().getStateInfo();
-	}
-
-	/**
-	 * Liefert den Namen des User, der diese Seite erstellt hat. Liefert 'Unknown author', falls der User bereits gelöscht wurde.
-	 * 
-	 * @see Page#hasCreatedUser()
-	 */
-	public String getCreatedByUserName() throws RQLException {
-
-		return getPage().getCreatedByUserName();
-	}
-
-	/**
-	 * Liefert diese oder die Vorgängerseite (über MainLink) zurück, die das gegebene Templateelement besitzt.
-	 */
-	public Page getPredecessorPageContainingElement(String templateElementName) throws RQLException {
-		return getPage().getPredecessorPageContainingElement(templateElementName);
-	}
-
-	/**
-	 * Liefert den Zeitpunkt der Erstellung dieser Seite.
-	 */
-	public ReddotDate getCreatedOn() throws RQLException {
-
-		return getPage().getCreatedOn();
-	}
-
-	/**
-	 * Aendert den Wert der Optionsliste dieser Seite, das auf dem gegebenen templateElement basiert. Der gegebenen Wert value wird dem
-	 * Autor angezeigt. Es ist nicht die GUID der OptionListSelection.
-	 * 
-	 * @param templateElementName
-	 *            TemplateElement muss Typ 8 sein
-	 */
-	public void setOptionListValue(String templateElementName, String value) throws RQLException {
-		getPage().setOptionListValue(templateElementName, value);
-	}
-
-	/**
-	 * Liefert die Kindseiten der Liste aus dieser Seite, der auf dem gegebenen templateElement basiert.
-	 * 
-	 * @param listTemplateElementName
-	 *            TemplateElement muss vom Typ 13 (Liste) sein.
-	 * @return <code>PageArrayList</code>
-	 * @see <code>PageArrayList</code>
-	 */
-	public PageArrayList getListChildPages(String listTemplateElementName) throws RQLException {
-
-		return getPage().getListChildPages(listTemplateElementName);
-	}
-
-	/**
-	 * Liefert das Berechtigungspaket (vom Typ=normal=page) dieser Seite, niemals das globale. Liefert null, falls diese Seite kein
-	 * Berechtigungspaket hat.
-	 */
-	public AuthorizationPackage getAuthorizationPackage() throws RQLException {
-		return getPage().getAuthorizationPackage();
-	}
-
-	/**
-	 * Liefert die Liste aus dieser Seite, der auf dem gegebenen templateElement basiert.
-	 * 
-	 * @param listTemplateElementName
-	 *            TemplateElement muss vom Typ 13 (Liste) sein.
-	 * @return <code>List</code>
-	 * @see <code>List</code>
-	 */
-	public com.hlcl.rql.as.List getList(String listTemplateElementName) throws RQLException {
-		return getPage().getList(listTemplateElementName);
-	}
-
-	/**
-	 * Liefert die RedDot GUID der Seite.
-	 */
-	public String getPageGuid() {
-		return getPage().getPageGuid();
-	}
-
-	/**
-	 * Liefert den Namen des Templates auf diese Seite basiert.
-	 */
-	public String getTemplateName() throws RQLException {
-		return getPage().getTemplateName();
-	}
-
-	/**
-	 * Zwei Seitenobjekte werden als identisch interpretiert, falls beide die gleiche GUID haben.
-	 * 
-	 * @return <code>true</code> if this object is the same as the obj argument; <code>false</code> otherwise.
-	 * @see java.lang.Boolean#hashCode()
-	 * @see java.util.Hashtable
-	 */
-	public boolean equals(ProjectPage page2) {
-		return getPage().equals(page2.getPage());
-	}
-
-	/**
-	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
-	 * <p>
-	 * Der gegebenen Wert value wird dem Autor angezeigt. Es ist nicht die GUID der OptionListSelection.
-	 * 
-	 * @see #startSetElementValues()
-	 * @see #endSetElementValues()
-	 */
-	public void addSetOptionListValue(String templateElementName, String value) throws RQLException {
-		getPage().addSetOptionListValue(templateElementName, value);
-	}
-
-	/**
-	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
-	 * 
-	 * @see #startSetElementValues()
-	 * @see #endSetElementValues()
-	 */
-	public void addSetStandardFieldTextValue(String templateElementName, String value) throws RQLException {
-		getPage().addSetStandardFieldTextValue(templateElementName, value);
-	}
-
-	/**
-	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
-	 * 
-	 * @see #startSetElementValues()
-	 * @see #endSetElementValues()
-	 */
-	public void addSetStandardFieldDateValue(String templateElementName, ReddotDate value) throws RQLException {
-		getPage().addSetStandardFieldDateValue(templateElementName, value);
-	}
-
-	/**
-	 * Stops the mode to add elements which values should be changed. Updates the page with the values for all added elements.
-	 * <p>
-	 * Ändert Inhaltselemente dieser Seite mit nur einem RQL request. Es werden nur die folgenden Elementtypen unterstützt:
-	 * <p>
-	 * StandardFieldText, StandardFieldNumeric, StandardFieldDate, StandardFieldUserDefined, OptionsList
-	 * <p>
-	 * 
-	 * Folgende Elementtypen werden nicht unterstützt, da für diese spezielle Updatemethoden benutzt werden müssen:
-	 * <p>
-	 * ImageElement, MediaElement, TextElement
-	 * <p>
-	 * 
-	 * @see #startSetElementValues()
-	 * @see #addSetOptionListValue(String, String)
-	 * @see #addSetStandardFieldNumericValue(String, int)
-	 * @see #addSetStandardFieldNumericValue(String, ReddotDate)
-	 * @see #addSetStandardFieldTextValue(String, String)
-	 * @see #endSetElementValues()
-	 */
-	public void endSetElementValues() throws RQLException {
-		getPage().endSetElementValues();
-	}
-
-	/**
 	 * Start a mode to add elements which values should be changed.
 	 * 
 	 * @see #setElementValues(Map)
@@ -640,203 +872,13 @@ public abstract class ProjectPage {
 	}
 
 	/**
-	 * Returns the number of changed elements. Call immediately before end set elements.
-	 * <p>
-	 * Even it returns 0 call {@link #endSetElementValues()}
+	 * Workflow: Übergibt eine Seite im Entwurf zur Prüfung an den Workflow. Vom aktuell angemeldeten User aus gesehen. Oder ohne
+	 * Workflow, wird die Änderung des Autors an dieser Seite gespeichert, so dass sie für alle sichtbar ist.
 	 * 
-	 * @see #startSetElementValues()
-	 * @see #endSetElementValues()
+	 * @return null, falls submit erfolgreich war java.util.List of TemplateElement, mit den fehlenden Pflichtfeldern
 	 */
-	public int endNumberOfSetElements() throws RQLException {
-		return getPage().endNumberOfSetElements();
-	}
-
-	/**
-	 * Liefert den Dateinamen dieser Seite unter Properties vom CMS zurück. Liefert null oder leeren string, falls keiner gesetzt ist.
-	 * <p>
-	 * Dies ist nicht der generierte Dateiname auf der site.
-	 * 
-	 * @see #getPublishedFilename(String)
-	 */
-	public String getFilename() throws RQLException {
-		return getPage().getFilename();
-	}
-
-	/**
-	 * Returns the name of the authorization package's name (used to identify the user group able to edit this page).
-	 * <p>
-	 * Returns an empty string, if page didn't have a package.
-	 */
-	public String getAuthorizationPackageName() throws RQLException {
-		return getPage().getAuthorizationPackageName();
-	}
-
-	/**
-	 * Returns a list of option list element values of this page. Some entries might be null.
-	 * <p>
-	 * Size of returned list is equal to size of given arguments.
-	 * 
-	 * @param templateElementNamePattern
-	 *            Pattern of the template elementn name containing exactly one argument {0}
-	 * @param arguments
-	 *            each argument string will be inserted into {0} and the value of this option list element will be collected
-	 * 
-	 * @see #getOptionListValue(String)
-	 */
-	public java.util.List<String> getOptionListValues(String templateElementNamePattern, String... arguments) throws RQLException {
-		return getPage().getOptionListValues(templateElementNamePattern, arguments);
-	}
-
-	/**
-	 * Returns a list of option list element values of this page.
-	 * 
-	 * @param templateElementNamePattern
-	 *            Pattern of the template elementn name containing exactly one argument {0}
-	 * @param arguments
-	 *            each argument number will be converted into a string and inserted into {0} and the value of this option list element
-	 *            will be collected
-	 * @param skipEmptyValues
-	 *            if true, values of empty option list elements (=null) are not included into result
-	 *            <p>
-	 *            if false, null values are included into result (size of arguments is equal to size of result list)
-	 * @throws RQLException
-	 * 
-	 * @see #getOptionListValue(String)
-	 */
-	public java.util.List<String> getOptionListValues(String templateElementNamePattern, boolean skipEmptyValues, int... arguments)
-			throws RQLException {
-		return getPage().getOptionListValues(templateElementNamePattern, skipEmptyValues, arguments);
-	}
-
-	/**
-	 * Returns a list of option list element values of this page.
-	 * 
-	 * @param templateElementNamePattern
-	 *            Pattern of the template elementn name containing exactly one argument {0}
-	 * @param arguments
-	 *            each argument string will be inserted into {0} and the value of this option list element will be collected
-	 * @param skipEmptyValues
-	 *            if true, values of empty option list elements (=null) are not included into result
-	 *            <p>
-	 *            if false, null values are included into result (size of arguments is equal to size of result list)
-	 * 
-	 * @see #getOptionListValue(String)
-	 */
-	public java.util.List<String> getOptionListValues(String templateElementNamePattern, boolean skipEmptyValues, String... arguments)
-			throws RQLException {
-		return getPage().getOptionListValues(templateElementNamePattern, skipEmptyValues, arguments);
-	}
-
-	/**
-	 * Startet eine Generierung beginnend bei dieser Seite für mehrere Projektvarianten.
-	 * 
-	 * @param withFollowingPages
-	 *            nur diese Seite, oder auch folgende? (without related pages)
-	 * @param projectVariantGuids
-	 *            Liste der GUIDs
-	 * @param separator
-	 *            Trennzeichen für die GUIDs der Projektvarianten
-	 * @param languageVariantGuid
-	 *            GUID der Sprachvariante die generiert werden soll
-	 * @see <code>PublishingJob</code>
-	 */
-	public PublishingJob publish(boolean withFollowingPages, String projectVariantGuids, String separator, String languageVariantGuid)
-			throws RQLException {
-		return getPage().publish(withFollowingPages, projectVariantGuids, separator, languageVariantGuid);
-	}
-
-	/**
-	 * Liefert die Kindseiten der Liste aus dieser Seite, der auf dem gegebenen templateElement basiert und dem gegebenen Template
-	 * entspricht.
-	 * 
-	 * @param listTemplateElementName
-	 *            TemplateElement muss vom Typ 13 (Liste) sein.
-	 * @return <code>PageArrayList</code>
-	 * @see <code>PageArrayList</code>
-	 */
-	public PageArrayList getListChildPages(String listTemplateElementName, String childTemplateName) throws RQLException {
-		return getPage().getListChildPages(listTemplateElementName, childTemplateName);
-	}
-
-	/**
-	 * Kopiert die Werte der Optionsliste passend zu namePattern (muss ein {0} enthalten) der gegebenen Seite sourcePage in
-	 * gleichnamige Elemete dieser Seite.
-	 * <p>
-	 * Kopie erfolgt nur, wenn das Element einen eingegebenen Wert besitzt. Der Vorgabewert aus dem Template wird nicht kopiert!
-	 */
-	public void copyOptionListValuesFrom(Page sourcePage, String namePattern) throws RQLException {
-		getPage().copyOptionListValuesFrom(sourcePage, namePattern);
-	}
-
-	/**
-	 * Kopiert den Wert des Textelements der gegebenen Seite sourcePage, das auf dem gegebenen templateElement basiert in das
-	 * gleichnamige Element dieser Seite.
-	 */
-	public void copyTextValueFrom(String templateElementName, Page sourcePage) throws RQLException {
-		getPage().copyTextValueFrom(templateElementName, sourcePage);
-	}
-
-	/**
-	 * Kopiert den Wert des Imageelements der gegebenen Seite sourcePage, das auf dem gegebenen templateElement basiert in das
-	 * gleichnamige Element dieser Seite.
-	 */
-	public void copyImageValueFrom(String templateElementName, Page sourcePage) throws RQLException {
-		getPage().copyImageValueFrom(templateElementName, sourcePage);
-	}
-
-	/**
-	 * @return true, if this recycling table block is multi linked, otherwise false
-	 * @see Page#isMultiLinked()
-	 */
-	public boolean isMultiLinked() throws RQLException {
-		return getPage().isMultiLinked();
-	}
-
-	/**
-	 * /** Liefert das Exportpaket über das diese Seite generiert werden muss. Liefert gegebenenfalls das globale Exportpaket zurück.
-	 * Liefert null, falls kein Exportpaket bestimmt werden kann. This method is quite slow, because of the underlaying RQL, if the
-	 * publicatoin packet is comprehensive.
-	 * <p>
-	 * The main link publication package is cached within this page to speed up publishing path calculation.
-	 * <p>
-	 * <b>Attention:</b> Do not use this method in same program together with functions to update/change the publication package. The
-	 * cache in this page might not be reset accordingly. So it is possible to get an publication package object with the old
-	 * (unchanged) data!
-	 * 
-	 * @see Page#getPublicationPackage()
-	 */
-	public PublicationPackage getPublicationPackage() throws RQLException {
-		return getPage().getPublicationPackage();
-	}
-
-	/**
-	 * Deletes this project page. This oject cannot be userd afterwards.
-	 */
-	public void delete() throws RQLException {
-		getPage().delete();
-
-		// deactivate this object
-		this.page = null;
-		this.parms = null;
-	}
-
-	/**
-	 * @return true, if this recycling table block is multi linked, otherwise false
-	 * @throws MultiLinkedPageException
-	 * @throws UnlinkedPageException
-	 * @see Page#getParentPage()
-	 */
-	public Page getParentPage() throws RQLException {
-		return getPage().getParentPage();
-	}
-	/**
-	 * Gibt den Speicher aller Caches wieder frei für die GC. Dieses Seitenobjekt bleibt voll funktionsfähig! Folgende Zugriffe auf
-	 * diese Seite füllen die Caches einfach wieder.
-	 * 
-	 * @see #clearLanguageVariantDependentCaches()
-	 */
-	public void freeOccupiedMemory() {
-		getPage().freeOccupiedMemory();
+	public java.util.List<TemplateElement> submitToWorkflow() throws RQLException {
+		return getPage().submitToWorkflow();
 	}
 
 }

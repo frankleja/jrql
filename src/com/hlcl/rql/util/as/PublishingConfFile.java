@@ -116,7 +116,7 @@ public class PublishingConfFile {
 		return confFile;
 	}
 	
-	public static class Log {
+	public class Log {
 
 		private java.io.File logFile = null;
 		private String projectVariantNameFromFileName = null;

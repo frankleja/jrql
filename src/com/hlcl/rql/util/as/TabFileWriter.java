@@ -79,6 +79,15 @@ public class TabFileWriter {
 	}
 
 	/**
+	 * Adds empty fields for the number of columns.
+	 */
+	public void indent(int numberOfColumns) throws RQLException {
+		for (int i = 1; i <= numberOfColumns; i++) {
+			append("");
+		}
+	}
+
+	/**
 	 * Appends a new column value into current line after replacing all \t and \n with blanks.
 	 */
 	public void append(String columnValue) throws RQLException {
