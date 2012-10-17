@@ -19,6 +19,7 @@ import com.hlcl.rql.util.as.SimulateSmartEditUsagePageAction;
 
 /**
  * @author lejafr
+ * 
  */
 public class BatchProgrammingCollectPhysicalPages {
 
@@ -30,7 +31,7 @@ public class BatchProgrammingCollectPhysicalPages {
 	 */
 	public static void main(String[] args) throws RQLException, ClassNotFoundException, SQLException {
 
-		String logonGuid = "0B1FBC04A6D94A45A6C5E2AC8915B698";
+		String logonGuid =  "0B1FBC04A6D94A45A6C5E2AC8915B698";
 		String sessionKey = "C26CF959E1434E31B7F9DA89829369B4";
 		String projectGuid = "73671509FA5C43ED8FC4171AD0298AD2";
 
