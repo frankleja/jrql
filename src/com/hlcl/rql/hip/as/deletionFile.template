@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<rde-dm:import-list>
-<rde-dm:import>
-<rde-dm:reference type="delete">FILENAME_VARIABLE</rde-dm:reference>
-</rde-dm:import>
-</rde-dm:import-list>
- 
