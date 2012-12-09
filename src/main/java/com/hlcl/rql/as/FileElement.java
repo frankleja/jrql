@@ -70,8 +70,7 @@ public abstract class FileElement extends Element implements FolderContainer {
 	public URL getDownloadUrl(boolean runsOnServer) throws RQLException {
 
 		// get url master
-		ResourceBundle b = ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw");
-		String downloadUrl = b.getString("downloadUrl");
+		String downloadUrl = getCmsClient().getFileDownloadUrlPattern();
 
 		// build parm array
 		String filename = getFilename();

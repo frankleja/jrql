@@ -3937,10 +3937,11 @@ public class Page implements ProjectContainer {
 
 	/**
 	 * Liefert die URL für die Seitenvorschau. Im Status draft funktioniert page preview nicht.
+	 * Can be used to activate page elements which are added into the template.
 	 */
 	public String getPagePreviewUrl() throws RQLException {
-		ResourceBundle b = ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw");
-		String pagePreviewUrl = b.getString("pagePreviewUrl");
+		
+		String pagePreviewUrl = getCmsClient().getPagePreviewUrlPattern();
 		Object[] parms = new Object[1];
 		parms[0] = getPageGuid();
 		return MessageFormat.format(pagePreviewUrl, parms);

@@ -63,11 +63,14 @@ public class CmsClient {
 	private static final String STATISTIC_MAIL_FROM_ADDRESS = "lejafr@hlag.com";
 
 	/**
-	 * BURMEBJ002A Diese Methode verschickt eine E-Mail mit Attachements an mehrere Empfï¿½nger. Ein groï¿½er Teil dieser Methode wurde
-	 * von der ursprï¿½nglichen Methode sendMail(String, String[], String, String, File[]) ï¿½bernommen. Lediglich der letzte Parameter
-	 * fileNames wurde ergï¿½nzt.
+	 * BURMEBJ002A Diese Methode verschickt eine E-Mail mit Attachements an
+	 * mehrere Empfï¿½nger. Ein groï¿½er Teil dieser Methode wurde von der
+	 * ursprï¿½nglichen Methode sendMail(String, String[], String, String,
+	 * File[]) ï¿½bernommen. Lediglich der letzte Parameter fileNames wurde
+	 * ergï¿½nzt.
 	 * 
-	 * Geï¿½ndert durch: Name Datum: MM-JJ Beschreibung: kurze Erlï¿½uterung der ï¿½nderung
+	 * Geï¿½ndert durch: Name Datum: MM-JJ Beschreibung: kurze Erlï¿½uterung der
+	 * ï¿½nderung
 	 * 
 	 * @param from
 	 *            ein String mit der E-Mail-Adresse des Absenders
@@ -80,20 +83,24 @@ public class CmsClient {
 	 * @param attachements
 	 *            ein Array von Files, die attached werden sollen
 	 * @param fileNames
-	 *            Ein Array mit den fileNames, die fï¿½r die Attachments in der Mail vergeben werden sollen. Dabei wird
-	 *            folgendermaï¿½en vorgegangen: Fï¿½r das i. Attachement wird geprï¿½ft, ob der i. Eintrag des fileNames-Array von null
-	 *            verschieden ist. Wenn ja, wird dieser fileName verwendet, ansonsten der ursprï¿½ngliche File-Name des Attachements.
-	 *            (BURMEBJ002A)
-	 * @exception javax.mail.MessagingException,
-	 *                wenn beim Versenden der E-Mail ein Fehler auftritt
+	 *            Ein Array mit den fileNames, die fï¿½r die Attachments in der
+	 *            Mail vergeben werden sollen. Dabei wird folgendermaï¿½en
+	 *            vorgegangen: Fï¿½r das i. Attachement wird geprï¿½ft, ob der
+	 *            i. Eintrag des fileNames-Array von null verschieden ist. Wenn
+	 *            ja, wird dieser fileName verwendet, ansonsten der
+	 *            ursprï¿½ngliche File-Name des Attachements. (BURMEBJ002A)
+	 * @exception javax.mail.MessagingException
+	 *                , wenn beim Versenden der E-Mail ein Fehler auftritt
 	 */
-	static public void sendMail(String from, String[] to, String subject, String msgText, java.io.File[] attachements,
-			String[] fileNames) throws MessagingException {
+	static public void sendMail(String from, String[] to, String subject,
+			String msgText, java.io.File[] attachements, String[] fileNames)
+			throws MessagingException {
 		//
 		// Der SMTP-Host wird aus einer properties-Datei gelesen:
 		//
 		String smtpHost = "";
-		PropertyResourceBundle bundle = (PropertyResourceBundle) PropertyResourceBundle.getBundle("com.hlcl.rql.as.SMTPHost");
+		PropertyResourceBundle bundle = (PropertyResourceBundle) PropertyResourceBundle
+				.getBundle("com.hlcl.rql.as.SMTPHost");
 		smtpHost = bundle.getString("smtpHost").trim();
 		//
 		// Erzeugen eines Properties-Objektes mit dem SMTP-Host:
@@ -161,7 +168,7 @@ public class CmsClient {
 			mp.addBodyPart(text);
 			//
 			// Anhängen der Attachements:
-			//		
+			//
 			// BURMEBJ003 moved end
 			// @BURMEBJ002A begin
 			int numberOfFileNames = 0;
@@ -196,7 +203,8 @@ public class CmsClient {
 	}
 
 	// BURMEBJ004A
-	static private void setOptionalProperty(String key, ResourceBundle bundle, Properties props) {
+	static private void setOptionalProperty(String key, ResourceBundle bundle,
+			Properties props) {
 		try {
 			String value = bundle.getString(key);
 			if (value != null) {
@@ -206,7 +214,8 @@ public class CmsClient {
 				}
 			}
 		} catch (MissingResourceException mre) {
-			// ignorieren, property ist optional, muß also nicht konfiguriert werden.
+			// ignorieren, property ist optional, muß also nicht konfiguriert
+			// werden.
 		}
 	}
 
@@ -229,7 +238,8 @@ public class CmsClient {
 	private RQLNodeList projectsNodeListCache;
 
 	// URL of remote RQL bridge ASP file
-	// determine to which CMS server it would be connected, from constructor or default from rql_fw.properties
+	// determine to which CMS server it would be connected, from constructor or
+	// default from rql_fw.properties
 	// like http://reddot.hlcl.com/cms/hlclRemoteRQL.asp
 	private URL cmsServerConnectionUrl;
 
@@ -239,7 +249,8 @@ public class CmsClient {
 	 * @param passwordAuthentication
 	 * @throws UserAlreadyLoggedInException
 	 */
-	public CmsClient(PasswordAuthentication passwordAuthentication) throws RQLException {
+	public CmsClient(PasswordAuthentication passwordAuthentication)
+			throws RQLException {
 
 		super();
 		cmsServerConnectionUrl = null;
@@ -252,7 +263,8 @@ public class CmsClient {
 	 * @param passwordAuthentication
 	 * @throws UserAlreadyLoggedInException
 	 */
-	public CmsClient(PasswordAuthentication passwordAuthentication, URL cmsServerConnectionUrl) throws RQLException {
+	public CmsClient(PasswordAuthentication passwordAuthentication,
+			URL cmsServerConnectionUrl) throws RQLException {
 
 		super();
 		// remember the CMS server to bind to
@@ -276,14 +288,16 @@ public class CmsClient {
 	}
 
 	/**
-	 * Erzeugt einen CmsClient fï¿½r die gegebene logonGuid. Gleichzeitig wird der angemeldete Benutzer initialisiert.
+	 * Erzeugt einen CmsClient fï¿½r die gegebene logonGuid. Gleichzeitig wird
+	 * der angemeldete Benutzer initialisiert.
 	 * 
 	 * @param logonGuid
 	 *            Anmelde-GUID des angemeldeten Nutzers
 	 * @param connectedUserGuid
 	 *            GUID des angemeldeten Nutzers
 	 */
-	public CmsClient(String logonGuid, String connectedUserGuid) throws RQLException {
+	public CmsClient(String logonGuid, String connectedUserGuid)
+			throws RQLException {
 		super();
 
 		this.logonGuid = logonGuid;
@@ -292,12 +306,14 @@ public class CmsClient {
 	}
 
 	/**
-	 * Erzeugt einen CmsClient fï¿½r die gegebene logonGuid und die gegebene URL zur CMS Server hlclRemoteRQL.asp.
+	 * Erzeugt einen CmsClient fï¿½r die gegebene logonGuid und die gegebene URL
+	 * zur CMS Server hlclRemoteRQL.asp.
 	 * 
 	 * @param logonGuid
 	 *            Anmelde-GUID des angemeldeten Nutzers
 	 */
-	public CmsClient(String logonGuid, URL cmsServerConnectionUrl) throws RQLException {
+	public CmsClient(String logonGuid, URL cmsServerConnectionUrl)
+			throws RQLException {
 		super();
 
 		this.logonGuid = logonGuid;
@@ -307,8 +323,9 @@ public class CmsClient {
 	}
 
 	/**
-	 * Diese Methode liefert den ï¿½bergebenen Node mit all seinen Nachkommen in einen RQLNode mit den entsprechenden Nachkommen um.
-	 * Der RQL-Node, der dem ï¿½bergebenen Node entspricht, wird zurï¿½ckgegeben.
+	 * Diese Methode liefert den ï¿½bergebenen Node mit all seinen Nachkommen in
+	 * einen RQLNode mit den entsprechenden Nachkommen um. Der RQL-Node, der dem
+	 * ï¿½bergebenen Node entspricht, wird zurï¿½ckgegeben.
 	 */
 	private RQLNode buildTree(Node root) {
 		if (root == null)
@@ -323,14 +340,16 @@ public class CmsClient {
 			for (int i = 0; i < (nnm != null ? nnm.getLength() : 0); i++) {
 				Node attr = nnm.item(i);
 				if (attr.getNodeType() == Node.ATTRIBUTE_NODE) {
-					((RQLTagNode) rqlRoot).addAttribute(attr.getNodeName(), attr.getNodeValue());
+					((RQLTagNode) rqlRoot).addAttribute(attr.getNodeName(),
+							attr.getNodeValue());
 				}
 			}
 
 			NodeList children = root.getChildNodes();
 			for (int i = 0; i < (children != null ? children.getLength() : 0); i++) {
 				Node child = children.item(i);
-				if (child.getNodeType() == Node.ELEMENT_NODE || child.getNodeType() == Node.TEXT_NODE) {
+				if (child.getNodeType() == Node.ELEMENT_NODE
+						|| child.getNodeType() == Node.TEXT_NODE) {
 					RQLNode rqlChild = buildTree(child);
 					((RQLTagNode) rqlRoot).addChild(rqlChild);
 				}
@@ -353,11 +372,14 @@ public class CmsClient {
 		User user = null;
 		String loginGuidOrNull = node.getAttribute("loginguid");
 		if (loginGuidOrNull == null) {
-			user = new User(this, node.getAttribute("name"), node.getAttribute("guid"), node.getAttribute("id"), node
-					.getAttribute("fullname"), node.getAttribute("email"));
+			user = new User(this, node.getAttribute("name"),
+					node.getAttribute("guid"), node.getAttribute("id"),
+					node.getAttribute("fullname"), node.getAttribute("email"));
 		} else {
-			user = new User(this, node.getAttribute("name"), node.getAttribute("guid"), node.getAttribute("id"), node
-					.getAttribute("fullname"), node.getAttribute("email"), loginGuidOrNull);
+			user = new User(this, node.getAttribute("name"),
+					node.getAttribute("guid"), node.getAttribute("id"),
+					node.getAttribute("fullname"), node.getAttribute("email"),
+					loginGuidOrNull);
 		}
 		return user;
 	}
@@ -365,13 +387,18 @@ public class CmsClient {
 	/**
 	 * Wandelt den RQLNode fï¿½r eine user interface language in ein Object.
 	 */
-	private UserInterfaceLanguage buildUserInterfaceLanguage(RQLNode languageNode) {
-		return new UserInterfaceLanguage(this, languageNode.getAttribute("rfclanguageid"), languageNode.getAttribute("id"),
-				languageNode.getAttribute("country"), languageNode.getAttribute("language"));
+	private UserInterfaceLanguage buildUserInterfaceLanguage(
+			RQLNode languageNode) {
+		return new UserInterfaceLanguage(this,
+				languageNode.getAttribute("rfclanguageid"),
+				languageNode.getAttribute("id"),
+				languageNode.getAttribute("country"),
+				languageNode.getAttribute("language"));
 	}
 
 	/**
-	 * Sendet einen RQL request an das CMS und gibt die geparste Antwort zurï¿½ck.
+	 * Sendet einen RQL request an das CMS und gibt die geparste Antwort
+	 * zurï¿½ck.
 	 * <p>
 	 * Leitet den Aufruf an den RQLHelper weiter.
 	 * 
@@ -387,17 +414,20 @@ public class CmsClient {
 	}
 
 	/**
-	 * Diese Methode fï¿½hr eine RQL-Anfrage mit der ï¿½bergebenen rqlQuery an das CMS aus. Das Ergebnis wird in Form eines RQLNode ("<IODATA>...</IODATA>")
-	 * zurï¿½ckgegeben. Wenn es zu Problemen kommt, wird eine RQLException geworfen.
+	 * Diese Methode fï¿½hr eine RQL-Anfrage mit der ï¿½bergebenen rqlQuery an
+	 * das CMS aus. Das Ergebnis wird in Form eines RQLNode
+	 * ("<IODATA>...</IODATA>") zurï¿½ckgegeben. Wenn es zu Problemen kommt,
+	 * wird eine RQLException geworfen.
 	 * 
 	 * @param rqlQuery
 	 *            String: s.o.
 	 * @return RQLNode: s.o.
-	 * @throws RQLException:
-	 *             s.o.
+	 * @throws RQLException
+	 *             : s.o.
 	 */
 	private RQLNode callCmsPrimitive(String rqlQuery) throws RQLException {
-		InputStream is = null; // BURMEBJ001A, um im finally ein close() zu machen
+		InputStream is = null; // BURMEBJ001A, um im finally ein close() zu
+								// machen
 		RQLNode root = null;
 
 		try {
@@ -442,7 +472,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Sendet einen RQL request an das CMS und gibt die ungeparste Antwort zurï¿½ck. Leitet den Aufruf an den RQLHelper weiter.
+	 * Sendet einen RQL request an das CMS und gibt die ungeparste Antwort
+	 * zurï¿½ck. Leitet den Aufruf an den RQLHelper weiter.
 	 * 
 	 * @param rqlRequest
 	 *            String
@@ -457,25 +488,33 @@ public class CmsClient {
 
 	// BURMEBJ001A
 	/**
-	 * Diese Methode fï¿½hr eine RQL-Anfrage mit der ï¿½bergebenen rqlQuery an das CMS aus. Das Ergebnis wird als String
-	 * zurï¿½ckgegeben. Es wird davon ausgegangen, daï¿½ die 1. Zeile von der Form <?xml ... ?> ist. In diesem Fall wird diese erste
-	 * Zeile weggelassen. Andernfalls kommt es zu einer Exception.
+	 * Diese Methode fï¿½hr eine RQL-Anfrage mit der ï¿½bergebenen rqlQuery an
+	 * das CMS aus. Das Ergebnis wird als String zurï¿½ckgegeben. Es wird davon
+	 * ausgegangen, daï¿½ die 1. Zeile von der Form <?xml ... ?> ist. In diesem
+	 * Fall wird diese erste Zeile weggelassen. Andernfalls kommt es zu einer
+	 * Exception.
 	 * 
 	 * @param rqlQuery
 	 *            String: s.o.
 	 * @return String: s.o.
-	 * @throws RQLException:
-	 *             s.o.
+	 * @throws RQLException
+	 *             : s.o.
 	 */
-	private String callCmsWithoutParsingPrimitive(String rqlQuery) throws RQLException {
+	private String callCmsWithoutParsingPrimitive(String rqlQuery)
+			throws RQLException {
 		BufferedReader br = null;
 
 		try {
-			br = new BufferedReader(new InputStreamReader(getCMSResultAsStream(rqlQuery), getResponseReaderEncoding()));
+			br = new BufferedReader(
+					new InputStreamReader(getCMSResultAsStream(rqlQuery),
+							getResponseReaderEncoding()));
 
-			StringBuffer firstLine = new StringBuffer(); // fï¿½r die erste Zeile der Antwort
-			StringBuffer content = new StringBuffer(); // fï¿½r die restlichen Zeilen der Antwort
-			byte state = 0; // 0: erste Zeile, 1: Zeilenumbrï¿½che am Ende der ersten Zeile, 2: weitere Zeilen
+			StringBuffer firstLine = new StringBuffer(); // fï¿½r die erste
+															// Zeile der Antwort
+			StringBuffer content = new StringBuffer(); // fï¿½r die restlichen
+														// Zeilen der Antwort
+			byte state = 0; // 0: erste Zeile, 1: Zeilenumbrï¿½che am Ende der
+							// ersten Zeile, 2: weitere Zeilen
 			int next = -1;
 
 			while ((next = br.read()) != -1) {
@@ -495,8 +534,11 @@ public class CmsClient {
 			}
 
 			String firstLineString = firstLine.toString();
-			if (!(firstLineString.startsWith("<?xml") && firstLineString.endsWith("?>")))
-				throw new RQLException("RQLHelper.callCMSWithoutParsing(): first line not valid: " + firstLineString);
+			if (!(firstLineString.startsWith("<?xml") && firstLineString
+					.endsWith("?>")))
+				throw new RQLException(
+						"RQLHelper.callCMSWithoutParsing(): first line not valid: "
+								+ firstLineString);
 
 			return content.toString();
 		} catch (IOException ioe) {
@@ -518,7 +560,8 @@ public class CmsClient {
 	 *            Guid des neuen Projektes
 	 * @return Project
 	 */
-	public Project changeCurrentProjectByGuid(String projectGuid) throws RQLException {
+	public Project changeCurrentProjectByGuid(String projectGuid)
+			throws RQLException {
 
 		return getProjectByGuid(projectGuid);
 	}
@@ -530,7 +573,8 @@ public class CmsClient {
 	 *            Name des neuen Projektes, z.b. hip.hlcl.com
 	 * @return Project
 	 */
-	public Project changeCurrentProjectByName(String projectName) throws RQLException {
+	public Project changeCurrentProjectByName(String projectName)
+			throws RQLException {
 
 		return getProjectByName(projectName);
 	}
@@ -549,17 +593,19 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert alle Mailadressen aller User zurï¿½ck, die fï¿½r die gegebenen Projekte zugelassen sind.
+	 * Liefert alle Mailadressen aller User zurï¿½ck, die fï¿½r die gegebenen
+	 * Projekte zugelassen sind.
 	 * <p>
-	 * Diese Abfrage kann nur ein Administrator ausfï¿½hren. Wiederholungen werden durch ein Set vermieden. User ohne Mailadresse
-	 * werden ausgelassen.
+	 * Diese Abfrage kann nur ein Administrator ausfï¿½hren. Wiederholungen
+	 * werden durch ein Set vermieden. User ohne Mailadresse werden ausgelassen.
 	 * 
 	 * @param sessionKey
 	 *            aktueller Session Key
 	 * @param projectGuids
 	 *            Strings mit den GUIDs der Projekte
 	 */
-	public java.util.List<String> collectUserMailAddressesForProjects(String sessionKey, String[] projectGuids) throws RQLException {
+	public java.util.List<String> collectUserMailAddressesForProjects(
+			String sessionKey, String[] projectGuids) throws RQLException {
 
 		// remember current project
 		Project oldProject = currentProject;
@@ -588,7 +634,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Meldet diesen Client vom CMS ab. Danach kann dieses Object nicht mehr benutzt werden.
+	 * Meldet diesen Client vom CMS ab. Danach kann dieses Object nicht mehr
+	 * benutzt werden.
 	 */
 	public void disconnect() throws RQLException {
 
@@ -602,11 +649,14 @@ public class CmsClient {
 	}
 
 	/**
-	 * Sperrt alle Projekte dieses Servers und meldet alle aktiven Benutzer (auï¿½er dem, der das Script gestartet hat) ab.
+	 * Sperrt alle Projekte dieses Servers und meldet alle aktiven Benutzer
+	 * (auï¿½er dem, der das Script gestartet hat) ab.
 	 */
-	public void enterOutage(String outageMessage, boolean isTest) throws RQLException {
+	public void enterOutage(String outageMessage, boolean isTest)
+			throws RQLException {
 
-		java.util.List<Project> projects = isTest ? getTestProjects() : getAllProjects();
+		java.util.List<Project> projects = isTest ? getTestProjects()
+				: getAllProjects();
 		for (int i = 0; i < projects.size(); i++) {
 			Project project = (Project) projects.get(i);
 			project.lock(outageMessage);
@@ -619,7 +669,8 @@ public class CmsClient {
 	 */
 	public void exitOutage(boolean isTest) throws RQLException {
 
-		java.util.List<Project> projects = isTest ? getTestProjects() : getAllProjects();
+		java.util.List<Project> projects = isTest ? getTestProjects()
+				: getAllProjects();
 		for (int i = 0; i < projects.size(); i++) {
 			Project project = (Project) projects.get(i);
 			project.unlock();
@@ -627,14 +678,16 @@ public class CmsClient {
 	}
 
 	/**
-	 * Lifert den RQLNode fï¿½r das gegebene Projekt oder null zurï¿½ck. Null signalisiert, dass dieses Projekt nicht fï¿½r den User
-	 * zugelassen ist, oder die GUID falsch ist.
+	 * Lifert den RQLNode fï¿½r das gegebene Projekt oder null zurï¿½ck. Null
+	 * signalisiert, dass dieses Projekt nicht fï¿½r den User zugelassen ist,
+	 * oder die GUID falsch ist.
 	 * 
 	 * @param projectGuid
 	 *            GUID des Projectes, an den sich der User anmelden will.
 	 * @return <code>RQLNode</code> or null
 	 */
-	private RQLNode findUserProjectNodeByGuid(String projectGuid) throws RQLException {
+	private RQLNode findUserProjectNodeByGuid(String projectGuid)
+			throws RQLException {
 
 		RQLNodeList nodes = getProjectsNodeList(getConnectedUser());
 
@@ -651,14 +704,16 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert den RQLNode fï¿½r das gegebene Projekt oder null zurï¿½ck. Null signalisiert, dass dieses Projekt nicht fï¿½r den User
-	 * zugelassen ist, oder die GUID falsch ist.
+	 * Liefert den RQLNode fï¿½r das gegebene Projekt oder null zurï¿½ck. Null
+	 * signalisiert, dass dieses Projekt nicht fï¿½r den User zugelassen ist,
+	 * oder die GUID falsch ist.
 	 * 
 	 * @param projectGuid
 	 *            GUID des Projectes, an den sich der User anmelden will.
 	 * @return <code>RQLNode</code> or null
 	 */
-	private RQLNode findUserProjectNodeByName(String projectName) throws RQLException {
+	private RQLNode findUserProjectNodeByName(String projectName)
+			throws RQLException {
 
 		RQLNodeList nodes = getProjectsNodeList(getConnectedUser());
 
@@ -689,7 +744,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert alle auf diesem RD Server eingerichteten Plugins (aktive und inaktive) unabhï¿½ngig von der Projektzuweisung.
+	 * Liefert alle auf diesem RD Server eingerichteten Plugins (aktive und
+	 * inaktive) unabhï¿½ngig von der Projektzuweisung.
 	 */
 	public java.util.List<Plugin> getAllPlugins() throws RQLException {
 
@@ -711,7 +767,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert alle Projekt auf diesem CMS Server, unabhï¿½ngig von den Rechten des angemeldeten Users.
+	 * Liefert alle Projekt auf diesem CMS Server, unabhï¿½ngig von den Rechten
+	 * des angemeldeten Users.
 	 */
 	public java.util.List<Project> getAllProjects() throws RQLException {
 
@@ -719,7 +776,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert alle User zurï¿½ck, die auf diesem CMS Server konfiguriert sind. Diese Abfrage kann nur ein Administrator ausfï¿½hren.
+	 * Liefert alle User zurï¿½ck, die auf diesem CMS Server konfiguriert sind.
+	 * Diese Abfrage kann nur ein Administrator ausfï¿½hren.
 	 */
 	public java.util.List<User> getAllUsers() throws RQLException {
 
@@ -727,29 +785,24 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert die RQLNodeList aller User zurï¿½ck, die auf diesem CMS Server konfiguriert sind. Diese Abfrage kann nur ein
-	 * Administrator ausfï¿½hren.
+	 * Liefert die RQLNodeList aller User zurï¿½ck, die auf diesem CMS Server
+	 * konfiguriert sind. Diese Abfrage kann nur ein Administrator ausfï¿½hren.
 	 */
 	private RQLNodeList getAllUsersNodeList() throws RQLException {
-		/* 
-		 V5 request
-		 <IODATA loginguid="[!guid_login!]">
-		 <ADMINISTRATION>
-		 <USERS action="list"/>
-		 </ADMINISTRATION>
-		 </IODATA>
-		 V5 response
-		 <IODATA>
-		 <USERS>
-		 <USER  guid="CF4776E0819043C393367B63D7512A36" id="247" name="abeelan" fullname="Andy Van den Abeele" flags1="0" flags2="0" email="abeelan@hlcl.com" maxlevel="4" dialoglanguageid="ENG" loginguid="8361A28AFE4A42E4989766F46F3FF136" logindate="38048.6737731481"/>
-		 ...
-		 </USERS>
-		 </IODATA> 
+		/*
+		 * V5 request <IODATA loginguid="[!guid_login!]"> <ADMINISTRATION>
+		 * <USERS action="list"/> </ADMINISTRATION> </IODATA> V5 response
+		 * <IODATA> <USERS> <USER guid="CF4776E0819043C393367B63D7512A36"
+		 * id="247" name="abeelan" fullname="Andy Van den Abeele" flags1="0"
+		 * flags2="0" email="abeelan@hlcl.com" maxlevel="4"
+		 * dialoglanguageid="ENG" loginguid="8361A28AFE4A42E4989766F46F3FF136"
+		 * logindate="38048.6737731481"/> ... </USERS> </IODATA>
 		 */
 
 		// call CMS
 		if (allUsersNodeListCache == null) {
-			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "  <ADMINISTRATION>" + "   <USERS action='list'/>"
+			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>"
+					+ "  <ADMINISTRATION>" + "   <USERS action='list'/>"
 					+ "  </ADMINISTRATION>" + "</IODATA>";
 			RQLNode rqlResponse = callCms(rqlRequest);
 			allUsersNodeListCache = rqlResponse.getNodes("USER");
@@ -760,28 +813,32 @@ public class CmsClient {
 
 	// BURMEBJ001A
 	/**
-	 * Diese Methode schickt die Ã¼bergebene rqlQuery an das CMS und liefert das Ergebnis als InputStream zurï¿½ck. Die aufrufende
-	 * Methode muï¿½ sich darum kï¿½mmern, den Stream wieder zu schlieï¿½en.
+	 * Diese Methode schickt die Ã¼bergebene rqlQuery an das CMS und liefert das
+	 * Ergebnis als InputStream zurï¿½ck. Die aufrufende Methode muï¿½ sich
+	 * darum kï¿½mmern, den Stream wieder zu schlieï¿½en.
 	 * 
-	 * @param rqlQuery:
-	 *            s.o.
+	 * @param rqlQuery
+	 *            : s.o.
 	 * @return InputStream: s.o.
 	 * @throws RQLException
 	 */
-	private InputStream getCMSResultAsStream(String rqlQuery) throws RQLException {
+	private InputStream getCMSResultAsStream(String rqlQuery)
+			throws RQLException {
 		OutputStreamWriter osr = null;
 
 		try {
 			URL url = getCmsServerConnectionUrl();
 			URLConnection conn = url.openConnection();
 			conn.setDoOutput(true);
-			osr = new OutputStreamWriter(conn.getOutputStream(), getRequestWriterEncoding());
+			osr = new OutputStreamWriter(conn.getOutputStream(),
+					getRequestWriterEncoding());
 			osr.write(rqlQuery);
 			osr.flush();
 
 			return conn.getInputStream();
 		} catch (IOException ioe) {
-			throw new RQLException("IO Exception reading result from server", ioe);
+			throw new RQLException("IO Exception reading result from server",
+					ioe);
 		} finally {
 			if (osr != null) {
 				try {
@@ -793,37 +850,96 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert die URL zu dem CMS Server zurï¿½ck, mit der sich dieser CmsClient verbindet.
+	 * Liefert die URL zu dem CMS Server zurück, mit der sich dieser CmsClient
+	 * verbindet.
 	 * <p>
-	 * Wird er nicht im Konstruktor gesetzt, wird er per default aus rql_fw.properties gelesen.
+	 * Wird er nicht im Konstruktor gesetzt, wird er per default aus
+	 * rql_fw.properties gelesen.
 	 * 
 	 * @throws RQLException
 	 */
 	public URL getCmsServerConnectionUrl() throws RQLException {
 		if (cmsServerConnectionUrl == null) {
-			setCmsServerConnectionUrl(ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw").getString("cmsServerConnectionUrl"));
+			setCmsServerConnectionUrl(ResourceBundle.getBundle(
+					"com.hlcl.rql.as.rql_fw").getString(
+					"cmsServerConnectionUrl"));
 		}
 		return cmsServerConnectionUrl;
 	}
 
 	/**
-	 * Returns the encoding which is used to read the response from the bridge asp.
+	 * Returns the encoding which is used to read the response from the bridge
+	 * asp.
 	 */
 	private String getResponseReaderEncoding() throws RQLException {
-		return ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw").getString("responseReaderEncoding");
+		return ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw").getString(
+				"responseReaderEncoding");
 	}
 
 	/**
-	 * Returns the encoding which is used to write the request to the bridge asp.
+	 * Returns the protocol, host and port number from the cms server connection
+	 * URL. It is used to build further URLs, like the download URL for the
+	 * correct host. Do not have a / at the end.
+	 * 
+	 * @return protocol, host name and port number (optional), e.g.
+	 *         http://reddot.hlcl.com or http://reddot.hlcl.com:8080
+	 */
+	private String getCmsServerConnectionUrlHost() throws RQLException {
+		URL url = getCmsServerConnectionUrl();
+		// assumes that no query parameters are used!
+		// simply remove the path /cms/hlclRemote.asp from the url string
+		return StringHelper.replace(url.toString(), url.getPath(), "");
+	}
+
+	/**
+	 * Returns the file download URL pattern
+	 * http://<cms-server>/cms/ImageCache/{0}/{1}/{2}/{3}. The cms-server
+	 * variable is retrieved from the {@link #getCmsServerConnectionUrl()}. The
+	 * Variables are: # 0 = project guid, # 1 = folder guid, # 2 = 2 letter
+	 * prefix, # 3 = filename
+	 * 
+	 * @see FileElement#getDownloadUrl(boolean)
+	 * @return file download URL pattern, e.g.
+	 *         http://reddot.hlcl.com/cms/ImageCache/{0}/{1}/{2}/{3}
+	 */
+	String getFileDownloadUrlPattern() throws RQLException {
+		ResourceBundle b = ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw");
+		String downloadPath = b.getString("downloadPath");
+		return getCmsServerConnectionUrlHost() + downloadPath;
+	}
+
+	/**
+	 * Returns the page preview URL pattern
+	 * http://<cms-server>/cms/ioRD.asp?Action
+	 * =RedDot&amp;Mode=0&amp;OnLoad=0&amp;PageGuid={0}&amp;PreviewType=2. The
+	 * variable cms-server is retrieved from this client's server connection
+	 * URL. &amp; needed, because MessageFormat.format() converts it back into &.
+	 * 
+	 * @return page preview url pattern, e.g.
+	 *         http://reddot.hlcl.com/cms/ioRD.asp
+	 *         ?Action=RedDot&amp;Mode=0&amp;OnLoad
+	 *         =0&amp;PageGuid={0}&amp;PreviewType=2
+	 */
+	String getPagePreviewUrlPattern() throws RQLException {
+		ResourceBundle b = ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw");
+		String pagePreviewPath = b.getString("pagePreviewPath");
+		return getCmsServerConnectionUrlHost() + pagePreviewPath;
+	}
+
+	/**
+	 * Returns the encoding which is used to write the request to the bridge
+	 * asp.
 	 */
 	private String getRequestWriterEncoding() throws RQLException {
-		return ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw").getString("requestWriterEncoding");
+		return ResourceBundle.getBundle("com.hlcl.rql.as.rql_fw").getString(
+				"requestWriterEncoding");
 	}
 
 	/**
 	 * Liefert den angemeldeten Benutzer, falls vorhanden.
 	 * <p>
-	 * Liegt keine User GUID vor, wird versucht diese aus dem sessionKey zu ermitteln.
+	 * Liegt keine User GUID vor, wird versucht diese aus dem sessionKey zu
+	 * ermitteln.
 	 * <p>
 	 * Dazu muss vorher ein Projekt gewï¿½hlt worden sein.
 	 */
@@ -835,7 +951,8 @@ public class CmsClient {
 			throw new MissingGuidException(
 					"The GUID for the connected user is missing. You created this CMS client by logon GUID only and did not select a project via session key, therefore no user GUID is available. Select a project via the session key, create a client by user name and password or create this CMS client with user GUID.");
 		} else {
-			return new User(this, getConnectedUserGuid(getCurrentProject().getSessionKey()));
+			return new User(this, getConnectedUserGuid(getCurrentProject()
+					.getSessionKey()));
 		}
 	}
 
@@ -854,9 +971,11 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert den angemeldeten Benutzer ï¿½ber eine beliebige Seite des aktuellen Projektes. Skurilerweise liefert das CMS die GUID
-	 * des angemeldeten Benuter ï¿½ber die Seite zurï¿½ck. Und die meisten Scripte beziehen sich auf eine Seite, diese ist also
-	 * vorhanden. Das funktioniert auch bereits in V5.6!
+	 * Liefert den angemeldeten Benutzer ï¿½ber eine beliebige Seite des
+	 * aktuellen Projektes. Skurilerweise liefert das CMS die GUID des
+	 * angemeldeten Benuter ï¿½ber die Seite zurï¿½ck. Und die meisten Scripte
+	 * beziehen sich auf eine Seite, diese ist also vorhanden. Das funktioniert
+	 * auch bereits in V5.6!
 	 */
 	public User getConnectedUser(Page page) throws RQLException {
 
@@ -865,7 +984,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert den angemeldeten Benutzer fï¿½r den gegebenen session key. Erst ab V6!.
+	 * Liefert den angemeldeten Benutzer fï¿½r den gegebenen session key. Erst
+	 * ab V6!.
 	 */
 	public User getConnectedUser(String sessionKey) throws RQLException {
 
@@ -874,41 +994,39 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert die GUID des angemeldeten Benutzers aus dem SessionKey des aktuellen Projektes.
+	 * Liefert die GUID des angemeldeten Benutzers aus dem SessionKey des
+	 * aktuellen Projektes.
 	 */
 	private String getConnectedUserGuid(String sessionKey) throws RQLException {
 		return getConnectedUserNode(sessionKey).getAttribute("guid");
 	}
 
 	/**
-	 * Liefert den RQLNode fï¿½r den angemeldeten Benutzer aus dem SessionKey des aktuellen Projektes.
+	 * Liefert den RQLNode fï¿½r den angemeldeten Benutzer aus dem SessionKey
+	 * des aktuellen Projektes.
 	 */
 	private RQLNode getConnectedUserNode(String sessionKey) throws RQLException {
 
 		/*
-		 V6 request
-		 <IODATA>
-		 <PROJECT sessionkey="[!key!]">
-		 <USER action="sessioninfo"/>
-		 </PROJECT>
-		 </IODATA>  
-		 V6 response
-		 <IODATA>
-		 <USER action="sessioninfo" languagevariantid="DEU" 
-		 dialoglanguageid="DEU" guid="[!guid_user!]" 
-		 projectguid="[!guid_project!]" name="admin" flag2="32768" id="1" 
-		 projectlevel="1"/>
-		 </IODATA> 
+		 * V6 request <IODATA> <PROJECT sessionkey="[!key!]"> <USER
+		 * action="sessioninfo"/> </PROJECT> </IODATA> V6 response <IODATA>
+		 * <USER action="sessioninfo" languagevariantid="DEU"
+		 * dialoglanguageid="DEU" guid="[!guid_user!]"
+		 * projectguid="[!guid_project!]" name="admin" flag2="32768" id="1"
+		 * projectlevel="1"/> </IODATA>
 		 */
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "  <PROJECT sessionkey='" + sessionKey + "'>"
-				+ "   <USER action='sessioninfo'/>" + "  </PROJECT>" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>"
+				+ "  <PROJECT sessionkey='" + sessionKey + "'>"
+				+ "   <USER action='sessioninfo'/>" + "  </PROJECT>"
+				+ "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 		return rqlResponse.getNode("USER");
 	}
 
 	/**
-	 * Liefert das aktuell gewï¿½hlte Projekt, falls vorher ein Projekt geholt wurde; sonst null.
+	 * Liefert das aktuell gewï¿½hlte Projekt, falls vorher ein Projekt geholt
+	 * wurde; sonst null.
 	 * 
 	 * @see <code>getProject</code>
 	 */
@@ -918,7 +1036,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert die GUID des aktuell gewï¿½hlten Projektes, falls vorher ein Projekt geholt wurde; sonst null.
+	 * Liefert die GUID des aktuell gewï¿½hlten Projektes, falls vorher ein
+	 * Projekt geholt wurde; sonst null.
 	 * 
 	 * @see <code>getProject</code>
 	 */
@@ -928,7 +1047,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert die Locale fï¿½r die gegebene locale ID (z.b. Germany = 1031) zurï¿½ck.
+	 * Liefert die Locale fï¿½r die gegebene locale ID (z.b. Germany = 1031)
+	 * zurï¿½ck.
 	 * 
 	 * @throws ElementNotFoundException
 	 *             if locale cannot be found
@@ -941,12 +1061,15 @@ public class CmsClient {
 			RQLNode localeNode = localeNodeList.get(i);
 			String lcid = localeNode.getAttribute("lcid");
 			if (lcid.equals(localeId)) {
-				return new Locale(this, lcid, localeNode.getAttribute("id"), localeNode.getAttribute("country"), localeNode
-						.getAttribute("language"));
+				return new Locale(this, lcid, localeNode.getAttribute("id"),
+						localeNode.getAttribute("country"),
+						localeNode.getAttribute("language"));
 			}
 		}
 
-		throw new ElementNotFoundException("The locale for the given locale ID " + localeId + " cannot be found.");
+		throw new ElementNotFoundException(
+				"The locale for the given locale ID " + localeId
+						+ " cannot be found.");
 	}
 
 	/**
@@ -955,28 +1078,27 @@ public class CmsClient {
 	private RQLNodeList getLocaleNodeList() throws RQLException {
 
 		/*
-		 V7.5 request
-		 <IODATA loginguid="FA6DBAC63F8D45CAB6B293379337A323">
-		 <LANGUAGE action="list"/>
-		 </IODATA>
-		 V6 response
-		 <IODATA>
-		 <LANGUAGES>
-		 ...
-		 <LIST id="DEU" country="Germany" language="German" standardlanguage="0" lcid="1031" rfclanguageid="de-de"/>
-		 ...
-		 <LIST id="ENG" country="United Kingdom" language="English" standardlanguage="1" lcid="2057" rfclanguageid="en-gb"/>
-		 <LIST id="ENU" country="United States" language="English" standardlanguage="0" lcid="1033" rfclanguageid="en-us"/>
-		 <LIST id="ESY" country="Uruguay" language="Spanish" standardlanguage="0" lcid="14346" rfclanguageid="es-uy"/>
-		 <LIST id="ESV" country="Venezuela" language="Spanish" standardlanguage="0" lcid="8202" rfclanguageid="es-ve"/>
-		 <LIST id="VIT" country="Viet Nam" language="Vietnamese" standardlanguage="0" lcid="1066" rfclanguageid="vi"/>
-		 <LIST id="ARY" country="Yemen" language="Arabic" standardlanguage="0" lcid="9217" rfclanguageid="ar-ye"/>
-		 </LANGUAGES>
-		 </IODATA>
+		 * V7.5 request <IODATA loginguid="FA6DBAC63F8D45CAB6B293379337A323">
+		 * <LANGUAGE action="list"/> </IODATA> V6 response <IODATA> <LANGUAGES>
+		 * ... <LIST id="DEU" country="Germany" language="German"
+		 * standardlanguage="0" lcid="1031" rfclanguageid="de-de"/> ... <LIST
+		 * id="ENG" country="United Kingdom" language="English"
+		 * standardlanguage="1" lcid="2057" rfclanguageid="en-gb"/> <LIST
+		 * id="ENU" country="United States" language="English"
+		 * standardlanguage="0" lcid="1033" rfclanguageid="en-us"/> <LIST
+		 * id="ESY" country="Uruguay" language="Spanish" standardlanguage="0"
+		 * lcid="14346" rfclanguageid="es-uy"/> <LIST id="ESV"
+		 * country="Venezuela" language="Spanish" standardlanguage="0"
+		 * lcid="8202" rfclanguageid="es-ve"/> <LIST id="VIT" country="Viet Nam"
+		 * language="Vietnamese" standardlanguage="0" lcid="1066"
+		 * rfclanguageid="vi"/> <LIST id="ARY" country="Yemen" language="Arabic"
+		 * standardlanguage="0" lcid="9217" rfclanguageid="ar-ye"/> </LANGUAGES>
+		 * </IODATA>
 		 */
 		// call CMS
 		if (allLocalesNodeListCache == null) {
-			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "  <LANGUAGE action='list'/>" + "</IODATA>";
+			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>"
+					+ "  <LANGUAGE action='list'/>" + "</IODATA>";
 			RQLNode rqlResponse = callCms(rqlRequest);
 			allLocalesNodeListCache = rqlResponse.getNodes("LIST");
 		}
@@ -992,7 +1114,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert das Plugin mit dem gegebenen Namen oder null, falls keines gefunden werden kann.
+	 * Liefert das Plugin mit dem gegebenen Namen oder null, falls keines
+	 * gefunden werden kann.
 	 * <p>
 	 * Check with equals().
 	 */
@@ -1017,11 +1140,13 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert alle Plugins, deren Name mit dem gegebenen Prefix beginnt oder eine leere Liste, falls keines gefunden werden kann.
+	 * Liefert alle Plugins, deren Name mit dem gegebenen Prefix beginnt oder
+	 * eine leere Liste, falls keines gefunden werden kann.
 	 * <p>
 	 * Check with startsWith().
 	 */
-	public Set<Plugin> getPluginsByNamePrefix(String pluginNamePrefix) throws RQLException {
+	public Set<Plugin> getPluginsByNamePrefix(String pluginNamePrefix)
+			throws RQLException {
 
 		RQLNodeList nodes = getPluginsNodeList();
 		// check if any plugins at all
@@ -1047,7 +1172,8 @@ public class CmsClient {
 	 * Builds a plugin object from given node.
 	 */
 	Plugin buildPlugin(RQLNode node) {
-		return new Plugin(this, node.getAttribute("guid"), node.getAttribute("active"), node.getAttribute("name"));
+		return new Plugin(this, node.getAttribute("guid"),
+				node.getAttribute("active"), node.getAttribute("name"));
 	}
 
 	/**
@@ -1056,38 +1182,34 @@ public class CmsClient {
 	private RQLNodeList getPluginsNodeList() throws RQLException {
 
 		/*
-		 V7.5 request
-		<IODATA loginguid="B55B02ADF81E4C2E86C095A1BCF93AF8">
-		<PLUGINS action="list" byproject="0"/>
-		</IODATA>
-		 V7.5 response
-		<IODATA>
-		<PLUGINS action="list" byproject="0">
-		<PLUGIN guid="002469BC78574E62A271A623CD514720" name="editLinking.jsp LOCAL" active="0" compatibility="6.5">
-		<PROJECT guid="06BE79A1D9F549388F06F6B649E27152" name="hip.hlcl.com"/>
-		</PLUGIN>
-		<PLUGIN guid="03E123F183BB4B4DAD72140595FDC61F" name="showChildDetails.jsp - LOCAL" active="0" compatibility="6.5">
-		<PROJECT guid="268F46EF5EB74A75824856D3DA1C6597" name="fishelp"/>
-		<PROJECT guid="06BE79A1D9F549388F06F6B649E27152" name="hip.hlcl.com"/>
-		</PLUGIN>
-		<PLUGIN guid="03EE3E6E6F6A475386FD7BE3D5B048C5" name="Show All Projects" active="0" compatibility="">
-		<PROJECT guid="031846B2E1A94FAFB52ACDC38B92513E" name="hlag_relaunch_2004"/>
-		<PROJECT guid="4EA3E533EEAF4C8794348D61602C80FB" name="processes"/>
-		<PROJECT guid="5256C671655D4CE696F663C73CE3E526" name="www.hapag-lloyd.com"/>
-		<PROJECT guid="126149CE860E4BF6BA5D36248E0ED7C0" name="Manuals"/>
-		<PROJECT guid="EA851692656044EEB27D9C482C7F0878" name="SYSHAND"/>
-		<PROJECT guid="268F46EF5EB74A75824856D3DA1C6597" name="fishelp"/>
-		<PROJECT guid="06BE79A1D9F549388F06F6B649E27152" name="hip.hlcl.com"/>
-		<PROJECT guid="E62CF0C8E4EC4D018C3E392C42A12161" name="Up-And-Away"/>
-		</PLUGIN>
-		...
-		</PLUGINS>
-		</IODATA>
+		 * V7.5 request <IODATA loginguid="B55B02ADF81E4C2E86C095A1BCF93AF8">
+		 * <PLUGINS action="list" byproject="0"/> </IODATA> V7.5 response
+		 * <IODATA> <PLUGINS action="list" byproject="0"> <PLUGIN
+		 * guid="002469BC78574E62A271A623CD514720" name="editLinking.jsp LOCAL"
+		 * active="0" compatibility="6.5"> <PROJECT
+		 * guid="06BE79A1D9F549388F06F6B649E27152" name="hip.hlcl.com"/>
+		 * </PLUGIN> <PLUGIN guid="03E123F183BB4B4DAD72140595FDC61F"
+		 * name="showChildDetails.jsp - LOCAL" active="0" compatibility="6.5">
+		 * <PROJECT guid="268F46EF5EB74A75824856D3DA1C6597" name="fishelp"/>
+		 * <PROJECT guid="06BE79A1D9F549388F06F6B649E27152"
+		 * name="hip.hlcl.com"/> </PLUGIN> <PLUGIN
+		 * guid="03EE3E6E6F6A475386FD7BE3D5B048C5" name="Show All Projects"
+		 * active="0" compatibility=""> <PROJECT
+		 * guid="031846B2E1A94FAFB52ACDC38B92513E" name="hlag_relaunch_2004"/>
+		 * <PROJECT guid="4EA3E533EEAF4C8794348D61602C80FB" name="processes"/>
+		 * <PROJECT guid="5256C671655D4CE696F663C73CE3E526"
+		 * name="www.hapag-lloyd.com"/> <PROJECT
+		 * guid="126149CE860E4BF6BA5D36248E0ED7C0" name="Manuals"/> <PROJECT
+		 * guid="EA851692656044EEB27D9C482C7F0878" name="SYSHAND"/> <PROJECT
+		 * guid="268F46EF5EB74A75824856D3DA1C6597" name="fishelp"/> <PROJECT
+		 * guid="06BE79A1D9F549388F06F6B649E27152" name="hip.hlcl.com"/>
+		 * <PROJECT guid="E62CF0C8E4EC4D018C3E392C42A12161" name="Up-And-Away"/>
+		 * </PLUGIN> ... </PLUGINS> </IODATA>
 		 */
 		// call CMS
 		if (allPluginsNodeListCache == null) {
-			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "  <PLUGINS action='list'  byproject='0'/>"
-					+ "</IODATA>";
+			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>"
+					+ "  <PLUGINS action='list'  byproject='0'/>" + "</IODATA>";
 			RQLNode rqlResponse = callCms(rqlRequest);
 			allPluginsNodeListCache = rqlResponse.getNodes("PLUGIN");
 		}
@@ -1095,44 +1217,46 @@ public class CmsClient {
 	}
 
 	/**
-	 * Creates a new plugin from the the Plugins XML file, which has to be a local path on the CMS server itself. Returns the imported
-	 * plugin. Same functionality as @link {@link #addPlugin(String)}.
+	 * Creates a new plugin from the the Plugins XML file, which has to be a
+	 * local path on the CMS server itself. Returns the imported plugin. Same
+	 * functionality as @link {@link #addPlugin(String)}.
 	 */
-	public Plugin importPlugin(String definitionXmlPathOnCmsServer) throws RQLException {
+	public Plugin importPlugin(String definitionXmlPathOnCmsServer)
+			throws RQLException {
 		return addPlugin(definitionXmlPathOnCmsServer);
 	}
-	
+
 	/**
-	 * Creates a new plugin from the the Plugins XML file, which has to be a local path on the CMS server itself. Returns the imported
-	 * plugin. Same functionality as {@link #importPlugin(String)}.
+	 * Creates a new plugin from the the Plugins XML file, which has to be a
+	 * local path on the CMS server itself. Returns the imported plugin. Same
+	 * functionality as {@link #importPlugin(String)}.
 	 */
-	public Plugin addPlugin(String definitionXmlPathOnCmsServer) throws RQLException {
+	public Plugin addPlugin(String definitionXmlPathOnCmsServer)
+			throws RQLException {
 
 		/*
-		 V9 request
-		<IODATA loginguid="DA524177C6FB4C798379EA4696D10F55">
-		<PLUGINS action="import" source="E:\Server\CMS\ASP\PlugIns\showNotes.xml"/>
-		</IODATA>
-		 V9 response
-		<IODATA>
-		<REPORT>
-		<INFO caption="showNotes.jsp - ???" text="The plug-in has been imported."/>
-		</REPORT>
-		</IODATA>
+		 * V9 request <IODATA loginguid="DA524177C6FB4C798379EA4696D10F55">
+		 * <PLUGINS action="import"
+		 * source="E:\Server\CMS\ASP\PlugIns\showNotes.xml"/> </IODATA> V9
+		 * response <IODATA> <REPORT> <INFO caption="showNotes.jsp - ???"
+		 * text="The plug-in has been imported."/> </REPORT> </IODATA>
 		 */
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "  <PLUGINS action='import' source='"
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>"
+				+ "  <PLUGINS action='import' source='"
 				+ definitionXmlPathOnCmsServer + "'/>" + "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		// reset cache
 		allPluginsNodeListCache = null;
 
-		return getPluginByName(rqlResponse.getNode("INFO").getAttribute("caption"));
+		return getPluginByName(rqlResponse.getNode("INFO").getAttribute(
+				"caption"));
 	}
 
 	/**
-	 * Erzeugt ein Project aus dem gegebenen sessionKey. Die GUID des Projektes wird ermittelt.
+	 * Erzeugt ein Project aus dem gegebenen sessionKey. Die GUID des Projektes
+	 * wird ermittelt.
 	 * <p>
 	 * Das aktuell gewï¿½hlte Projekt wird festgehalten.
 	 * 
@@ -1145,7 +1269,8 @@ public class CmsClient {
 	}
 
 	/**
-	 * Erzeugt ein Project aus dem gegebenen sessionKey und der GUID des Projektes.
+	 * Erzeugt ein Project aus dem gegebenen sessionKey und der GUID des
+	 * Projektes.
 	 * <p>
 	 * Das aktuell gewï¿½hlte Projekt wird festgehalten.
 	 * 
@@ -1155,9 +1280,11 @@ public class CmsClient {
 	 *            Guid des Projektes
 	 * @return Project
 	 */
-	public Project getProject(String sessionKey, String projectGuid) throws RQLException {
+	public Project getProject(String sessionKey, String projectGuid)
+			throws RQLException {
 
-		if (currentProject == null || !currentProject.getProjectGuid().equals(projectGuid)) {
+		if (currentProject == null
+				|| !currentProject.getProjectGuid().equals(projectGuid)) {
 			// prevent projectGuid == null
 			if (projectGuid == null) {
 				projectGuid = getProjectGuid(sessionKey);
@@ -1169,24 +1296,17 @@ public class CmsClient {
 		// ab V6
 		// aus sessionKey kann projectGUID + userGUID ermittelt werden
 		/*
-		 request
-		 <IODATA>
-		 <PROJECT sessionkey="[!key!]">
-		 <USER action="sessioninfo"/>
-		 </PROJECT>
-		 </IODATA>
-		 response
-		 <IODATA>
-		 <USER action="sessioninfo" languagevariantid="DEU" 
-		 dialoglanguageid="DEU" guid="[!guid_user!]" 
-		 projectguid="[!guid_project!]" name="admin" flag2="32768" id="1" 
-		 projectlevel="1"/>
-		 </IODATA> 
+		 * request <IODATA> <PROJECT sessionkey="[!key!]"> <USER
+		 * action="sessioninfo"/> </PROJECT> </IODATA> response <IODATA> <USER
+		 * action="sessioninfo" languagevariantid="DEU" dialoglanguageid="DEU"
+		 * guid="[!guid_user!]" projectguid="[!guid_project!]" name="admin"
+		 * flag2="32768" id="1" projectlevel="1"/> </IODATA>
 		 */
 	}
 
 	/**
-	 * Erzeugt ein Project aus der gegebenen GUID des Projektes. Das aktuell gewï¿½hlte Projekt wird festgehalten.
+	 * Erzeugt ein Project aus der gegebenen GUID des Projektes. Das aktuell
+	 * gewï¿½hlte Projekt wird festgehalten.
 	 * 
 	 * @param projectGuid
 	 *            Guid des Projektes
@@ -1194,11 +1314,14 @@ public class CmsClient {
 	 */
 	public Project getProjectByGuid(String projectGuid) throws RQLException {
 
-		if (currentProject == null || !currentProject.getProjectGuid().equals(projectGuid)) {
+		if (currentProject == null
+				|| !currentProject.getProjectGuid().equals(projectGuid)) {
 			RQLNode projectNodeOrNull = findUserProjectNodeByGuid(projectGuid);
 			if (projectNodeOrNull == null) {
-				throw new ProjectNotFoundException("Project with GUID " + projectGuid
-						+ " could not be found, or the user could not access this project.");
+				throw new ProjectNotFoundException(
+						"Project with GUID "
+								+ projectGuid
+								+ " could not be found, or the user could not access this project.");
 			}
 			setCurrentProject(new Project(this, projectGuid));
 			// validate against project
@@ -1209,8 +1332,9 @@ public class CmsClient {
 	}
 
 	/**
-	 * Erzeugt ein Project mit dem gegebenen Namen. Der Benutzer muss auf dieses Projekt berechtigt sind. Das aktuell gewï¿½hlte
-	 * Projekt wird festgehalten.
+	 * Erzeugt ein Project mit dem gegebenen Namen. Der Benutzer muss auf dieses
+	 * Projekt berechtigt sind. Das aktuell gewï¿½hlte Projekt wird
+	 * festgehalten.
 	 * 
 	 * @param projectName
 	 *            Name des Projektes, z.b. hip.hlcl.com
@@ -1218,13 +1342,17 @@ public class CmsClient {
 	 */
 	public Project getProjectByName(String projectName) throws RQLException {
 
-		if (currentProject == null || !currentProject.getName().equals(projectName)) {
+		if (currentProject == null
+				|| !currentProject.getName().equals(projectName)) {
 			RQLNode projectNodeOrNull = findUserProjectNodeByName(projectName);
 			if (projectNodeOrNull == null) {
-				throw new ProjectNotFoundException("Project with name " + projectName
-						+ " could not be found, or the user could not access this project.");
+				throw new ProjectNotFoundException(
+						"Project with name "
+								+ projectName
+								+ " could not be found, or the user could not access this project.");
 			}
-			setCurrentProject(new Project(this, projectNodeOrNull.getAttribute("guid")));
+			setCurrentProject(new Project(this,
+					projectNodeOrNull.getAttribute("guid")));
 			// validate against project
 			currentProject.validate();
 		}
@@ -1245,31 +1373,46 @@ public class CmsClient {
 	 * @return <code>RQLNodeList</code>
 	 */
 	private RQLNodeList getProjectsNodeList() throws RQLException {
-		/* 
-		 V5 request
-		 <IODATA loginguid="7B387EFFCA5D44ADACD45BE9332DB0B5">
-		 <ADMINISTRATION>
-		 <PROJECTS action="list"/>
-		 </ADMINISTRATION>
-		 </IODATA>
-		 V5 response
-		 <IODATA>
-		 <PROJECTS action="list">
-		 <PROJECT guid="06BE79A1D9F549388F06F6B649E27152" name="hip.hlcl.com" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0"/>
-		 <PROJECT guid="126149CE860E4BF6BA5D36248E0ED7C0" name="Manuals" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0"/>
-		 <PROJECT guid="4EA3E533EEAF4C8794348D61602C80FB" name="processes" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0"/>
-		 <PROJECT guid="0E9807BAD7D14B738038214E793EC9A8" name="Projekt orgaweb" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="17" lockinfo="RedDot for orgaweb not available from 21 July 2004 until 27 July 2004. rgds, Antje Kiessig" checkdatabase="002.043" lockedbysystem="0"/>
-		 <PROJECT guid="268F46EF5EB74A75824856D3DA1C6597" name="projekt_fishelp" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0"/>
-		 <PROJECT guid="094C0E751B524A83BD9707889135B5DD" name="projekt_hlag" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0"/>
-		 <PROJECT guid="7CF5EBA32CB34E55A329CA181D5D150D" name="projekt_hlcln" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0"/>
-		 <PROJECT guid="EA851692656044EEB27D9C482C7F0878" name="SYSHAND" servername="khh30006" server="khh30006" versioning="-1" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0"/>
-		 <PROJECT guid="E62CF0C8E4EC4D018C3E392C42A12161" name="Up-And-Away" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0"/></PROJECTS>
-		 </IODATA>
+		/*
+		 * V5 request <IODATA loginguid="7B387EFFCA5D44ADACD45BE9332DB0B5">
+		 * <ADMINISTRATION> <PROJECTS action="list"/> </ADMINISTRATION>
+		 * </IODATA> V5 response <IODATA> <PROJECTS action="list"> <PROJECT
+		 * guid="06BE79A1D9F549388F06F6B649E27152" name="hip.hlcl.com"
+		 * servername="khh30006" server="khh30006" versioning="0"
+		 * inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0"/> <PROJECT guid="126149CE860E4BF6BA5D36248E0ED7C0"
+		 * name="Manuals" servername="khh30006" server="khh30006" versioning="0"
+		 * inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0"/> <PROJECT guid="4EA3E533EEAF4C8794348D61602C80FB"
+		 * name="processes" servername="khh30006" server="khh30006"
+		 * versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0"/> <PROJECT guid="0E9807BAD7D14B738038214E793EC9A8"
+		 * name="Projekt orgaweb" servername="khh30006" server="khh30006"
+		 * versioning="0" inhibitlevel="17" lockinfo=
+		 * "RedDot for orgaweb not available from 21 July 2004 until 27 July 2004. rgds, Antje Kiessig"
+		 * checkdatabase="002.043" lockedbysystem="0"/> <PROJECT
+		 * guid="268F46EF5EB74A75824856D3DA1C6597" name="projekt_fishelp"
+		 * servername="khh30006" server="khh30006" versioning="0"
+		 * inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0"/> <PROJECT guid="094C0E751B524A83BD9707889135B5DD"
+		 * name="projekt_hlag" servername="khh30006" server="khh30006"
+		 * versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0"/> <PROJECT guid="7CF5EBA32CB34E55A329CA181D5D150D"
+		 * name="projekt_hlcln" servername="khh30006" server="khh30006"
+		 * versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0"/> <PROJECT guid="EA851692656044EEB27D9C482C7F0878"
+		 * name="SYSHAND" servername="khh30006" server="khh30006"
+		 * versioning="-1" inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0"/> <PROJECT guid="E62CF0C8E4EC4D018C3E392C42A12161"
+		 * name="Up-And-Away" servername="khh30006" server="khh30006"
+		 * versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0"/></PROJECTS> </IODATA>
 		 */
 
 		// call CMS
 		if (projectsNodeListCache == null) {
-			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + " <ADMINISTRATION>" + "   <PROJECTS action='list'/>"
+			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>"
+					+ " <ADMINISTRATION>" + "   <PROJECTS action='list'/>"
 					+ " </ADMINISTRATION>" + "</IODATA>";
 			RQLNode rqlResponse = callCms(rqlRequest);
 			projectsNodeListCache = rqlResponse.getNodes("PROJECT");
@@ -1279,40 +1422,67 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert die RQLNodeList mit allen Projekt-Nodes des gegebenen Users zurï¿½ck.
+	 * Liefert die RQLNodeList mit allen Projekt-Nodes des gegebenen Users
+	 * zurï¿½ck.
 	 * 
 	 * @return <code>RQLNodeList</code>
 	 */
 	RQLNodeList getProjectsNodeList(User user) throws RQLException {
-		/* 
-		 V5 request
-		 <IODATA loginguid="40C426B57BF9485D964B0B2694DB41C2">
-		 <ADMINISTRATION>
-		 <USER guid="8898998310DD4513BB8CC1771FFD00BC">
-		 <PROJECTS action="list"/>
-		 </USER>
-		 </ADMINISTRATION>
-		 </IODATA>
-		 V5 response
-		 <IODATA>
-		 <USER guid="8898998310DD4513BB8CC1771FFD00BC">
-		 <PROJECTS action="list" parentguid="8898998310DD4513BB8CC1771FFD00BC" parenttype="USR">
-		 <PROJECT guid="06BE79A1D9F549388F06F6B649E27152" name="hip.hlcl.com" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0" languagemanagerright="0" istranslator="0"/>
-		 <PROJECT guid="126149CE860E4BF6BA5D36248E0ED7C0" name="Manuals" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0" languagemanagerright="0" istranslator="0"/>
-		 <PROJECT guid="4EA3E533EEAF4C8794348D61602C80FB" name="processes" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0" languagemanagerright="0" istranslator="0"/>
-		 <PROJECT guid="0E9807BAD7D14B738038214E793EC9A8" name="Projekt orgaweb" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="17" lockinfo="RedDot for orgaweb not available from 21 July 2004 until 27 July 2004. rgds, Antje Kiessig" checkdatabase="002.043" lockedbysystem="0" inhibit="1" userlevel="4" templateeditorright="0" languagemanagerright="0" istranslator="0"/>
-		 <PROJECT guid="268F46EF5EB74A75824856D3DA1C6597" name="projekt_fishelp" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0" languagemanagerright="0" istranslator="0"/>
-		 <PROJECT guid="094C0E751B524A83BD9707889135B5DD" name="projekt_hlag" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0" languagemanagerright="0" istranslator="0"/>
-		 <PROJECT guid="7CF5EBA32CB34E55A329CA181D5D150D" name="projekt_hlcln" servername="khh30006" server="khh30006" versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0" languagemanagerright="0" istranslator="0"/>
-		 <PROJECT guid="EA851692656044EEB27D9C482C7F0878" name="SYSHAND" servername="khh30006" server="khh30006" versioning="-1" inhibitlevel="0" lockinfo="" checkdatabase="002.043" lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0" languagemanagerright="0" istranslator="0"/>
-		 </PROJECTS>
-		 </USER>
-		 </IODATA>
+		/*
+		 * V5 request <IODATA loginguid="40C426B57BF9485D964B0B2694DB41C2">
+		 * <ADMINISTRATION> <USER guid="8898998310DD4513BB8CC1771FFD00BC">
+		 * <PROJECTS action="list"/> </USER> </ADMINISTRATION> </IODATA> V5
+		 * response <IODATA> <USER guid="8898998310DD4513BB8CC1771FFD00BC">
+		 * <PROJECTS action="list" parentguid="8898998310DD4513BB8CC1771FFD00BC"
+		 * parenttype="USR"> <PROJECT guid="06BE79A1D9F549388F06F6B649E27152"
+		 * name="hip.hlcl.com" servername="khh30006" server="khh30006"
+		 * versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0"
+		 * languagemanagerright="0" istranslator="0"/> <PROJECT
+		 * guid="126149CE860E4BF6BA5D36248E0ED7C0" name="Manuals"
+		 * servername="khh30006" server="khh30006" versioning="0"
+		 * inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0"
+		 * languagemanagerright="0" istranslator="0"/> <PROJECT
+		 * guid="4EA3E533EEAF4C8794348D61602C80FB" name="processes"
+		 * servername="khh30006" server="khh30006" versioning="0"
+		 * inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0"
+		 * languagemanagerright="0" istranslator="0"/> <PROJECT
+		 * guid="0E9807BAD7D14B738038214E793EC9A8" name="Projekt orgaweb"
+		 * servername="khh30006" server="khh30006" versioning="0"
+		 * inhibitlevel="17" lockinfo=
+		 * "RedDot for orgaweb not available from 21 July 2004 until 27 July 2004. rgds, Antje Kiessig"
+		 * checkdatabase="002.043" lockedbysystem="0" inhibit="1" userlevel="4"
+		 * templateeditorright="0" languagemanagerright="0" istranslator="0"/>
+		 * <PROJECT guid="268F46EF5EB74A75824856D3DA1C6597"
+		 * name="projekt_fishelp" servername="khh30006" server="khh30006"
+		 * versioning="0" inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0"
+		 * languagemanagerright="0" istranslator="0"/> <PROJECT
+		 * guid="094C0E751B524A83BD9707889135B5DD" name="projekt_hlag"
+		 * servername="khh30006" server="khh30006" versioning="0"
+		 * inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0"
+		 * languagemanagerright="0" istranslator="0"/> <PROJECT
+		 * guid="7CF5EBA32CB34E55A329CA181D5D150D" name="projekt_hlcln"
+		 * servername="khh30006" server="khh30006" versioning="0"
+		 * inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0"
+		 * languagemanagerright="0" istranslator="0"/> <PROJECT
+		 * guid="EA851692656044EEB27D9C482C7F0878" name="SYSHAND"
+		 * servername="khh30006" server="khh30006" versioning="-1"
+		 * inhibitlevel="0" lockinfo="" checkdatabase="002.043"
+		 * lockedbysystem="0" inhibit="0" userlevel="4" templateeditorright="0"
+		 * languagemanagerright="0" istranslator="0"/> </PROJECTS> </USER>
+		 * </IODATA>
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + " <ADMINISTRATION>" + "  <USER guid='"
-				+ user.getUserGuid() + "'>" + "   <PROJECTS action='list'/>" + "  </USER>" + " </ADMINISTRATION>" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>"
+				+ " <ADMINISTRATION>" + "  <USER guid='" + user.getUserGuid()
+				+ "'>" + "   <PROJECTS action='list'/>" + "  </USER>"
+				+ " </ADMINISTRATION>" + "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 		return rqlResponse.getNodes("PROJECT");
 	}
@@ -1330,12 +1500,15 @@ public class CmsClient {
 	}
 
 	/**
-	 * Liefert ein paar User zurï¿½ck, an die testweise ein mail versendet werden kann.
+	 * Liefert ein paar User zurï¿½ck, an die testweise ein mail versendet
+	 * werden kann.
 	 */
 	public java.util.List<User> getTestUsers() {
 
 		java.util.List<User> testUsers = new ArrayList<User>();
-		testUsers.add(new User(this, "lejafr4", "198C466E5362482EBBD0AEE77BF141C3", "user id", "Frank Leja", "lejafr@hlcl.com"));
+		testUsers.add(new User(this, "lejafr4",
+				"198C466E5362482EBBD0AEE77BF141C3", "user id", "Frank Leja",
+				"lejafr@hlcl.com"));
 
 		return testUsers;
 	}
@@ -1358,16 +1531,19 @@ public class CmsClient {
 				return buildUser(userNode);
 			}
 		}
-		throw new ElementNotFoundException("User with name " + userName + " is not configured at the CMS server.");
+		throw new ElementNotFoundException("User with name " + userName
+				+ " is not configured at the CMS server.");
 	}
 
 	/**
-	 * Liefert die UserInterfaceLanguage fï¿½r die gegebene language ID (z.B. DEU, ENG) zurï¿½ck.
+	 * Liefert die UserInterfaceLanguage fï¿½r die gegebene language ID (z.B.
+	 * DEU, ENG) zurï¿½ck.
 	 * 
 	 * @throws ElementNotFoundException
 	 *             if language cannot be found
 	 */
-	public UserInterfaceLanguage getUserInterfaceLanguageByLanguageId(String languageId) throws RQLException {
+	public UserInterfaceLanguage getUserInterfaceLanguageByLanguageId(
+			String languageId) throws RQLException {
 
 		RQLNodeList languageNodeList = getUserInterfaceLanguageNodeList();
 
@@ -1379,16 +1555,20 @@ public class CmsClient {
 			}
 		}
 
-		throw new ElementNotFoundException("The user interface language for the given language ID " + languageId + " cannot be found.");
+		throw new ElementNotFoundException(
+				"The user interface language for the given language ID "
+						+ languageId + " cannot be found.");
 	}
 
 	/**
-	 * Liefert die UserInterfaceLanguage fï¿½r die gegebene RFC language ID (z.B. de-de, fr-ca) zurï¿½ck.
+	 * Liefert die UserInterfaceLanguage fï¿½r die gegebene RFC language ID
+	 * (z.B. de-de, fr-ca) zurï¿½ck.
 	 * 
 	 * @throws ElementNotFoundException
 	 *             if language cannot be found
 	 */
-	public UserInterfaceLanguage getUserInterfaceLanguageByRfcId(String rfcLanguageId) throws RQLException {
+	public UserInterfaceLanguage getUserInterfaceLanguageByRfcId(
+			String rfcLanguageId) throws RQLException {
 
 		RQLNodeList languageNodeList = getUserInterfaceLanguageNodeList();
 
@@ -1400,8 +1580,9 @@ public class CmsClient {
 			}
 		}
 
-		throw new ElementNotFoundException("The user interface language for the given RFC language ID " + rfcLanguageId
-				+ " cannot be found.");
+		throw new ElementNotFoundException(
+				"The user interface language for the given RFC language ID "
+						+ rfcLanguageId + " cannot be found.");
 	}
 
 	/**
@@ -1410,34 +1591,42 @@ public class CmsClient {
 	private RQLNodeList getUserInterfaceLanguageNodeList() throws RQLException {
 
 		/*
-		 V7.5 request
-		 <IODATA loginguid="D866C366A1EF4D81B4A7255CEFA41975">
-		 <DIALOG action="listlanguages"/>
-		 </IODATA>
-		 V7.5 response
-		 <IODATA>
-		 <LANGUAGES>
-		 <LIST id="PTB" country="Brazil" language="Portuguese" standardlanguage="0" lcid="1046" disabled="0" rfclanguageid="pt-br"/>
-		 <LIST id="FRC" country="Canada" language="French" standardlanguage="0" lcid="3084" disabled="0" rfclanguageid="fr-ca"/>
-		 <LIST id="CSY" country="Czech Republic" language="Czech" standardlanguage="0" lcid="1029" disabled="0" rfclanguageid="cs"/>
-		 <LIST id="DEU" country="Germany" language="German" standardlanguage="0" lcid="1031" disabled="0" rfclanguageid="de-de"/>
-		 <LIST id="ELL" country="Greece" language="Greek" standardlanguage="0" lcid="1032" disabled="0" rfclanguageid="el"/>
-		 <LIST id="HUN" country="Hungary" language="Hungarian" standardlanguage="0" lcid="1038" disabled="0" rfclanguageid="hu"/>
-		 <LIST id="ITA" country="Italy" language="Italian" standardlanguage="0" lcid="1040" disabled="0" rfclanguageid="it-it"/>
-		 <LIST id="JPN" country="Japan" language="Japanese" standardlanguage="0" lcid="1041" disabled="0" rfclanguageid="ja"/>
-		 <LIST id="PLK" country="Poland" language="Polish" standardlanguage="0" lcid="1045" disabled="0" rfclanguageid="pl"/>
-		 <LIST id="CHS" country="PRC" language="Chinese" standardlanguage="0" lcid="2052" disabled="0" rfclanguageid="zh-cn"/>
-		 <LIST id="ESN" country="Spain" language="Spanish" standardlanguage="0" lcid="1034" disabled="0" rfclanguageid="es-es"/>
-		 <LIST id="SVE" country="Sweden" language="Swedish" standardlanguage="0" lcid="1053" disabled="0" rfclanguageid="sv-se"/>
-		 <LIST id="ENG" country="United Kingdom" language="English" standardlanguage="1" lcid="2057" disabled="0" rfclanguageid="en-gb"/>
-		 </LANGUAGES>
-		 </IODATA>
+		 * V7.5 request <IODATA loginguid="D866C366A1EF4D81B4A7255CEFA41975">
+		 * <DIALOG action="listlanguages"/> </IODATA> V7.5 response <IODATA>
+		 * <LANGUAGES> <LIST id="PTB" country="Brazil" language="Portuguese"
+		 * standardlanguage="0" lcid="1046" disabled="0" rfclanguageid="pt-br"/>
+		 * <LIST id="FRC" country="Canada" language="French"
+		 * standardlanguage="0" lcid="3084" disabled="0" rfclanguageid="fr-ca"/>
+		 * <LIST id="CSY" country="Czech Republic" language="Czech"
+		 * standardlanguage="0" lcid="1029" disabled="0" rfclanguageid="cs"/>
+		 * <LIST id="DEU" country="Germany" language="German"
+		 * standardlanguage="0" lcid="1031" disabled="0" rfclanguageid="de-de"/>
+		 * <LIST id="ELL" country="Greece" language="Greek" standardlanguage="0"
+		 * lcid="1032" disabled="0" rfclanguageid="el"/> <LIST id="HUN"
+		 * country="Hungary" language="Hungarian" standardlanguage="0"
+		 * lcid="1038" disabled="0" rfclanguageid="hu"/> <LIST id="ITA"
+		 * country="Italy" language="Italian" standardlanguage="0" lcid="1040"
+		 * disabled="0" rfclanguageid="it-it"/> <LIST id="JPN" country="Japan"
+		 * language="Japanese" standardlanguage="0" lcid="1041" disabled="0"
+		 * rfclanguageid="ja"/> <LIST id="PLK" country="Poland"
+		 * language="Polish" standardlanguage="0" lcid="1045" disabled="0"
+		 * rfclanguageid="pl"/> <LIST id="CHS" country="PRC" language="Chinese"
+		 * standardlanguage="0" lcid="2052" disabled="0" rfclanguageid="zh-cn"/>
+		 * <LIST id="ESN" country="Spain" language="Spanish"
+		 * standardlanguage="0" lcid="1034" disabled="0" rfclanguageid="es-es"/>
+		 * <LIST id="SVE" country="Sweden" language="Swedish"
+		 * standardlanguage="0" lcid="1053" disabled="0" rfclanguageid="sv-se"/>
+		 * <LIST id="ENG" country="United Kingdom" language="English"
+		 * standardlanguage="1" lcid="2057" disabled="0" rfclanguageid="en-gb"/>
+		 * </LANGUAGES> </IODATA>
 		 */
 		// call CMS
 		if (allUserInterfaceLanguagesNodeListCache == null) {
-			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "  <DIALOG action='listlanguages'/>" + "</IODATA>";
+			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>"
+					+ "  <DIALOG action='listlanguages'/>" + "</IODATA>";
 			RQLNode rqlResponse = callCms(rqlRequest);
-			allUserInterfaceLanguagesNodeListCache = rqlResponse.getNodes("LIST");
+			allUserInterfaceLanguagesNodeListCache = rqlResponse
+					.getNodes("LIST");
 		}
 		return allUserInterfaceLanguagesNodeListCache;
 	}
@@ -1445,12 +1634,14 @@ public class CmsClient {
 	/**
 	 * Liefert alle UserInterfaceLanguages zurï¿½ck.
 	 */
-	public java.util.List<UserInterfaceLanguage> getUserInterfaceLanguages() throws RQLException {
+	public java.util.List<UserInterfaceLanguage> getUserInterfaceLanguages()
+			throws RQLException {
 
 		RQLNodeList languageNodeList = getUserInterfaceLanguageNodeList();
 
 		// wrap all
-		java.util.List<UserInterfaceLanguage> result = new ArrayList<UserInterfaceLanguage>(languageNodeList.size());
+		java.util.List<UserInterfaceLanguage> result = new ArrayList<UserInterfaceLanguage>(
+				languageNodeList.size());
 		for (int i = 0; i < languageNodeList.size(); i++) {
 			RQLNode languageNode = languageNodeList.get(i);
 			result.add(buildUserInterfaceLanguage(languageNode));
@@ -1466,37 +1657,43 @@ public class CmsClient {
 	 * @throws RQLException
 	 * @throws UnknownUserOrWrongPasswordException
 	 */
-	private void login(PasswordAuthentication passwordAuthentication) throws UserAlreadyLoggedInException, RQLException,
+	private void login(PasswordAuthentication passwordAuthentication)
+			throws UserAlreadyLoggedInException, RQLException,
 			UnknownUserOrWrongPasswordException {
 		// extract wrapped credentials
 		String userName = passwordAuthentication.getUserName();
 		String password = passwordAuthentication.getPassword();
 
-		/* 
-		 V5 request
-		 <IODATA>
-		 <ADMINISTRATION action="login" name="user_name" password="pw"/>
-		 </IODATA>
-
-		 V5 response
-		 <IODATA>
-		 <LOGIN  guid="[!guid_login!]" server="svr001" serverguid="[!guid_server!]" translationeditorserverlicense="1"/>
-		 <USER  guid="[!guid_user!]" id="3" flags1="0" flags2="0" maxlevel="1" dialoglanguageid="DEU" languageid="DEU" isservermanager="-1" te="-1" lm="0" showstarthelp="0" projectcount="5" lcid="1031"/>
-		 <PROJECT  guid="[!guid_project!]" name="project_name" description="" versioning="-1" speciallock="0" inhibitlevel="0" lockinfo="" inhibit="0" userlevel="1" templateeditorright="-1" languagemanagerright="0" projectversion="002.015" reddotstartpageguid="" lockedbysystem="0"/>
-		 </IODATA> 
+		/*
+		 * V5 request <IODATA> <ADMINISTRATION action="login" name="user_name"
+		 * password="pw"/> </IODATA>
+		 * 
+		 * V5 response <IODATA> <LOGIN guid="[!guid_login!]" server="svr001"
+		 * serverguid="[!guid_server!]" translationeditorserverlicense="1"/>
+		 * <USER guid="[!guid_user!]" id="3" flags1="0" flags2="0" maxlevel="1"
+		 * dialoglanguageid="DEU" languageid="DEU" isservermanager="-1" te="-1"
+		 * lm="0" showstarthelp="0" projectcount="5" lcid="1031"/> <PROJECT
+		 * guid="[!guid_project!]" name="project_name" description=""
+		 * versioning="-1" speciallock="0" inhibitlevel="0" lockinfo=""
+		 * inhibit="0" userlevel="1" templateeditorright="-1"
+		 * languagemanagerright="0" projectversion="002.015"
+		 * reddotstartpageguid="" lockedbysystem="0"/> </IODATA>
 		 */
 
 		// call CMS
 		RQLNode rqlResponse = null;
 		try {
-			String rqlRequest = "<IODATA>" + " <ADMINISTRATION action='login' name='" + userName + "' password='" + password + "'/>"
-					+ "</IODATA>";
+			String rqlRequest = "<IODATA>"
+					+ " <ADMINISTRATION action='login' name='" + userName
+					+ "' password='" + password + "'/>" + "</IODATA>";
 			rqlResponse = callCms(rqlRequest);
 		} catch (RQLException rqle) {
 			// check if already logged in
 			if (rqle.getMessage().indexOf("#RDError101") > 0) {
-				throw new UserAlreadyLoggedInException("The user with name " + userName
-						+ " is already logged in. Please logout this user and try again.");
+				throw new UserAlreadyLoggedInException(
+						"The user with name "
+								+ userName
+								+ " is already logged in. Please logout this user and try again.");
 			}
 			// throw
 			throw rqle;
@@ -1505,49 +1702,50 @@ public class CmsClient {
 		// check if login was successful
 		logonGuid = rqlResponse.getNode("LOGIN").getAttribute("guid");
 		if (logonGuid == null || logonGuid.length() == 0) {
-			throw new UnknownUserOrWrongPasswordException("The user with name " + userName
+			throw new UnknownUserOrWrongPasswordException("The user with name "
+					+ userName
 					+ " is unknown or the given password is not correct.");
 		}
 		// save login results
-		connectedUser = new User(this, rqlResponse.getNode("USER").getAttribute("guid"), logonGuid);
+		connectedUser = new User(this, rqlResponse.getNode("USER")
+				.getAttribute("guid"), logonGuid);
 	}
 
 	/**
 	 * Meldet den User mit der gegebenen logon GUID vom CMS ab.
 	 */
 	void logout(String logonGuid) throws RQLException {
-		/* 
-		 V5 request
-		 <IODATA loginguid="98AF5E2CA5E1480ABA2BD39181234394">
-		 <ADMINISTRATION>
-		 <LOGOUT guid="98AF5E2CA5E1480ABA2BD39181234394" />
-		 </ADMINISTRATION>
-		 </IODATA>
-		 V5 response
-		 <IODATA>
-		 </IODATA>
+		/*
+		 * V5 request <IODATA loginguid="98AF5E2CA5E1480ABA2BD39181234394">
+		 * <ADMINISTRATION> <LOGOUT guid="98AF5E2CA5E1480ABA2BD39181234394" />
+		 * </ADMINISTRATION> </IODATA> V5 response <IODATA> </IODATA>
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + logonGuid + "'>" + "  <ADMINISTRATION>" + "   <LOGOUT guid='" + logonGuid + "'/>"
-				+ "  </ADMINISTRATION>" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + logonGuid + "'>"
+				+ "  <ADMINISTRATION>" + "   <LOGOUT guid='" + logonGuid
+				+ "'/>" + "  </ADMINISTRATION>" + "</IODATA>";
 		callCms(rqlRequest);
 	}
 
 	/**
-	 * Liefert einen LDAP directory service context zurï¿½ck. Muss mit closeLdapContext() geschlossen werden.
+	 * Liefert einen LDAP directory service context zurï¿½ck. Muss mit
+	 * closeLdapContext() geschlossen werden.
 	 * 
 	 * @see #closeLdapContext()
 	 */
 	public DirContext openLdapContext() throws RQLException {
 		// get LDAP server properties
-		PropertyResourceBundle bundle = (PropertyResourceBundle) PropertyResourceBundle.getBundle("com.hlcl.rql.as.rql_fw");
+		PropertyResourceBundle bundle = (PropertyResourceBundle) PropertyResourceBundle
+				.getBundle("com.hlcl.rql.as.rql_fw");
 		String ldapServerName = bundle.getString(LDAP_SERVER_NAME_KEY).trim();
 		String ldapServerPort = bundle.getString(LDAP_SERVER_PORT_KEY).trim();
 		// prepare context creation
 		Hashtable<String, String> environment = new Hashtable<String, String>();
-		environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory"); // fix LDAP
-		environment.put(Context.PROVIDER_URL, "ldap://" + ldapServerName + ":" + ldapServerPort);
+		environment.put(Context.INITIAL_CONTEXT_FACTORY,
+				"com.sun.jndi.ldap.LdapCtxFactory"); // fix LDAP
+		environment.put(Context.PROVIDER_URL, "ldap://" + ldapServerName + ":"
+				+ ldapServerPort);
 		// create context
 		try {
 			ldapContext = new InitialDirContext(environment);
@@ -1560,7 +1758,8 @@ public class CmsClient {
 	/**
 	 * Sendet eine Mail an alle gegebenen User.
 	 */
-	public void sendMail(java.util.List<User> users, String from, String subject, String message) throws RQLException {
+	public void sendMail(java.util.List<User> users, String from,
+			String subject, String message) throws RQLException {
 
 		// convert receivers
 		String[] to = new String[users.size()];
@@ -1579,7 +1778,8 @@ public class CmsClient {
 	/**
 	 * Sendet eine Mail an einen Empfï¿½nger.
 	 */
-	public void sendMail(String from, String to, String subject, String message) throws RQLException {
+	public void sendMail(String from, String to, String subject, String message)
+			throws RQLException {
 
 		String[] toAddresses = new String[1];
 		toAddresses[0] = to;
@@ -1590,33 +1790,40 @@ public class CmsClient {
 	/**
 	 * Sends an e-mail to the given list of addresses.
 	 */
-	public void sendMail(String from, String toAddresses, String delimiter, String subject, String message) throws RQLException {
-		sendMail(from, StringHelper.split(toAddresses, delimiter), subject, message);
+	public void sendMail(String from, String toAddresses, String delimiter,
+			String subject, String message) throws RQLException {
+		sendMail(from, StringHelper.split(toAddresses, delimiter), subject,
+				message);
 	}
 
 	/**
 	 * Anbindung an den DS MailService.
 	 */
-	public void sendMail(String from, String[] toAddresses, String subject, String message) throws RQLException {
+	public void sendMail(String from, String[] toAddresses, String subject,
+			String message) throws RQLException {
 
 		// send mail
 		try {
 			CmsClient.sendMail(from, toAddresses, subject, message, null, null);
 		} catch (MessagingException me) {
-			throw new RQLException("The e-mail '" + subject + "' could not be send.", me);
+			throw new RQLException("The e-mail '" + subject
+					+ "' could not be send.", me);
 		}
 	}
 
 	/**
 	 * Sendet eine Mail an alle eingerichteten User.
 	 */
-	public void sendMailToAllUsers(String from, String subject, String message, boolean isTest) throws RQLException {
+	public void sendMailToAllUsers(String from, String subject, String message,
+			boolean isTest) throws RQLException {
 
-		sendMail(isTest ? getTestUsers() : getAllUsers(), from, subject, message);
+		sendMail(isTest ? getTestUsers() : getAllUsers(), from, subject,
+				message);
 	}
 
 	/**
-	 * Sendet eine Mail mit Statistikinformationen (Dauer, Zeitpunkt...) im CSV Format an statisticReceiver.
+	 * Sendet eine Mail mit Statistikinformationen (Dauer, Zeitpunkt...) im CSV
+	 * Format an statisticReceiver.
 	 * <p>
 	 * 
 	 * @param statisticReceiver
@@ -1633,12 +1840,14 @@ public class CmsClient {
 	 *            zusätzliche Datenfelder (mit ; getrennt)
 	 * @throws RQLException
 	 */
-	public void sendStatisticMail(String statisticReceiver, String sourceId, long start, long end, String additionalHeader,
-			String additionalData) throws RQLException {
+	public void sendStatisticMail(String statisticReceiver, String sourceId,
+			long start, long end, String additionalHeader, String additionalData)
+			throws RQLException {
 
 		StringBuffer buffer = new StringBuffer();
 		// header
-		buffer.append("sourceId;date;time;duration in s;" + additionalHeader + "\n");
+		buffer.append("sourceId;date;time;duration in s;" + additionalHeader
+				+ "\n");
 		// data
 		buffer.append(sourceId + ";");
 		Date d = new Date();
@@ -1648,25 +1857,30 @@ public class CmsClient {
 		buffer.append(tf.format(d) + ";");
 		buffer.append((end - start) / 1000 + ";");
 		buffer.append(additionalData + "\n");
-		sendMail(STATISTIC_MAIL_FROM_ADDRESS, statisticReceiver, sourceId + " statistic", buffer.toString());
+		sendMail(STATISTIC_MAIL_FROM_ADDRESS, statisticReceiver, sourceId
+				+ " statistic", buffer.toString());
 	}
 
 	/**
 	 * @param cmsServerConnectionUrl
 	 *            the cmsServerConnectionUrl to set
 	 */
-	private void setCmsServerConnectionUrl(String cmsServerConnectionUrl) throws RQLException {
+	private void setCmsServerConnectionUrl(String cmsServerConnectionUrl)
+			throws RQLException {
 		try {
 			this.cmsServerConnectionUrl = new URL(cmsServerConnectionUrl);
 		} catch (MalformedURLException ex) {
-			throw new RQLException("URL of CMS server connection " + cmsServerConnectionUrl
-					+ " is not valid. Has to be similar to http://reddot.hlcl.com/cms/hlclRemoteRQL.asp", ex);
+			throw new RQLException(
+					"URL of CMS server connection "
+							+ cmsServerConnectionUrl
+							+ " is not valid. Has to be similar to http://reddot.hlcl.com/cms/hlclRemoteRQL.asp",
+					ex);
 		}
 	}
 
 	/**
-	 * Ändert den Cache für das Project auf das gegebenen Project. Ein eventuell vorhandenes altes Projekt-Objekt wird unbenutzbar
-	 * gemacht.
+	 * Ändert den Cache für das Project auf das gegebenen Project. Ein eventuell
+	 * vorhandenes altes Projekt-Objekt wird unbenutzbar gemacht.
 	 */
 	private void setCurrentProject(Project project) {
 		// same login GUID didn't work in 2 projects at the same time
@@ -1685,7 +1899,8 @@ public class CmsClient {
 		try {
 			Thread.sleep(seconds * 1000);
 		} catch (InterruptedException ie) {
-			throw new RQLException("Waiting for " + seconds + " seconds were interrupted.", ie);
+			throw new RQLException("Waiting for " + seconds
+					+ " seconds were interrupted.", ie);
 		}
 	}
 
@@ -1697,11 +1912,14 @@ public class CmsClient {
 	}
 
 	/**
-	 * Erzeugt für alle gegebenen Projekt-Nodes Projekte und liefert sie gesammelt in einer Liste zurück.
+	 * Erzeugt für alle gegebenen Projekt-Nodes Projekte und liefert sie
+	 * gesammelt in einer Liste zurück.
 	 */
-	java.util.List<Project> wrapProjectNodes(RQLNodeList projectsNodeList) throws RQLException {
+	java.util.List<Project> wrapProjectNodes(RQLNodeList projectsNodeList)
+			throws RQLException {
 
-		java.util.List<Project> projects = new ArrayList<Project>(projectsNodeList.size());
+		java.util.List<Project> projects = new ArrayList<Project>(
+				projectsNodeList.size());
 
 		for (int i = 0; i < projectsNodeList.size(); i++) {
 			RQLNode node = projectsNodeList.get(i);
@@ -1732,9 +1950,11 @@ public class CmsClient {
 	}
 
 	/**
-	 * Setzt alle Plugins, die namePart im Namen haben, auf active=true. Returns all changed plugins.
+	 * Setzt alle Plugins, die namePart im Namen haben, auf active=true. Returns
+	 * all changed plugins.
 	 */
-	public java.util.List<Plugin> enablePluginsByNameContains(String namePart, boolean ignoreCase) throws RQLException {
+	public java.util.List<Plugin> enablePluginsByNameContains(String namePart,
+			boolean ignoreCase) throws RQLException {
 		java.util.List<Plugin> result = new ArrayList<Plugin>();
 		for (Plugin plugin : getPluginsByNameContains(namePart, ignoreCase)) {
 			plugin.setIsActive(true);
@@ -1744,9 +1964,11 @@ public class CmsClient {
 	}
 
 	/**
-	 * Löscht alle Plugins, die namePart im Namen haben. Returns the number of deleted plug-ins. 
+	 * Löscht alle Plugins, die namePart im Namen haben. Returns the number of
+	 * deleted plug-ins.
 	 */
-	public int deletePluginsByNameContains(String namePart, boolean ignoreCase) throws RQLException {
+	public int deletePluginsByNameContains(String namePart, boolean ignoreCase)
+			throws RQLException {
 		List<Plugin> plugins = getPluginsByNameContains(namePart, ignoreCase);
 		for (Plugin plugin : plugins) {
 			plugin.delete();
@@ -1755,9 +1977,11 @@ public class CmsClient {
 	}
 
 	/**
-	 * Setzt alle Plugins, die namePart im Namen haben, auf active=false. Returns all changed plugins.
+	 * Setzt alle Plugins, die namePart im Namen haben, auf active=false.
+	 * Returns all changed plugins.
 	 */
-	public java.util.List<Plugin> disablePluginsByNameContains(String namePart, boolean ignoreCase) throws RQLException {
+	public java.util.List<Plugin> disablePluginsByNameContains(String namePart,
+			boolean ignoreCase) throws RQLException {
 		java.util.List<Plugin> result = new ArrayList<Plugin>();
 		for (Plugin plugin : getPluginsByNameContains(namePart, ignoreCase)) {
 			plugin.setIsActive(false);
@@ -1767,9 +1991,11 @@ public class CmsClient {
 	}
 
 	/**
-	 * Returns all plug-ins which name contains given namePart. Check with contains; case depending on given ignoreCase.
+	 * Returns all plug-ins which name contains given namePart. Check with
+	 * contains; case depending on given ignoreCase.
 	 */
-	public java.util.List<Plugin> getPluginsByNameContains(String namePart, boolean ignoreCase) throws RQLException {
+	public java.util.List<Plugin> getPluginsByNameContains(String namePart,
+			boolean ignoreCase) throws RQLException {
 		java.util.List<Plugin> result = new ArrayList<Plugin>();
 		for (Plugin plugin : getAllPlugins()) {
 			// check namePart case dependent on given value
@@ -1781,9 +2007,11 @@ public class CmsClient {
 	}
 
 	/**
-	 * Returns all active plug-ins which name contains given namePart. Check with contains; case depending on given ignoreCase.
+	 * Returns all active plug-ins which name contains given namePart. Check
+	 * with contains; case depending on given ignoreCase.
 	 */
-	public java.util.List<Plugin> getActivePluginsByNameContains(String namePart, boolean ignoreCase) throws RQLException {
+	public java.util.List<Plugin> getActivePluginsByNameContains(
+			String namePart, boolean ignoreCase) throws RQLException {
 		java.util.List<Plugin> result = new ArrayList<Plugin>();
 		for (Plugin plugin : getPluginsByNameContains(namePart, ignoreCase)) {
 			if (plugin.isActive()) {
