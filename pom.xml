@@ -5,7 +5,7 @@
 
 	<groupId>com.hlag</groupId>
 	<artifactId>jrql</artifactId>
-	<version>1.2</version>
+	<version>1.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>jRQL</name>
@@ -13,6 +13,11 @@
 	It encapsulate RQL request and response handling and offer high level functions from SmartEdit, 
 	SmartTree and ServerManager area.</description>
 	<url>https://jrql.wordpress.com/</url>
+
+	<issueManagement>
+		<url>https://github.com/frankleja/jrql/issues</url>
+		<system>GitHub Issues</system>
+	</issueManagement>
 
 	<licenses>
 		<license>
@@ -22,17 +27,17 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:svn:http://jrql.svn.sourceforge.net/viewvc/jrql/tags/REL-1.2/</connection>
-		<developerConnection>scm:svn:https://jrql.svn.sourceforge.net/svnroot/jrql</developerConnection>
+		<url>http://github.com/frankleja/jrql</url>
+		<connection>scm:git:git://github.com/frankleja/jrql</connection>
+		<developerConnection>scm:git:git@github.com:frankleja/jrql</developerConnection>
 		<tag>HEAD</tag>
-		<url>http://jrql.svn.sourceforge.net/viewvc/jrql/tags/REL-1.2/</url>
 	</scm>
 	
 	<developers>
     <developer>
-      <id>frank</id>
+      <id>franklejfa</id>
       <name>Frank Leja</name>
-      <email>frank.leja@gmx.de</email>
+      <email>frank.leja@hlag.com</email>
       <url>http://www.xing.com/profile/Frank_Leja</url>
       <organization>Hapag-Lloyd AG</organization>
       <organizationUrl>http://www.hapag-lloyd.com</organizationUrl>
