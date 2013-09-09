@@ -362,6 +362,16 @@ public class Page implements ProjectContainer {
 	 * @see #startSetElementValues()
 	 * @see #endSetElementValues()
 	 */
+	public void addSetStandardFieldEmailValue(String templateElementName, String value) throws RQLException {
+		setElementValuesMap.put(getStandardFieldEmailElement(templateElementName), value);
+	}
+	
+	/**
+	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
+	 * 
+	 * @see #startSetElementValues()
+	 * @see #endSetElementValues()
+	 */
 	public void addSetStandardFieldUserDefinedValue(String templateElementName, String value) throws RQLException {
 		setElementValuesMap.put(getStandardFieldUserDefinedElement(templateElementName), value);
 	}
@@ -2352,6 +2362,8 @@ public class Page implements ProjectContainer {
 				result.add(getMediaElement(templateElement));
 			} else if (templateElement.isOptionList()) {
 				result.add(getOptionList(templateElement));
+			} else if (templateElement.isStandardFieldEmail()) {
+				result.add(getStandardFieldEmailElement(templateElement));
 			} else if (templateElement.isStandardFieldDate()) {
 				result.add(getStandardFieldDateElement(templateElement));
 			} else if (templateElement.isStandardFieldNumeric()) {
@@ -4263,6 +4275,17 @@ public class Page implements ProjectContainer {
 	}
 
 	/**
+	 * Liefert Standardfeld E-Mail Elements dieser Seite, das auf dem gegebenen templateElement basiert.
+	 * 
+	 * @param templateElementName
+	 *            TemplateElement muss vom Typ 50 sein
+	 */
+	public StandardFieldEmailElement getStandardFieldEmailElement(String templateElementName) throws RQLException {
+
+		return getStandardFieldEmailElement(getTemplateElementByName(templateElementName));
+	}
+
+	/**
 	 * Liefert Standardfeld Date Elements dieser Seite, das auf dem gegebenen templateElement basiert.
 	 * 
 	 * @param templateElement
@@ -4280,6 +4303,27 @@ public class Page implements ProjectContainer {
 
 		// wrap page element data
 		return new StandardFieldDateElement(this, templateElement, elementNode.getAttribute("name"), elementNode.getAttribute("guid"),
+				elementNode.getAttribute("value"));
+	}
+
+	/**
+	 * Liefert Standardfeld E-Mail Elements dieser Seite, das auf dem gegebenen templateElement basiert.
+	 * 
+	 * @param templateElement
+	 *            muss vom Typ 50 sein
+	 */
+	private StandardFieldEmailElement getStandardFieldEmailElement(TemplateElement templateElement) throws RQLException {
+
+		// check type of template element
+		if (!templateElement.isStandardFieldEmail()) {
+			throw new WrongTypeException("Template element " + templateElement.getName() + " is not of type Standard-Field E-Mail.");
+		}
+
+		// call CMS
+		RQLNode elementNode = findElementNode(templateElement);
+
+		// wrap page element data
+		return new StandardFieldEmailElement(this, templateElement, elementNode.getAttribute("name"), elementNode.getAttribute("guid"),
 				elementNode.getAttribute("value"));
 	}
 

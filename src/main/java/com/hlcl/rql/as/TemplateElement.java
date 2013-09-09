@@ -43,6 +43,7 @@ public class TemplateElement implements TemplateContainer {
 	static final int STANDARDFIELD_NUMERIC_TYPE = 48;
 	static final int STANDARDFIELD_TEXT_TYPE = 1;
 	static final int STANDARDFIELD_USER_DEFINED = 999;
+	static final int STANDARDFIELD_EMAIL_TYPE = 50;
 
 	static final int TEXT_ASCII_TYPE = 31;
 
@@ -75,6 +76,7 @@ public class TemplateElement implements TemplateContainer {
 		t2n.put(new Integer(LIST_TYPE), "List");
 		t2n.put(new Integer(MEDIA_TYPE), "Media");
 		t2n.put(new Integer(OPTIONLIST_TYPE), "Option List");
+		t2n.put(new Integer(STANDARDFIELD_DATE_TYPE), "StandardField E-Mail");
 		t2n.put(new Integer(STANDARDFIELD_DATE_TYPE), "StandardField Date");
 		t2n.put(new Integer(STANDARDFIELD_NUMERIC_TYPE), "StandardField Numeric");
 		t2n.put(new Integer(STANDARDFIELD_TEXT_TYPE), "StandardField Text");
@@ -171,6 +173,7 @@ public class TemplateElement implements TemplateContainer {
 		LABELED_TYPES.add(IMAGE_TYPE);
 		LABELED_TYPES.add(MEDIA_TYPE);
 		LABELED_TYPES.add(OPTIONLIST_TYPE);
+		LABELED_TYPES.add(STANDARDFIELD_EMAIL_TYPE);
 		LABELED_TYPES.add(STANDARDFIELD_DATE_TYPE);
 		LABELED_TYPES.add(STANDARDFIELD_NUMERIC_TYPE);
 		LABELED_TYPES.add(STANDARDFIELD_TEXT_TYPE);
@@ -183,6 +186,7 @@ public class TemplateElement implements TemplateContainer {
 		CONTENT_TYPES.add(IMAGE_TYPE);
 		CONTENT_TYPES.add(MEDIA_TYPE);
 		CONTENT_TYPES.add(OPTIONLIST_TYPE);
+		CONTENT_TYPES.add(STANDARDFIELD_EMAIL_TYPE);
 		CONTENT_TYPES.add(STANDARDFIELD_DATE_TYPE);
 		CONTENT_TYPES.add(STANDARDFIELD_NUMERIC_TYPE);
 		CONTENT_TYPES.add(STANDARDFIELD_TEXT_TYPE);
@@ -194,6 +198,7 @@ public class TemplateElement implements TemplateContainer {
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(IMAGE_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(MEDIA_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(OPTIONLIST_TYPE);
+		CONTENT_WITHOUT_HEADLINE_TYPES.add(STANDARDFIELD_EMAIL_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(STANDARDFIELD_DATE_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(STANDARDFIELD_NUMERIC_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(STANDARDFIELD_TEXT_TYPE);
@@ -1284,6 +1289,14 @@ public class TemplateElement implements TemplateContainer {
 	public boolean isStandardField() {
 
 		return isStandardFieldText() || isStandardFieldNumeric() || isStandardFieldDate() || isStandardFieldUserDefined();
+	}
+
+	/**
+	 * Liefert true genau dann, wenn dieses Template-Element ein Standardfeld E-Mail ist.
+	 */
+	public boolean isStandardFieldEmail() {
+
+		return getType() == STANDARDFIELD_EMAIL_TYPE;
 	}
 
 	/**
