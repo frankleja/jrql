@@ -69,7 +69,7 @@ public class Page implements ProjectContainer {
 
 		// check if given
 		if (pageGuid.trim().length() == 0) {
-			throw new MissingGuidException("Page could not be created because the page guid is not deliverd.");
+			throw new MissingGuidException("Page could not be created because the page guid is not delivered.");
 		}
 		this.pageGuid = pageGuid;
 	}
