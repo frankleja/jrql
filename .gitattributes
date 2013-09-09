@@ -1,0 +1,4 @@
+# Set default behaviour use LF on every os for specific files, see https://help.github.com/articles/dealing-with-line-endings#platform-windows
+*.java text eol=crlf
+*.properties text eol=crlf
+*.xml text eol=crlf
