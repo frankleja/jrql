@@ -17,7 +17,6 @@ public class RQLException extends Exception {
 	/**
 	 * Dieses Feld enthält die Ursache dieser Exception.
 	 */
-	private Throwable reason = null;
 	private Date created = new Date();
 
 	/**
@@ -34,11 +33,10 @@ public class RQLException extends Exception {
 	 * Konstruktor.
 	 * 
 	 * @param msg		Beschreibung der Exception.
-	 * @param reason	Ursache des Problems, evtl. auch null.
+	 * @param reason	Ursache des Problems.
 	 */
 	public RQLException(String msg, Throwable reason) {
-		super(msg);
-		this.reason = reason;
+		super(msg, reason);
 	}
 
 	/**
@@ -46,7 +44,7 @@ public class RQLException extends Exception {
 	 */
 	public String getMessage() {
 		// format date to 20061127 18:35
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd H:mm");
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm");
 		return df.format(created) +" "+ super.getMessage();
 	}
 
@@ -54,6 +52,6 @@ public class RQLException extends Exception {
 	 * Getter für das Feld "reason".
 	 */
 	public Throwable getReason() {
-		return reason;
+		return getCause();
 	}
 }
