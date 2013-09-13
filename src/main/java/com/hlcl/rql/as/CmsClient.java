@@ -836,8 +836,7 @@ public class CmsClient {
 
 			return conn.getInputStream();
 		} catch (IOException ioe) {
-			throw new RQLException("IO Exception reading result from server",
-					ioe);
+			throw new RQLException(ioe.toString(), ioe);
 		} finally {
 			if (osr != null) {
 				try {
