@@ -19,4 +19,6 @@ On the command line with Maven and Java properly set up:
 
 * mvn compile
 * mvn package
+* mvn javadoc:javadoc
 * mvn clean
+
