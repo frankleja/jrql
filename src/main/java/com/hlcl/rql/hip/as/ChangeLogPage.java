@@ -206,7 +206,6 @@ public class ChangeLogPage extends ProjectPage {
 	/**
 	 * Returns the latest entry of the list of changes
 	 * 
-	 * @return
 	 * @throws RQLException
 	 */
 	public ChangeLogEntry getLatestChange() throws RQLException {

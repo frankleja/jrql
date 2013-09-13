@@ -85,7 +85,7 @@ public abstract class UsageReference implements ProjectContainer {
 	/**
 	 * Returns all language variants rfc language IDs in which this file is used.
 	 * 
-	 * @see LanguageVariant#getRfcLanguageId();
+	 * @see LanguageVariant#getRfcLanguageId()
 	 */
 	public String getUsedLanguageVariantRfcLanguageIds(String delimiter) {
 		String result = "";

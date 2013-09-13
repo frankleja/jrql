@@ -2111,8 +2111,6 @@ public class Template implements TemplateFolderContainer {
 	 * templateElement basiert.
 	 * <p>
 	 * Die Seitenelemente werden auf das gegebene targetElement verwiesen.
-	 * 
-	 * @return List of Pages
 	 */
 	public void referencePageElements(TemplateElement templateElement, StandardFieldTextElement targetElement, int maxPages)
 			throws RQLException {
@@ -2130,8 +2128,6 @@ public class Template implements TemplateFolderContainer {
 	 * templateElement basiert.
 	 * <p>
 	 * Die Seitenelemente werden auf das gegebene targetElement verwiesen.
-	 * 
-	 * @return List of Pages
 	 */
 	public void referencePageElements(TemplateElement templateElement, TextElement targetElement, int maxPages) throws RQLException {
 
@@ -2147,8 +2143,6 @@ public class Template implements TemplateFolderContainer {
 	 * Seite.
 	 * <p>
 	 * Die Links in den ersten maxPages Seiten werden auf den gegebenen targetLink verwiesen.
-	 * 
-	 * @return List of Pages
 	 */
 	public void referencePageLinks(String templateElementName, MultiLink targetLink, int maxPages) throws RQLException {
 		referencePageLinks(getTemplateElementByName(templateElementName), targetLink, maxPages);
@@ -2159,8 +2153,6 @@ public class Template implements TemplateFolderContainer {
 	 * basiert.
 	 * <p>
 	 * Die Seitenlinks werden auf den gegebenen targetLink verwiesen.
-	 * 
-	 * @return List of Pages
 	 */
 	public void referencePageLinks(TemplateElement templateElement, MultiLink targetLink, int maxPages) throws RQLException {
 

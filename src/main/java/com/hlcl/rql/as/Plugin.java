@@ -25,8 +25,8 @@ public class Plugin implements CmsClientContainer {
 	 *            the cms client instance
 	 * @param pluginGuid
 	 *            the GUID of this plugin
-	 * @param active
-	 *            =1, if this plugin is currently active, sonst 0
+	 * @param active0or1
+	 *            =1, if this plugin is currently active, else 0
 	 * @param name
 	 *            the name of this plugin
 	 * @param url
@@ -39,6 +39,7 @@ public class Plugin implements CmsClientContainer {
 		this.active = active0or1.equals("1");
 		this.pluginGuid = pluginGuid;
 		this.name = name;
+		// FIXME: url is missing
 	}
 
 	/**

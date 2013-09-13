@@ -56,9 +56,7 @@ public class BOMUtil {
 	}
 
 	/**
-	 * Just reads necessary bytes from the stream
-	 * 
-	 * @param _fIn
+	 * Just reads necessary bytes from the stream.
 	 */
 	public static Reader getReader(File _f, String encoding) throws IOException {
 		int BOMType = getBOMType(_f);

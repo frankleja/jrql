@@ -10,7 +10,7 @@ public class PageMediaElementUsageReference extends UsageReference {
 	/**
 	 * @param file
 	 *            parent file this reference belongs to
-	 * @param usedLanguageVariantCodes
+	 * @param languageVariantsCodes
 	 *            the 3 letter codes of the language variants this file is referenced
 	 * @param mediaElement
 	 *            the page media element using the given file

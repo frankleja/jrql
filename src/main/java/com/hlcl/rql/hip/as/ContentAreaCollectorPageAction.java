@@ -294,7 +294,7 @@ public class ContentAreaCollectorPageAction extends PageAction {
 	/**
 	 * Klassifiziert die gegebene Seite zu der aktuellen content area.
 	 * 
-	 * @see com.hlcl.rql.as.PageAction#invoke(com.hlcl.rql.as.Page)
+	 * @see com.hlcl.rql.util.as.PageAction#invoke
 	 */
 	public void invoke(Page page) throws RQLException {
 		// skip all *_fragment pages

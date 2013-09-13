@@ -406,7 +406,6 @@ public class CmsClient {
 	 *            String
 	 * @return RQLNode
 	 * @throws RQLException
-	 * @see RQLHelper RQLNode
 	 */
 	public RQLNode callCms(String rqlRequest) throws RQLException {
 		// System.out.println(rqlRequest); // TODO request logging
@@ -479,7 +478,7 @@ public class CmsClient {
 	 *            String
 	 * @return XML String
 	 * @throws RQLException
-	 * @see RQLHelper RQLNode
+	 * @see RQLNode
 	 */
 	public String callCmsWithoutParsing(String rqlRequest) throws RQLException {
 		// System.out.println(rqlRequest); // TODO request logging

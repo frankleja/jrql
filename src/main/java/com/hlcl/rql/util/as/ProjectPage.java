@@ -606,13 +606,7 @@ public abstract class ProjectPage {
 	 * <p>
 	 * ImageElement, MediaElement, TextElement
 	 * <p>
-	 * 
-	 * @see #startSetElementValues()
-	 * @see #addSetOptionListValue(String, String)
-	 * @see #addSetStandardFieldNumericValue(String, int)
-	 * @see #addSetStandardFieldNumericValue(String, ReddotDate)
-	 * @see #addSetStandardFieldTextValue(String, String)
-	 * @see #endSetElementValues()
+
 	 */
 	public void endSetElementValues() throws RQLException {
 		getPage().endSetElementValues();
@@ -621,18 +615,6 @@ public abstract class ProjectPage {
 	/**
 	 * Start a mode to add elements which values should be changed.
 	 * 
-	 * @see #setElementValues(Map)
-	 * @see #startSetElementValues()
-	 * @see #addSetOptionListValue(String, String)
-	 * @see #addSetStandardFieldNumericValue(String, int)
-	 * @see #addSetStandardFieldNumericValue(String, ReddotDate)
-	 * @see #addSetStandardFieldTextValue(String, String)
-	 * @see #addSetStandardFieldUserDefinedValue(String, String)
-	 * @see #addCopyOptionListValueFrom(String, Page)
-	 * @see #addCopyStandardFieldDateValueFrom(String, Page)
-	 * @see #addCopyStandardFieldNumericValueFrom(String, Page)
-	 * @see #addCopyStandardFieldTextValueFrom(String, Page)
-	 * @see #addCopyStandardFieldUserDefinedValueFrom(String, Page)
 	 * @see #endSetElementValues()
 	 */
 	public void startSetElementValues() throws RQLException {
@@ -656,7 +638,7 @@ public abstract class ProjectPage {
 	 * <p>
 	 * Dies ist nicht der generierte Dateiname auf der site.
 	 * 
-	 * @see #getPublishedFilename(String)
+	 * @see Page#getPublishedFilename(String)
 	 */
 	public String getFilename() throws RQLException {
 		return getPage().getFilename();
@@ -833,7 +815,7 @@ public abstract class ProjectPage {
 	 * Gibt den Speicher aller Caches wieder frei für die GC. Dieses Seitenobjekt bleibt voll funktionsfähig! Folgende Zugriffe auf
 	 * diese Seite füllen die Caches einfach wieder.
 	 * 
-	 * @see #clearLanguageVariantDependentCaches()
+	 * @see Page#clearLanguageVariantDependentCaches()
 	 */
 	public void freeOccupiedMemory() {
 		getPage().freeOccupiedMemory();

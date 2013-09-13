@@ -99,7 +99,7 @@ public class LiveServer {
 	 * <p>
 	 * Returned filenames will be sorted ascending.
 	 * 
-	 * @param pattern
+	 * @param pathName
 	 *            if null, all files found will be returned
 	 *            otherwise a filename filter for given pattern (the only supported wild card is *) is applied, like hip_*_filter.zip.
 	 */

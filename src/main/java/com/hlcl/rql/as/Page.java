@@ -249,7 +249,6 @@ public class Page implements ProjectContainer {
 	 * 
 	 * @see #startDeleteElementValues()
 	 * @see #addDeleteElementValue(Element)
-	 * @see #addElementToDeleteValue(TextElement)
 	 * @see #endDeleteElementValues()
 	 * @see Element#deleteValue()
 	 * @see TextElement#deleteValue()
@@ -1921,11 +1920,6 @@ public class Page implements ProjectContainer {
 	 * <p>
 	 * 
 	 * @see #startSetElementValues()
-	 * @see #addSetOptionListValue(String, String)
-	 * @see #addSetStandardFieldNumericValue(String, int)
-	 * @see #addSetStandardFieldNumericValue(String, ReddotDate)
-	 * @see #addSetStandardFieldTextValue(String, String)
-	 * @see #endSetElementValues()
 	 */
 	public void endSetElementValues() throws RQLException {
 		if (setElementValuesMap == null) {
@@ -2569,7 +2563,7 @@ public class Page implements ProjectContainer {
 	 * werden) confirm = -64 +524288 = -2^6 +2^19 = -(wartet auf Freigabe) +(Seite ist von einem Benutzer bereits freigegeben worden)
 	 * Diese Änderung werden aber nicht beim Speichern eines neuen Seitenstatus verwendet!
 	 * 
-	 * @see changeState()
+	 * @see #changeState
 	 */
 	private BigInteger getDetailsStateFlag() throws RQLException {
 
@@ -6363,7 +6357,6 @@ public class Page implements ProjectContainer {
 	 * @see #startSetElementValues()
 	 * @see #addSetOptionListValue(String, String)
 	 * @see #addSetStandardFieldNumericValue(String, int)
-	 * @see #addSetStandardFieldNumericValue(String, ReddotDate)
 	 * @see #addSetStandardFieldTextValue(String, String)
 	 * @see #addSetStandardFieldUserDefinedValue(String, String)
 	 * @see #addCopyOptionListValueFrom(String, Page)

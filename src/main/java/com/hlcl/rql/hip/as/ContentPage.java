@@ -144,7 +144,7 @@ public class ContentPage extends ProjectPage {
 	/**
 	 * Creates a new link table block page on the blocks container.
 	 * 
-	 * @param headline
+	 * @param headlinePrefix
 	 *            Headline of new created link table block page
 	 */
 	public LinkTableBlock createLinkTableBlock(String headlinePrefix) throws RQLException {
@@ -635,7 +635,6 @@ public class ContentPage extends ProjectPage {
 	 * Gets the responsible user name if template element available
 	 * 
 	 * @param ifNotAvailable
-	 * @return
 	 * @throws RQLException
 	 */
 	public String getResponsibleUserNameIfAvailable(String ifNotAvailable) throws RQLException {
@@ -654,7 +653,6 @@ public class ContentPage extends ProjectPage {
 	 * Gets the responsible user id if template element available
 	 * 
 	 * @param ifNotAvailable
-	 * @return
 	 * @throws RQLException
 	 */
 	public String getResponsibleUserIdIfAvailable(String ifNotAvailable) throws RQLException {
@@ -923,7 +921,6 @@ public class ContentPage extends ProjectPage {
 	 * Gets the updated date if template element available
 	 * 
 	 * @param ifNotAvailable
-	 * @return
 	 * @throws RQLException
 	 */
 	public String getUpdatedOnIfAvailable(String ifNotAvailable) throws RQLException {

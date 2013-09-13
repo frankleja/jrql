@@ -10,7 +10,7 @@ public class PageImageElementUsageReference extends UsageReference {
 	/**
 	 * @param file
 	 *            parent file this reference belongs to
-	 * @param usedLanguageVariantCodes
+	 * @param languageVariantsCodes
 	 *            the 3 letter codes of the language variants this file is referenced
 	 * @param imageElement
 	 *            the page image element using the given file

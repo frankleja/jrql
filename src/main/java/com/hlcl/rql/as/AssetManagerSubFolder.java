@@ -16,7 +16,7 @@ public class AssetManagerSubFolder extends Folder {
 	 * constructor
 	 * @param project com.hlcl.rql.as.Project
 	 * @param name java.lang.String
-	 * @param folderGuid java.lang.String
+	 * @param subFolderGuid java.lang.String
 	 * TODO not finished regarding super class constructor (path is doubled)
 	 */
 	public AssetManagerSubFolder(Project project, AssetManagerFolder parentAssetManagerFolder, String name, String subFolderGuid, String path, String description) {

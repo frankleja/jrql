@@ -10,7 +10,7 @@ import com.hlcl.rql.as.StringHelper;
 /**
  * Summarize the common log file's file size and group per day.
  * 
- * @author: LEJAFR
+ * @author LEJAFR
  */
 public class CommonLogSizeApp {
 

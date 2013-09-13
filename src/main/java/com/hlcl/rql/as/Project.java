@@ -1729,10 +1729,10 @@ public class Project implements CmsClientContainer {
 	 * Liefert den AssetManager-Ordner mit dem gegebenen Namen oder null, falls kein AssetManager für den Namen gefunden wurde.
 	 * Benötigt den session key!
 	 * 
-	 * @param name
+	 * @param assetManagerFolderName
 	 *            Name des AssetManager-Ordners.
 	 * @return AssetManagerFolder
-	 * @see <code>Folder</code>
+	 * @see Folder
 	 */
 	public AssetManagerFolder getAssetManagerByName(String assetManagerFolderName) throws RQLException {
 
@@ -1748,7 +1748,7 @@ public class Project implements CmsClientContainer {
 	 * Liefert den AssetManager-Subfolder für die gegebenen Foldernamen. Liefert null, falls kein AssetManagerFolder gefunden wurde.
 	 * Benötigt den session key!
 	 * 
-	 * @param name
+	 * @param assetManagerFolderSlashSubfolderName
 	 *            Name des AssetManager-Ordners/Name des Unterordners; e.g. view_pdf/orga_charts_pdf
 	 * @throws WrongParameterFormatException
 	 *             if folder names are not separated by / (a slash)
@@ -1943,7 +1943,7 @@ public class Project implements CmsClientContainer {
 	/**
 	 * Liefert die rfc language id (en, de, zh, es) der gerade im Projekt gewählten Sprachvariante zurück.
 	 * 
-	 * @see LanguageVariant.#getRfcLanguageId()
+	 * @see LanguageVariant#getRfcLanguageId()
 	 */
 	public String getCurrentLanguageVariantRfcLanguageId() throws RQLException {
 		return getCurrentLanguageVariant().getRfcLanguageId();
@@ -2672,8 +2672,6 @@ public class Project implements CmsClientContainer {
 	 * Liefert ein script parameter objekt für die gegebenen Parameterseite.
 	 * <p>
 	 * Prefer usage of get parameters with class name to benefit of caching.
-	 * 
-	 * @see
 	 */
 	public ScriptParameters getParameters(String parameterPageId) throws RQLException {
 		return new ScriptParameters(getPageById(parameterPageId));
@@ -3569,8 +3567,8 @@ public class Project implements CmsClientContainer {
 	 * ACHTUNG. Das gelieferte RQL ist seit V7.5 nicht mehr gültig. Es tauchen doppelte Attribute innerhalb eines Tags auf. Das parsen
 	 * muss daher per Hand erfolgen.
 	 * 
-	 * @see #StringHelper.getStartTag()
-	 * @see #StringHelper.getAttributeValue()
+	 * @see StringHelper#getStartTag
+	 * @see StringHelper#getAttributeValue
 	 */
 	String getSmartTreeSegments(String type, String guid) throws RQLException {
 		/*

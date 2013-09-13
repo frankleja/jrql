@@ -57,9 +57,6 @@ public class MainLinkPagePathBuilder implements PageContainer {
 	 * Per default werden nur die physical pages zurückgegeben. Die blöcke und nodes werden hinzugefügt, wenn gewünscht.
 	 * <p>
 	 * Erste Seite der Liste ist die Projetstartseite und letzte ist die Seite aus dem Konstruktor.
-	 * 
-	 * @param startPageIds
-	 *            path construction ends at one of the given pages, otherwise path go back to project's start page
 	 */
 	public PageArrayList getMainLinkPath(boolean includeBlocks, boolean includeNodes) throws RQLException {
 		return getPath(null, ",", includeBlocks, includeNodes);

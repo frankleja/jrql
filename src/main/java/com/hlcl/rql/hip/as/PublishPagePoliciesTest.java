@@ -16,7 +16,7 @@ import com.hlcl.rql.as.RQLException;
 /**
  * Test of class PublishPagePolicies.
  * 
- * @author: LEJAFR
+ * @author LEJAFR
  */
 public class PublishPagePoliciesTest {
 	/**
