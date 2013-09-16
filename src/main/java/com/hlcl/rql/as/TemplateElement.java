@@ -1288,7 +1288,7 @@ public class TemplateElement implements TemplateContainer {
 	 */
 	public boolean isStandardField() {
 
-		return isStandardFieldText() || isStandardFieldNumeric() || isStandardFieldDate() || isStandardFieldUserDefined();
+		return isStandardFieldText() || isStandardFieldNumeric() || isStandardFieldDate() || isStandardFieldUserDefined() || isStandardFieldEmail();
 	}
 
 	/**
