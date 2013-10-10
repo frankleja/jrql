@@ -6532,7 +6532,7 @@ public class Page implements ProjectContainer {
 	}
 
     /**
-     * Entfernt den vorhanden appearance schedule des Hauptlinks
+     * Entfernt den vorhanden Erscheinungszeitraum des Hauptlinks
      *
      * @throws RQLException
      */
@@ -6544,7 +6544,7 @@ public class Page implements ProjectContainer {
     }
 
     /**
-     * Weist dem Hauptlink dieser Seite einen appearance schedule zu
+     * Weist dem Hauptlink dieser Seite einen Erscheinungszeitraum zu
      *
      * @param appearanceSchedule
      * @throws RQLException

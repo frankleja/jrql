@@ -3,7 +3,7 @@ package com.hlcl.rql.as;
 import java.util.Date;
 
 /**
- * Diese Klasse repräsentiert den appearance schedule, der an einem Hauptlink angelegt werden kann.
+ * Diese Klasse repräsentiert den Erscheinungszeitraum, der an einem Hauptlink angelegt werden kann.
  *
  * @author barszczewski on 09.10.13
  */
@@ -15,7 +15,7 @@ public class AppearanceSchedule {
     private ReddotDate end;
 
     /**
-     * Erzeugt einen neuen schedule für ein Start- und Enddatum (java.util.Date)
+     * Erzeugt einen neuen Erscheinungszeitraum für ein Start- und Enddatum (java.util.Date)
      *
      * @param start Startdatum
      * @param end Enddatum
@@ -26,7 +26,7 @@ public class AppearanceSchedule {
     }
 
     /**
-     * Erzeugt einen neuen schedule für ein Start- und Enddatum (com.hlcl.rql.as.ReddotDate)
+     * Erzeugt einen neuen Erscheinungszeitraum für ein Start- und Enddatum (com.hlcl.rql.as.ReddotDate)
      *
      * @param start Startdatum
      * @param end Enddatum
@@ -37,7 +37,7 @@ public class AppearanceSchedule {
     }
 
     /**
-     * Erzeugt einen neuen schedule für ein Start- und Endzeitpunkt
+     * Erzeugt einen neuen Erscheinungszeitraum für ein Start- und Endzeitpunkt
      *
      * @param start Startzeitpunkt im Microsoft format
      * @param end  Endzeitpunkt String im Microsoft format
@@ -48,7 +48,7 @@ public class AppearanceSchedule {
     }
 
     /**
-     * Liefert einen leeren schedule.
+     * Liefert einen leeren Erscheinungszeitraum.
      *
      * @return
      */
