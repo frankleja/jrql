@@ -474,9 +474,16 @@ public class Page implements ProjectContainer {
 		TemplateElement templateElement = existsOnPage.getTemplateElementByGuid(linkNode.getAttribute("templateelementguid"));
 		if (type == 13) {
 			multiLink = buildList(linkNode, templateElement, existsOnPage);
+
+            String datebegin = linkNode.getAttribute("datebegin");
+            String dateend = linkNode.getAttribute("dateend");
+            if(datebegin != null && !datebegin.equals("0") && dateend != null && !dateend.equals("0")){
+                multiLink.setAppearanceSchedule(AppearanceSchedule.forPeriod(datebegin, dateend));
+            }
+
 		} else if (type == 28) {
 			multiLink = buildContainer(linkNode, templateElement, existsOnPage);
-		} else {
+        } else {
 			throw new WrongTypeException("Creation of a List(13) or Container(28) fails, because given link node has type " + type
 					+ ".");
 		}
@@ -2244,8 +2251,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert den Container aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
-	 *            muss vom Typ 28 (Container) sein.
+	 * @param containerTemplateElement  muss vom Typ 28 (Container) sein.
 	 * @return <code>Container</code>
 	 * @see <code>Container</code>
 	 */
@@ -6524,4 +6530,50 @@ public class Page implements ProjectContainer {
 		// force re-read of all changeable values
 		resetChangeableValues();
 	}
+
+    /**
+     * Entfernt den vorhanden appearance schedule des Hauptlinks
+     *
+     * @throws RQLException
+     */
+    public void clearMainLinkAppearanceSchedule() throws RQLException {
+
+        if(this.getMainMultiLink().getAppearanceSchedule() != null) {
+            this.assignMainLinkAppearanceSchedule(AppearanceSchedule.clearedSchedule());
+        }
+    }
+
+    /**
+     * Weist dem Hauptlink dieser Seite einen appearance schedule zu
+     *
+     * @param appearanceSchedule
+     * @throws RQLException
+     */
+    public void assignMainLinkAppearanceSchedule(AppearanceSchedule appearanceSchedule) throws RQLException {
+        StringBuilder sb = new StringBuilder("");
+
+        sb.append("<IODATA loginguid=\"").append(this.getLogonGuid())
+                .append("\" sessionkey=\"").append(this.getSessionKey()).append("\">")
+                .append("<PAGE guid=\"").append(this.getPageGuid()).append("\"><LINKSFROM action=\"load\" /></PAGE>")
+                .append("</IODATA>");
+
+        //1. retrieve relationguid
+        String rqlRequest = sb.toString();
+        RQLNode rqlResponse = this.getCmsClient().callCms(rqlRequest);
+        RQLNode linkNode = rqlResponse.getNode("LINK");
+        String relationGuid = linkNode.getAttribute("relationguid");
+
+        //2. set appearance schedule
+        sb = new StringBuilder("");
+        sb.append("<IODATA loginguid=\"").append(this.getLogonGuid()).append("\" sessionkey=\"").append(this.getSessionKey()).append("\">")
+                .append("<PAGE><LINKFROM action=\"save\" guid=\"").append(relationGuid)
+                .append("\" datebegin=\"").append(appearanceSchedule.getBegin().toMsDoubleString())
+                .append("\" dateend=\"").append(appearanceSchedule.getEnd().toMsDoubleString()).append("\" />")
+                .append("</PAGE></IODATA>");
+
+        rqlRequest = sb.toString();
+        getCmsClient().callCmsWithoutParsing(rqlRequest);
+
+        this.getMainMultiLink().setAppearanceSchedule(appearanceSchedule);
+    }
 }

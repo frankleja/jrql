@@ -44,6 +44,8 @@ public abstract class MultiLink implements PageContainer {
 	private Page page;
 	private TemplateElement templateElement;
 
+    private AppearanceSchedule appearanceSchedule;
+
 	/**
 	 * Container constructor comment.
 	 * 
@@ -1961,4 +1963,24 @@ public abstract class MultiLink implements PageContainer {
 
 		return true;
 	}
+
+    /**
+     * Liefert den appearance schedule, falls einer existiert.
+     *
+     * @return appearanceSchedule oder null
+     */
+    public AppearanceSchedule getAppearanceSchedule() {
+        return appearanceSchedule;
+    }
+
+    /**
+     * Setzt einen {@link com.hlcl.rql.as.AppearanceSchedule} auf diesem Link. <b>Es wird dadurch nicht persistiert!</b>
+     * Um einen schedule auch zu speichern bitte {@link com.hlcl.rql.as.Page#assignMainLinkAppearanceSchedule(AppearanceSchedule)} benutzen.
+     *
+     * @param appearanceSchedule
+     * @throws RQLException
+     */
+    public void setAppearanceSchedule(AppearanceSchedule appearanceSchedule) throws RQLException {
+        this.appearanceSchedule = appearanceSchedule;
+    }
 }
