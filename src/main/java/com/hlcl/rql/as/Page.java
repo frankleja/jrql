@@ -63,15 +63,7 @@ public class Page implements ProjectContainer {
 	 */
 	public Page(Project project, String pageGuid) throws RQLException {
 
-		super();
-
-		this.project = project;
-
-		// check if given
-		if (pageGuid.trim().length() == 0) {
-			throw new MissingGuidException("Page could not be created because the page guid is not delivered.");
-		}
-		this.pageGuid = pageGuid;
+        this(project, null, pageGuid, null, null);
 	}
 
 	/**
@@ -86,14 +78,9 @@ public class Page implements ProjectContainer {
 	 * @param headline
 	 *            headline of this page
 	 */
-	public Page(Project project, String pageGuid, String pageId, String headline) {
+	public Page(Project project, String pageGuid, String pageId, String headline) throws RQLException{
 
-		super();
-
-		this.project = project;
-		this.pageGuid = pageGuid;
-		this.pageId = pageId;
-		this.headline = headline;
+        this(project, null, pageGuid, pageId, headline);
 	}
 
 	/**
@@ -110,9 +97,12 @@ public class Page implements ProjectContainer {
 	 * @param headline
 	 *            headline of this page
 	 */
-	public Page(Project project, Template template, String pageGuid, String pageId, String headline) {
+	public Page(Project project, Template template, String pageGuid, String pageId, String headline) throws RQLException{
 
-		super();
+        // check if given
+        if (pageGuid.trim().length() == 0) {
+            throw new MissingGuidException("Page could not be created because the page guid is not delivered.");
+        }
 
 		this.project = project;
 		this.template = template;
