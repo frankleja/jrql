@@ -6,6 +6,9 @@ package com.hlcl.rql.as;
  * @author LEJAFR
  */
 public class LanguageVariant implements ProjectContainer {
+
+    public static final String RQL_ELEMENT_NAME = "LANGUAGEVARIANT";
+
 	private String languageVariantGuid;
 	private String name;
 	private String rfcLanguageCode; // e.g. en-US

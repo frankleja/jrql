@@ -2055,7 +2055,7 @@ public class Page implements ProjectContainer {
 	 * Liefert den RQLNode mit dem Link dieser Seite, der auf dem gegebenen templateElement basiert. Falls für den gesuchten Link keine
 	 * GUID geliefert wird, wird ein Aufruf im SmartEdit simuliert, um die Seite korrekt zu aktualisieren.
 	 * 
-	 * @param templateElement
+	 * @param linkTemplateElement
 	 *            muss zum Template dieser Seite gehoeren
 	 * @return <code>RQLNode</code>
 	 */
@@ -2095,7 +2095,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert den RQLNode mit dem Link dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param linkTemplateElement
 	 *            muss zum Template dieser Seite gehoeren
 	 * @return <code>RQLNode</code>
 	 */
@@ -2680,8 +2680,6 @@ public class Page implements ProjectContainer {
 	 * Es werden nur Elemente geliefert, die auch in der Sprachvariante geändert werden können. D.h., dass sprachvariantenunabhängige
 	 * Elemente werden nur in der Hauptsprachvariante geliefert.
 	 * 
-	 * @param templateElement
-	 *            muss ein Element dieser Seite sein
 	 * @return <code>RQLNode</code>
 	 */
 	private RQLNodeList getElementNodeList() throws RQLException {
@@ -2899,7 +2897,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert den Frame aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param frameTemplateElement
 	 *            muss vom Typ 3 (Frame) sein.
 	 * @return <code>Frame</code>
 	 * @see <code>Frame</code>
@@ -3225,7 +3223,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert die Liste aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param listTemplateElement
 	 *            muss vom Typ 13 (Liste) sein.
 	 * @return <code>List</code>
 	 * @see <code>List</code>
@@ -3481,7 +3479,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert den MultiLink (Container oder Liste) aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param multiLinkTemplateElement
 	 *            muss vom Typ 13 (Liste) oder Typ 28 (Container) sein.
 	 * @return <code>MultiLink</code>
 	 * @see <code>getList()</code>
@@ -3783,7 +3781,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert die OptionsListe aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param listTemplateElement
 	 *            muss vom Typ 8 (OptionList) sein.
 	 * @return <code>OptionList</code>
 	 * @see <code>OptionList</code>
@@ -6565,5 +6563,42 @@ public class Page implements ProjectContainer {
         getCmsClient().callCmsWithoutParsing(rqlRequest);
 
         this.getMainMultiLink().setAppearanceSchedule(appearanceSchedule);
+    }
+
+
+    /**
+     * Liefert alle Sprachvarianten für diese Seite
+     *
+     * @return
+     * @throws RQLException
+     */
+    public List<LanguageVariant> getLanguageVariants() throws RQLException {
+        List<LanguageVariant> languageVariants = Collections.emptyList();
+
+        StringBuilder sb = new StringBuilder("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">");
+        sb.append("<PROJECT><LANGUAGEVARIANTS action=\"pageavailable\" pageguid=\"").append(this.getPageGuid()).append("\"/></PROJECT></IODATA>");
+
+        RQLNode response = getCmsClient().callCms(sb.toString());
+
+        if(response != null) {
+            RQLNodeList nodes = response.getNodes(LanguageVariant.RQL_ELEMENT_NAME);
+            if(nodes != null){
+                languageVariants = new ArrayList<LanguageVariant>();
+                for(int i = 0; i < nodes.size(); i++) {
+                    RQLNode node = nodes.get(i);
+                    LanguageVariant languageVariant = new LanguageVariant(
+                            this.project,
+                            this.pageGuid,
+                            node.getAttribute("name"),
+                            node.getAttribute("rfclanguageid"),
+                            node.getAttribute("ismainlanguage"),
+                            node.getAttribute("language")
+                    );
+                    languageVariants.add(languageVariant);
+                }
+            }
+        }
+
+        return languageVariants;
     }
 }
