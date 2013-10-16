@@ -538,7 +538,7 @@ public class Page implements ProjectContainer {
 	 * Lt. RQL Doku können folgende Stati gesetzt werden: 32768 = Seitenbearbeitung abschließen (submit to workflow); im Workflow:
 	 * Seite wartet auf Freigabe 16384 = Seite zur Korrektur zurücksenden (reject) 4096 = Seite freigeben (release)
 	 * 
-	 * @param actionFlag
+	 * @param newActionFlag
 	 *            berechneter neuer Seitenstatus
 	 */
 	private RQLNode changeState(String newActionFlag) throws RQLException {
@@ -6575,10 +6575,10 @@ public class Page implements ProjectContainer {
     public List<LanguageVariant> getLanguageVariants() throws RQLException {
         List<LanguageVariant> languageVariants = Collections.emptyList();
 
-        StringBuilder sb = new StringBuilder("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">");
-        sb.append("<PROJECT><LANGUAGEVARIANTS action=\"pageavailable\" pageguid=\"").append(this.getPageGuid()).append("\"/></PROJECT></IODATA>");
+        StringBuilder rqlRequest = new StringBuilder("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">");
+        rqlRequest.append("<PROJECT><LANGUAGEVARIANTS action=\"pageavailable\" pageguid=\"").append(this.getPageGuid()).append("\"/></PROJECT></IODATA>");
 
-        RQLNode response = getCmsClient().callCms(sb.toString());
+        RQLNode response = getCmsClient().callCms(rqlRequest.toString());
 
         if(response != null) {
             RQLNodeList nodes = response.getNodes(LanguageVariant.RQL_ELEMENT_NAME);
@@ -6600,5 +6600,31 @@ public class Page implements ProjectContainer {
         }
 
         return languageVariants;
+    }
+
+    /**
+     * Ändert den aktuellen Benutzer einer Seite in den übergebenen Benutzer
+     *
+     * @param user Neuer Benutzer
+     * @throws RQLException
+     */
+    public void switchUserTo(User user) throws RQLException {
+
+        if(user == null)
+            throw new IllegalArgumentException("User must not be null");
+
+        StringBuilder rqlRequest = new StringBuilder("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">")
+        .append("<PAGE  guid=\"").append(this.getPageGuid()).append("\">")
+        .append("<CHANGE><USER action=\"save\" guid=\"").append(user.getUserGuid()).append("\"/></CHANGE>")
+        .append("</PAGE></IODATA>");
+
+
+        System.out.println("----------------------");
+        System.out.println(user.getName());
+        System.out.println(rqlRequest.toString());
+        System.out.println("----------------------");
+
+        getCmsClient().callCmsWithoutParsing(rqlRequest.toString());
+
     }
 }
