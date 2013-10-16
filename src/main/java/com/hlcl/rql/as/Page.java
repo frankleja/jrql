@@ -6618,13 +6618,6 @@ public class Page implements ProjectContainer {
         .append("<CHANGE><USER action=\"save\" guid=\"").append(user.getUserGuid()).append("\"/></CHANGE>")
         .append("</PAGE></IODATA>");
 
-
-        System.out.println("----------------------");
-        System.out.println(user.getName());
-        System.out.println(rqlRequest.toString());
-        System.out.println("----------------------");
-
         getCmsClient().callCmsWithoutParsing(rqlRequest.toString());
-
     }
 }
