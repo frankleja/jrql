@@ -1422,18 +1422,44 @@ public class Page implements ProjectContainer {
 			// signal any other problem
 			throw rqle;
 		}
+        invalidatePage();
+    }
 
-		// make this object "invalid"
-		// state pattern?
-		project = null;
-		pageGuid = null;
-		template = null;
-		pageId = null;
-		headline = null;
-		detailsNode = null;
-		elementsNodeList = null;
-		linksNodeList = null;
-	}
+    private void invalidatePage() {
+        // make this object "invalid"
+        // state pattern?
+        project = null;
+        pageGuid = null;
+        template = null;
+        pageId = null;
+        headline = null;
+        detailsNode = null;
+        elementsNodeList = null;
+        linksNodeList = null;
+    }
+
+
+    /**
+     * Löscht eine Seite für eine angegebene Sprachvariante, auch wenn es noch weitere Referenzen auf diese Seite gibt.
+     *
+     * @param languageVariant
+     * @throws RQLException
+     */
+    public void deleteForLanguageVariant(LanguageVariant languageVariant) throws RQLException {
+
+        if(languageVariant == null){
+            throw new IllegalArgumentException("lanuageVariant must not be null");
+        }
+
+        StringBuilder rqlRequest = new StringBuilder("");
+        rqlRequest.append("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">")
+          .append("<PAGE action=\"delete\" guid=\"" + getPageGuid() + "\" forcedelete2910=\"1\" forcedelete2911=\"1\"").append(" languagevariantid=\"").append(languageVariant.getLanguageCode()).append("\">")
+          .append("<LANGUAGEVARIANTS elementguid=\"").append(getPageGuid()).append("\">")
+          .append("<LANGUAGEVARIANT language=\"").append(languageVariant.getLanguageCode()).append("\"/>")
+          .append("</LANGUAGEVARIANTS></PAGE></IODATA>");
+
+        getCmsClient().callCmsWithoutParsing(rqlRequest.toString());
+    }
 
 	/**
 	 * Löscht den cache für den detailsNode. Bei erneuten Zugriff wird der aktuelle Wert wieder vom CMS Server gelesen.
@@ -1495,14 +1521,7 @@ public class Page implements ProjectContainer {
 
 		// make this object "invalid"
 		// state pattern?
-		project = null;
-		pageGuid = null;
-		template = null;
-		pageId = null;
-		headline = null;
-		detailsNode = null;
-		elementsNodeList = null;
-		linksNodeList = null;
+        invalidatePage();
 	}
 
 	/**
