@@ -6607,7 +6607,7 @@ public class Page implements ProjectContainer {
                     RQLNode node = nodes.get(i);
                     LanguageVariant languageVariant = new LanguageVariant(
                             this.project,
-                            this.pageGuid,
+                            node.getAttribute("guid"),
                             node.getAttribute("name"),
                             node.getAttribute("rfclanguageid"),
                             node.getAttribute("ismainlanguage"),
