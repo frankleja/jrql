@@ -222,6 +222,16 @@ public abstract class MultiLink implements PageContainer {
 		callCms(rqlRequest);
 	}
 
+    /**
+     * Ordnet eine Liste von Pages anhand ihrer Reihenfolge in der übergebenen Liste
+     *
+     * @param pages
+     * @throws RQLException
+     */
+    public void applyOrder(java.util.List<Page> pages) throws RQLException {
+        this.changeOrder(new PageArrayList(pages));
+    }
+
 	/**
 	 * Ändert den Sortierungsmodus dieses Multilinks (nur für Liste getestet!).
 	 * 
@@ -396,7 +406,7 @@ public abstract class MultiLink implements PageContainer {
 	 * @param copyAllContainersChildren
 	 *            falls true werden kindseiten von containerelement der source children mit kopiert
 	 */
-	protected void copyChildrenWithContentFrom(MultiLink sourceMultiLink, String ignoreElementNames, String separator,
+	protected void  copyChildrenWithContentFrom(MultiLink sourceMultiLink, String ignoreElementNames, String separator,
 			boolean copyAllContainersChildren) throws RQLException {
 
 		PageArrayList sourceChildren = sourceMultiLink.getChildrenReversed();
