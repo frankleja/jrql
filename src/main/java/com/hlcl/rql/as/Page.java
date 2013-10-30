@@ -3389,7 +3389,7 @@ public class Page implements ProjectContainer {
 		// get links to this page
 		RQLNodeList linkNodeListOrNull = getLinkedFromNodeList();
 		if (linkNodeListOrNull == null) {
-			throw new UnlinkedPageException("Page " + getPageId() + " is unlinked. Script does not work on unlinked pages.");
+			throw new UnlinkedPageException("Page " + getPageId() + " (" + getHeadlineAndId() + ") is unlinked. Script does not work on unlinked pages.");
 		}
 
 		// find main link
@@ -6545,9 +6545,14 @@ public class Page implements ProjectContainer {
      */
     public void clearMainLinkAppearanceSchedule() throws RQLException {
 
-        if(this.getMainMultiLink().getAppearanceSchedule() != null) {
-            this.assignMainLinkAppearanceSchedule(AppearanceSchedule.clearedSchedule());
+        MultiLink mainMultiLink = this.getMainMultiLink();
+
+        if(mainMultiLink != null){
+            if(mainMultiLink.getAppearanceSchedule() != null) {
+                this.assignMainLinkAppearanceSchedule(AppearanceSchedule.clearedSchedule());
+            }
         }
+
     }
 
     /**

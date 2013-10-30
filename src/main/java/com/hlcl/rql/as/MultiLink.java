@@ -223,12 +223,28 @@ public abstract class MultiLink implements PageContainer {
 	}
 
     /**
-     * Ordnet eine Liste von Pages anhand ihrer Reihenfolge in der übergebenen Liste
+     * Ordnet eine Liste child pages nach der Reihenfolge der übergebenen pages
      *
      * @param pages
      * @throws RQLException
      */
-    public void applyOrder(java.util.List<Page> pages) throws RQLException {
+    public void applyChildPageOrderByPages(java.util.List<Page> pages) throws RQLException {
+        this.changeOrder(new PageArrayList(pages));
+    }
+
+    /**
+     * Ordnet eine Liste child pages nach der Reihenfolge der übergebenen page GUIDS
+     *
+     * @param pageGuids
+     * @throws RQLException
+     */
+    public void applyChildPageOrderByPageGuids(java.util.List<String> pageGuids) throws RQLException {
+
+        java.util.List<Page> pages = new ArrayList<Page>(pageGuids.size());
+        for (String pageGuid : pageGuids) {
+            pages.add(new Page(this.getProject(), pageGuid));
+        }
+
         this.changeOrder(new PageArrayList(pages));
     }
 
@@ -394,6 +410,28 @@ public abstract class MultiLink implements PageContainer {
 			}
 		}
 	}
+
+    /**
+     * Linkt die gegebenen Seiten GUIDS (die Reihenfolge wird beibehalten) an diese Liste oder Container.
+     *
+     * @param targetPageGuids
+     *            Seiten GUIDS, die an diesen MultiLink angehängt wird
+     * @param addAtBottom
+     *            die gegebenen Seiten kommen (in ihrer Reihenfolge unverändert) unter oder über die bereits gelinkten Seiten
+     * @param setMainLink
+     *            Ändert den Mainlink für alle Seiten in targetPages auf diesen Link
+     */
+    public void connectToExistingPages(String[] targetPageGuids, boolean addAtBottom, boolean setMainLink) throws RQLException {
+
+        java.util.List<Page> pages = new ArrayList<Page>(targetPageGuids.length);
+
+        for (int i = 0; i < targetPageGuids.length; i++) {
+            String targetPageGuid = targetPageGuids[i];
+            pages.add(new Page(this.getProject(), targetPageGuid));
+        }
+
+        connectToExistingPages(pages, addAtBottom, setMainLink);
+    }
 
 	/**
 	 * Kopiert alle Kindseiten (nur der 1. level) von sourceMultiLink an diese Liste. Die Werte der content elements werden mit
