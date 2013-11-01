@@ -6545,14 +6545,17 @@ public class Page implements ProjectContainer {
      */
     public void clearMainLinkAppearanceSchedule() throws RQLException {
 
-        MultiLink mainMultiLink = this.getMainMultiLink();
+        MultiLink mainMultiLink = null;
+
+        try {
+            mainMultiLink = this.getMainMultiLink();
+        } catch(UnlinkedPageException upe){}
 
         if(mainMultiLink != null){
             if(mainMultiLink.getAppearanceSchedule() != null) {
                 this.assignMainLinkAppearanceSchedule(AppearanceSchedule.clearedSchedule());
             }
         }
-
     }
 
     /**
