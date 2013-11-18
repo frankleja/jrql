@@ -2019,4 +2019,15 @@ public class CmsClient {
 		return result;
 	}
 
+
+    /**
+     * Leifert einen ReddotMailer für diese CMS-Verbindung
+     *
+     * @return
+     */
+    public ReddotMailer getCmsMailer(){
+
+        return ReddotMailer.forCmsClient(this);
+    }
+
 }
