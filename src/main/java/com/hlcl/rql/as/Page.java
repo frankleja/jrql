@@ -14,13 +14,14 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import com.hlcl.rql.util.as.PageArrayList;
+import com.hlcl.rql.util.as.RqlKeywordObject;
 
 /**
  * Diese Klasse repräsentiert eine RedDot Seite.
  * 
  * @author LEJAFR
  */
-public class Page implements ProjectContainer {
+public class Page extends RqlKeywordObject implements ProjectContainer {
 	private static final String PAGE_ACTION_REJECT = "16384"; // 2^14
 	private static final String PAGE_ACTION_RELEASE = "4096"; // 2^12
 
@@ -46,6 +47,7 @@ public class Page implements ProjectContainer {
 	private HashMap<Element, Object> setElementValuesMap = null;
 	private String databaseQueryCache = null;
 	private PublicationPackage publicationPackage = null;
+
 
 	private Project project;
 
@@ -2148,6 +2150,7 @@ public class Page implements ProjectContainer {
 
 		deleteDetailsNodeCache();
 		deleteElementsNodeListCache();
+        keywords = null;
 		linksNodeList = null;
 		template = null;
 		publicationPackage = null;
@@ -2935,6 +2938,47 @@ public class Page implements ProjectContainer {
 		// add templateElement too?
 		return new Frame(this, linkNode.getAttribute("name"), linkNode.getAttribute("guid"));
 	}
+
+    protected void loadKeywords() {
+
+        StringBuilder rqlRequest = new StringBuilder("");
+
+        rqlRequest.append("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">")
+            .append("<PROJECT sessionkey=\"").append(getSessionKey())
+            .append("\"><PAGE guid=\"").append(getPageGuid()).append("\"><KEYWORDS action=\"load\" /></PAGE></PROJECT></IODATA>");
+
+        RQLNode rqlResponse = null;
+        try {
+            rqlResponse = callCms(rqlRequest.toString());
+
+            if(rqlResponse != null){
+
+                List<Keyword> keywordsFound = new ArrayList<Keyword>();
+                
+                RQLNodeList categegoryNodes = rqlResponse.getNodes("CATEGORY");
+
+                for (int i = 0; i < categegoryNodes.size(); i++) {
+                    RQLNode categoryNode = categegoryNodes.get(i);
+
+                    KeywordCategory keywordCategory = new KeywordCategory(categoryNode.getAttribute("guid"), categoryNode.getAttribute("value"));
+
+                    RQLNodeList keywordNodes = categoryNode.getNodes("KEYWORD");
+                    for (int j = 0; j < keywordNodes.size(); j++) {
+                        RQLNode keywordNode = keywordNodes.get(j);
+
+                        Keyword keyword = new Keyword(keywordNode.getAttribute("guid"), keywordCategory ,keywordNode.getAttribute("value"));
+                        keywordsFound.add(keyword);
+                    }
+                }
+
+                this.keywords = keywordsFound;
+            }
+
+        } catch (RQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 	/**
 	 * Returns the headline of this page. Is empty, if page is created by guid and in recycle bin. In that case use PageSearch to get

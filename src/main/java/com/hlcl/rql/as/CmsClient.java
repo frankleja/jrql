@@ -1,10 +1,6 @@
 package com.hlcl.rql.as;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -41,6 +37,10 @@ import javax.naming.directory.InitialDirContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -412,6 +412,8 @@ public class CmsClient {
 		return callCmsPrimitive(rqlRequest);
 	}
 
+
+
 	/**
 	 * Diese Methode fï¿½hr eine RQL-Anfrage mit der ï¿½bergebenen rqlQuery an
 	 * das CMS aus. Das Ergebnis wird in Form eines RQLNode
@@ -437,18 +439,52 @@ public class CmsClient {
 			dbf.setIgnoringElementContentWhitespace(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
 
+            Boolean shouldDebugRql = Boolean.valueOf(System.getProperty("debugRql"));
+
+            if(shouldDebugRql){
+                System.out.println(">------ RQL request ----->\n" + StringHelper.prettyPrintXml(rqlQuery, 2));
+            }
+
 			is = getCMSResultAsStream(rqlQuery); // BURMEBJ001A
-			InputSource source = new InputSource(is);
-			// how it's related to the encoding within xml document?
-			source.setEncoding(getResponseReaderEncoding());
-			root = buildTree(db.parse(source).getDocumentElement()); // BURMEBJ001M
+
+
+            if(shouldDebugRql){
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = is.read(buffer)) > -1 ) {
+                    baos.write(buffer, 0, len);
+                }
+                baos.flush();
+
+                InputStream is2 = new ByteArrayInputStream(baos.toByteArray());
+                InputStream is1 = new ByteArrayInputStream(baos.toByteArray());
+
+                InputSource source = new InputSource(is1);
+                // how it's related to the encoding within xml document?
+                source.setEncoding(getResponseReaderEncoding());
+
+                java.util.Scanner s = new java.util.Scanner(is2).useDelimiter("\\A");
+                String rqlResponse =  s.hasNext() ? s.next() : "";
+
+                System.out.println("<------ RQL response ------<\n" + StringHelper.prettyPrintXml(rqlResponse, 2) );
+
+                root = buildTree(db.parse(source).getDocumentElement()); // BURMEBJ001M
+            } else {
+                InputSource source = new InputSource(is);
+                // how it's related to the encoding within xml document?
+                source.setEncoding(getResponseReaderEncoding());
+                root = buildTree(db.parse(source).getDocumentElement()); // BURMEBJ001M
+            }
+
 		} catch (ParserConfigurationException pce) {
 			throw new RQLException("RQLHelper.callCMS()", pce);
 		} catch (SAXException se) {
 			throw new RQLException("RQLHelper.callCMS()", se);
 		} catch (IOException ioe) {
 			throw new RQLException("RQLHelper.callCMS()", ioe);
-		} finally {
+        } finally {
 			// BURMEBJ001M begin
 			// Das bisherige Schlieï¿½en des OutputStreamWriter wurde
 			// natï¿½rlich ebenfalls in die Methode getCMSResultAsStream()
@@ -707,7 +743,7 @@ public class CmsClient {
 	 * signalisiert, dass dieses Projekt nicht fï¿½r den User zugelassen ist,
 	 * oder die GUID falsch ist.
 	 * 
-	 * @param projectGuid
+	 * @param projectName
 	 *            GUID des Projectes, an den sich der User anmelden will.
 	 * @return <code>RQLNode</code> or null
 	 */

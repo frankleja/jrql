@@ -1,15 +1,9 @@
 package com.hlcl.rql.as;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 import com.hlcl.rql.util.as.PageArrayList;
+import com.hlcl.rql.util.as.RqlKeywordObject;
 import com.hlcl.rql.util.as.ScriptParameters;
 
 /**
@@ -17,7 +11,7 @@ import com.hlcl.rql.util.as.ScriptParameters;
  * 
  * @author LEJAFR
  */
-public class Project implements CmsClientContainer {
+public class Project extends RqlKeywordObject implements CmsClientContainer {
 	/**
 	 * Iterator over all MultiLinks referencing the given GUID.
 	 */
@@ -321,7 +315,7 @@ public class Project implements CmsClientContainer {
 	 * Returns the number of unlinked users.
 	 */
 	public int unlinkUsers() throws RQLException {
-		List<User> allUsers = getAllUsers();
+		java.util.List<User> allUsers = getAllUsers();
 		int result = allUsers.size();
 		unlinkUsers(getAllUsers());
 		return result;
@@ -427,7 +421,7 @@ public class Project implements CmsClientContainer {
 	/**
 	 * Liefert den TemplateFolder mit dem gegebenen Namen vom CMS zurück.
 	 * 
-	 * @param name
+	 * @param templateFolderNode
 	 *            Name des Template Folder.
 	 * @return TemplateFolder
 	 * @see TemplateFolder
@@ -653,7 +647,7 @@ public class Project implements CmsClientContainer {
 	 * 
 	 * @param packageType
 	 *            see possible list in class <code>AuthorizationPackage</code>
-	 * @param packageName
+	 * @param authorizationPackageName
 	 *            Name des Berechtigungspaketes (case ignored!)
 	 * @see AuthorizationPackage
 	 * @throws ElementNotFoundException
@@ -684,7 +678,7 @@ public class Project implements CmsClientContainer {
 	/**
 	 * Liefert den Dateiordner mit dem gegebenen Namen vom CMS zurück.
 	 * 
-	 * @param name
+	 * @param folderGuid
 	 *            Name des Dateiordners.
 	 * @return Folder
 	 * @see <code>Folder</code>
@@ -2438,7 +2432,63 @@ public class Project implements CmsClientContainer {
 		return name;
 	}
 
-	/**
+
+    protected void loadKeywords() {
+
+        StringBuilder rqlRequest = new StringBuilder("");
+
+        rqlRequest
+            .append("<IODATA loginguid=\"").append(cmsClient.getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">")
+            .append("<PROJECT><CATEGORIES action=\"list\"/></PROJECT></IODATA>");
+
+
+        RQLNode rqlResponse = null;
+
+        try {
+            rqlResponse = callCms(rqlRequest.toString());
+
+            if(rqlResponse != null){
+
+                java.util.List<KeywordCategory> categoriesFound = new ArrayList<KeywordCategory>();
+
+                RQLNodeList categegoryNodes = rqlResponse.getNodes("CATEGORY");
+                for (int i = 0; i < categegoryNodes.size(); i++) {
+                    RQLNode categoryNode = categegoryNodes.get(i);
+                    KeywordCategory keywordCategory = new KeywordCategory(categoryNode.getAttribute("guid"), categoryNode.getAttribute("value"));
+                    categoriesFound.add(keywordCategory);
+                }
+
+                java.util.List<Keyword> keywordsFound = new ArrayList<Keyword>();
+                for (KeywordCategory keywordCategory : categoriesFound) {
+
+                    rqlRequest = new StringBuilder("");
+
+                    rqlRequest
+                        .append("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">")
+                        .append("<PROJECT><CATEGORY guid=\"").append(keywordCategory.getGuid()).append("\"><KEYWORDS action=\"load\"/>")
+                        .append("</CATEGORY></PROJECT></IODATA>");
+
+
+                    rqlResponse = callCms(rqlRequest.toString());
+                    RQLNodeList keywordNodes = rqlResponse.getNodes("KEYWORD");
+                    for (int j = 0; j < keywordNodes.size(); j++) {
+                        RQLNode keywordNode = keywordNodes.get(j);
+
+                        Keyword keyword = new Keyword(keywordNode.getAttribute("guid"), keywordCategory, keywordNode.getAttribute("value"));
+                        keywordsFound.add(keyword);
+                    }
+                }
+
+                this.keywords = keywordsFound;
+            }
+
+        } catch (RQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
 	 * Liefert die Anzahl aller Templates dieses Projekts zurück.
 	 */
 	public int getNumberOfAllTemplates() throws RQLException {
@@ -4017,7 +4067,7 @@ public class Project implements CmsClientContainer {
 	 * @param level
 	 *            Art der Sperre -1= entire project 0 = unlock project 1 = below administrator 2 = below site builder 3 = below editor
 	 *            4 = below author 5 = visitor
-	 * @param lockInformationMessage
+	 * @param message
 	 *            Nachricht für Benutzer, die sich versuchen anzumelden. should be null if level = 0
 	 */
 	private void lock(int level, String message) throws RQLException {

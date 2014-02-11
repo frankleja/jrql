@@ -130,7 +130,7 @@ public class PageSearch implements ProjectContainer {
 	 */
 	private RQLNodeList getPagesNodeList(int maxPages) throws RQLException {
 		String rqlRequest = buildRequest(maxPages);
-		return callCms(rqlRequest).getNodes("PAGE");
+        return callCms(rqlRequest).getNodes("PAGE");
 	}
 
 	/**
@@ -469,5 +469,13 @@ public class PageSearch implements ProjectContainer {
 		add(new PageSearchItem("pagestate", "waitingfortranslation", "eq", "sourcelanguage='" + sourceLanguage.getLanguageCode()
 				+ "' users='myself'"));
 	}
+
+    public void addKeywordCriteriaEqual(Keyword keyword){
+        add(new PageSearchItem("keyword", keyword.getGuid(), "eq"));
+    }
+
+    public void addKeywordCriteriaNotEqual(Keyword keyword){
+        add(new PageSearchItem("keyword", keyword.getGuid(), "ne"));
+    }
 
 }
