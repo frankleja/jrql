@@ -2957,17 +2957,19 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
                 
                 RQLNodeList categegoryNodes = rqlResponse.getNodes("CATEGORY");
 
-                for (int i = 0; i < categegoryNodes.size(); i++) {
-                    RQLNode categoryNode = categegoryNodes.get(i);
+                if(categegoryNodes != null){
+                    for (int i = 0; i < categegoryNodes.size(); i++) {
+                        RQLNode categoryNode = categegoryNodes.get(i);
 
-                    KeywordCategory keywordCategory = new KeywordCategory(categoryNode.getAttribute("guid"), categoryNode.getAttribute("value"));
+                        KeywordCategory keywordCategory = new KeywordCategory(categoryNode.getAttribute("guid"), categoryNode.getAttribute("value"));
 
-                    RQLNodeList keywordNodes = categoryNode.getNodes("KEYWORD");
-                    for (int j = 0; j < keywordNodes.size(); j++) {
-                        RQLNode keywordNode = keywordNodes.get(j);
+                        RQLNodeList keywordNodes = categoryNode.getNodes("KEYWORD");
+                        for (int j = 0; j < keywordNodes.size(); j++) {
+                            RQLNode keywordNode = keywordNodes.get(j);
 
-                        Keyword keyword = new Keyword(keywordNode.getAttribute("guid"), keywordCategory ,keywordNode.getAttribute("value"));
-                        keywordsFound.add(keyword);
+                            Keyword keyword = new Keyword(keywordNode.getAttribute("guid"), keywordCategory ,keywordNode.getAttribute("value"));
+                            keywordsFound.add(keyword);
+                        }
                     }
                 }
 
