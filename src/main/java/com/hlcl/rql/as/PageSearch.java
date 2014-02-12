@@ -161,8 +161,15 @@ public class PageSearch implements ProjectContainer {
 		// wrap into pages; use only the main data from the search
 		for (int i = 0; i < pageNodes.size(); i++) {
 			RQLNode pageNode = pageNodes.get(i);
-			result.add(new Page(getProject(), pageNode.getAttribute("guid"), pageNode.getAttribute("id"), pageNode.getAttribute("headline")));
-		}
+
+			RQLNode templateNode = pageNode.getNode("CONTENTCLASS");
+			RQLNode templateFolderNode = pageNode.getNode("FOLDER");
+
+            TemplateFolder templateFolder = new TemplateFolder(getProject(), templateFolderNode.getAttribute("name"), templateFolderNode.getAttribute("guid"));
+            Template template = new Template(templateFolder, templateNode.getAttribute("name"), templateNode.getAttribute("guid"), "");
+
+            result.add(new Page(getProject(), template, pageNode.getAttribute("guid"), pageNode.getAttribute("id"), pageNode.getAttribute("headline")));
+        }
 		return result;
 	}
 
