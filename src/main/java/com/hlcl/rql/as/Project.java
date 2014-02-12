@@ -2433,6 +2433,9 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	}
 
 
+    /**
+     * {@inheritDoc}
+     */
     protected void loadKeywords() {
 
         StringBuilder rqlRequest = new StringBuilder("");

@@ -87,5 +87,8 @@ public abstract class RqlKeywordObject implements KeywordsAware{
         return keywordFound;
     }
 
+    /**
+     * Diese Methode implementiert, wie die Keywords aus dem CMS geladen werden.
+     */
     protected abstract void loadKeywords();
 }
