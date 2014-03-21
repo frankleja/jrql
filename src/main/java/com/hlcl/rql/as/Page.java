@@ -14,13 +14,14 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import com.hlcl.rql.util.as.PageArrayList;
+import com.hlcl.rql.util.as.RqlKeywordObject;
 
 /**
  * Diese Klasse repräsentiert eine RedDot Seite.
  * 
  * @author LEJAFR
  */
-public class Page implements ProjectContainer {
+public class Page extends RqlKeywordObject implements ProjectContainer {
 	private static final String PAGE_ACTION_REJECT = "16384"; // 2^14
 	private static final String PAGE_ACTION_RELEASE = "4096"; // 2^12
 
@@ -47,6 +48,7 @@ public class Page implements ProjectContainer {
 	private String databaseQueryCache = null;
 	private PublicationPackage publicationPackage = null;
 
+
 	private Project project;
 
 	// lazy initialized
@@ -63,15 +65,7 @@ public class Page implements ProjectContainer {
 	 */
 	public Page(Project project, String pageGuid) throws RQLException {
 
-		super();
-
-		this.project = project;
-
-		// check if given
-		if (pageGuid.trim().length() == 0) {
-			throw new MissingGuidException("Page could not be created because the page guid is not delivered.");
-		}
-		this.pageGuid = pageGuid;
+        this(project, null, pageGuid, null, null);
 	}
 
 	/**
@@ -86,14 +80,9 @@ public class Page implements ProjectContainer {
 	 * @param headline
 	 *            headline of this page
 	 */
-	public Page(Project project, String pageGuid, String pageId, String headline) {
+	public Page(Project project, String pageGuid, String pageId, String headline) throws RQLException{
 
-		super();
-
-		this.project = project;
-		this.pageGuid = pageGuid;
-		this.pageId = pageId;
-		this.headline = headline;
+        this(project, null, pageGuid, pageId, headline);
 	}
 
 	/**
@@ -110,9 +99,12 @@ public class Page implements ProjectContainer {
 	 * @param headline
 	 *            headline of this page
 	 */
-	public Page(Project project, Template template, String pageGuid, String pageId, String headline) {
+	public Page(Project project, Template template, String pageGuid, String pageId, String headline) throws RQLException{
 
-		super();
+        // check if given
+        if (pageGuid.trim().length() == 0) {
+            throw new MissingGuidException("Page could not be created because the page guid is not delivered.");
+        }
 
 		this.project = project;
 		this.template = template;
@@ -474,9 +466,16 @@ public class Page implements ProjectContainer {
 		TemplateElement templateElement = existsOnPage.getTemplateElementByGuid(linkNode.getAttribute("templateelementguid"));
 		if (type == 13) {
 			multiLink = buildList(linkNode, templateElement, existsOnPage);
+
+            String datebegin = linkNode.getAttribute("datebegin");
+            String dateend = linkNode.getAttribute("dateend");
+            if(datebegin != null && !datebegin.equals("0") && dateend != null && !dateend.equals("0")){
+                multiLink.setAppearanceSchedule(AppearanceSchedule.forPeriod(datebegin, dateend));
+            }
+
 		} else if (type == 28) {
 			multiLink = buildContainer(linkNode, templateElement, existsOnPage);
-		} else {
+        } else {
 			throw new WrongTypeException("Creation of a List(13) or Container(28) fails, because given link node has type " + type
 					+ ".");
 		}
@@ -541,7 +540,7 @@ public class Page implements ProjectContainer {
 	 * Lt. RQL Doku können folgende Stati gesetzt werden: 32768 = Seitenbearbeitung abschließen (submit to workflow); im Workflow:
 	 * Seite wartet auf Freigabe 16384 = Seite zur Korrektur zurücksenden (reject) 4096 = Seite freigeben (release)
 	 * 
-	 * @param actionFlag
+	 * @param newActionFlag
 	 *            berechneter neuer Seitenstatus
 	 */
 	private RQLNode changeState(String newActionFlag) throws RQLException {
@@ -1425,18 +1424,44 @@ public class Page implements ProjectContainer {
 			// signal any other problem
 			throw rqle;
 		}
+        invalidatePage();
+    }
 
-		// make this object "invalid"
-		// state pattern?
-		project = null;
-		pageGuid = null;
-		template = null;
-		pageId = null;
-		headline = null;
-		detailsNode = null;
-		elementsNodeList = null;
-		linksNodeList = null;
-	}
+    private void invalidatePage() {
+        // make this object "invalid"
+        // state pattern?
+        project = null;
+        pageGuid = null;
+        template = null;
+        pageId = null;
+        headline = null;
+        detailsNode = null;
+        elementsNodeList = null;
+        linksNodeList = null;
+    }
+
+
+    /**
+     * Löscht eine Seite für eine angegebene Sprachvariante, auch wenn es noch weitere Referenzen auf diese Seite gibt.
+     *
+     * @param languageVariant
+     * @throws RQLException
+     */
+    public void deleteForLanguageVariant(LanguageVariant languageVariant) throws RQLException {
+
+        if(languageVariant == null){
+            throw new IllegalArgumentException("lanuageVariant must not be null");
+        }
+
+        StringBuilder rqlRequest = new StringBuilder("");
+        rqlRequest.append("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">")
+          .append("<PAGE action=\"delete\" guid=\"" + getPageGuid() + "\" forcedelete2910=\"1\" forcedelete2911=\"1\"").append(" languagevariantid=\"").append(languageVariant.getLanguageCode()).append("\">")
+          .append("<LANGUAGEVARIANTS elementguid=\"").append(getPageGuid()).append("\">")
+          .append("<LANGUAGEVARIANT language=\"").append(languageVariant.getLanguageCode()).append("\"/>")
+          .append("</LANGUAGEVARIANTS></PAGE></IODATA>");
+
+        getCmsClient().callCmsWithoutParsing(rqlRequest.toString());
+    }
 
 	/**
 	 * Löscht den cache für den detailsNode. Bei erneuten Zugriff wird der aktuelle Wert wieder vom CMS Server gelesen.
@@ -1498,14 +1523,7 @@ public class Page implements ProjectContainer {
 
 		// make this object "invalid"
 		// state pattern?
-		project = null;
-		pageGuid = null;
-		template = null;
-		pageId = null;
-		headline = null;
-		detailsNode = null;
-		elementsNodeList = null;
-		linksNodeList = null;
+        invalidatePage();
 	}
 
 	/**
@@ -2058,7 +2076,7 @@ public class Page implements ProjectContainer {
 	 * Liefert den RQLNode mit dem Link dieser Seite, der auf dem gegebenen templateElement basiert. Falls für den gesuchten Link keine
 	 * GUID geliefert wird, wird ein Aufruf im SmartEdit simuliert, um die Seite korrekt zu aktualisieren.
 	 * 
-	 * @param templateElement
+	 * @param linkTemplateElement
 	 *            muss zum Template dieser Seite gehoeren
 	 * @return <code>RQLNode</code>
 	 */
@@ -2098,7 +2116,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert den RQLNode mit dem Link dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param linkTemplateElement
 	 *            muss zum Template dieser Seite gehoeren
 	 * @return <code>RQLNode</code>
 	 */
@@ -2132,6 +2150,7 @@ public class Page implements ProjectContainer {
 
 		deleteDetailsNodeCache();
 		deleteElementsNodeListCache();
+        keywords = null;
 		linksNodeList = null;
 		template = null;
 		publicationPackage = null;
@@ -2244,8 +2263,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert den Container aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
-	 *            muss vom Typ 28 (Container) sein.
+	 * @param containerTemplateElement  muss vom Typ 28 (Container) sein.
 	 * @return <code>Container</code>
 	 * @see <code>Container</code>
 	 */
@@ -2684,8 +2702,6 @@ public class Page implements ProjectContainer {
 	 * Es werden nur Elemente geliefert, die auch in der Sprachvariante geändert werden können. D.h., dass sprachvariantenunabhängige
 	 * Elemente werden nur in der Hauptsprachvariante geliefert.
 	 * 
-	 * @param templateElement
-	 *            muss ein Element dieser Seite sein
 	 * @return <code>RQLNode</code>
 	 */
 	private RQLNodeList getElementNodeList() throws RQLException {
@@ -2903,7 +2919,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert den Frame aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param frameTemplateElement
 	 *            muss vom Typ 3 (Frame) sein.
 	 * @return <code>Frame</code>
 	 * @see <code>Frame</code>
@@ -2922,6 +2938,49 @@ public class Page implements ProjectContainer {
 		// add templateElement too?
 		return new Frame(this, linkNode.getAttribute("name"), linkNode.getAttribute("guid"));
 	}
+
+    protected void loadKeywords() {
+
+        StringBuilder rqlRequest = new StringBuilder("");
+
+        rqlRequest.append("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">")
+            .append("<PROJECT sessionkey=\"").append(getSessionKey())
+            .append("\"><PAGE guid=\"").append(getPageGuid()).append("\"><KEYWORDS action=\"load\" /></PAGE></PROJECT></IODATA>");
+
+        RQLNode rqlResponse = null;
+        try {
+            rqlResponse = callCms(rqlRequest.toString());
+
+            if(rqlResponse != null){
+
+                List<Keyword> keywordsFound = new ArrayList<Keyword>();
+                
+                RQLNodeList categegoryNodes = rqlResponse.getNodes("CATEGORY");
+
+                if(categegoryNodes != null){
+                    for (int i = 0; i < categegoryNodes.size(); i++) {
+                        RQLNode categoryNode = categegoryNodes.get(i);
+
+                        KeywordCategory keywordCategory = new KeywordCategory(categoryNode.getAttribute("guid"), categoryNode.getAttribute("value"));
+
+                        RQLNodeList keywordNodes = categoryNode.getNodes("KEYWORD");
+                        for (int j = 0; j < keywordNodes.size(); j++) {
+                            RQLNode keywordNode = keywordNodes.get(j);
+
+                            Keyword keyword = new Keyword(keywordNode.getAttribute("guid"), keywordCategory ,keywordNode.getAttribute("value"));
+                            keywordsFound.add(keyword);
+                        }
+                    }
+                }
+
+                this.keywords = keywordsFound;
+            }
+
+        } catch (RQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 	/**
 	 * Returns the headline of this page. Is empty, if page is created by guid and in recycle bin. In that case use PageSearch to get
@@ -3229,7 +3288,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert die Liste aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param listTemplateElement
 	 *            muss vom Typ 13 (Liste) sein.
 	 * @return <code>List</code>
 	 * @see <code>List</code>
@@ -3376,7 +3435,7 @@ public class Page implements ProjectContainer {
 		// get links to this page
 		RQLNodeList linkNodeListOrNull = getLinkedFromNodeList();
 		if (linkNodeListOrNull == null) {
-			throw new UnlinkedPageException("Page " + getPageId() + " is unlinked. Script does not work on unlinked pages.");
+			throw new UnlinkedPageException("Page " + getPageId() + " (" + getHeadlineAndId() + ") is unlinked. Script does not work on unlinked pages.");
 		}
 
 		// find main link
@@ -3485,7 +3544,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert den MultiLink (Container oder Liste) aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param multiLinkTemplateElement
 	 *            muss vom Typ 13 (Liste) oder Typ 28 (Container) sein.
 	 * @return <code>MultiLink</code>
 	 * @see <code>getList()</code>
@@ -3787,7 +3846,7 @@ public class Page implements ProjectContainer {
 	/**
 	 * Liefert die OptionsListe aus dieser Seite, der auf dem gegebenen templateElement basiert.
 	 * 
-	 * @param templateElement
+	 * @param listTemplateElement
 	 *            muss vom Typ 8 (OptionList) sein.
 	 * @return <code>OptionList</code>
 	 * @see <code>OptionList</code>
@@ -6524,4 +6583,114 @@ public class Page implements ProjectContainer {
 		// force re-read of all changeable values
 		resetChangeableValues();
 	}
+
+    /**
+     * Entfernt den vorhanden Erscheinungszeitraum des Hauptlinks
+     *
+     * @throws RQLException
+     */
+    public void clearMainLinkAppearanceSchedule() throws RQLException {
+
+        MultiLink mainMultiLink = null;
+
+        try {
+            mainMultiLink = this.getMainMultiLink();
+        } catch(UnlinkedPageException upe){}
+
+        if(mainMultiLink != null){
+            if(mainMultiLink.getAppearanceSchedule() != null) {
+                this.assignMainLinkAppearanceSchedule(AppearanceSchedule.clearedSchedule());
+            }
+        }
+    }
+
+    /**
+     * Weist dem Hauptlink dieser Seite einen Erscheinungszeitraum zu
+     *
+     * @param appearanceSchedule
+     * @throws RQLException
+     */
+    public void assignMainLinkAppearanceSchedule(AppearanceSchedule appearanceSchedule) throws RQLException {
+        StringBuilder sb = new StringBuilder("");
+
+        sb.append("<IODATA loginguid=\"").append(this.getLogonGuid())
+                .append("\" sessionkey=\"").append(this.getSessionKey()).append("\">")
+                .append("<PAGE guid=\"").append(this.getPageGuid()).append("\"><LINKSFROM action=\"load\" /></PAGE>")
+                .append("</IODATA>");
+
+        //1. retrieve relationguid
+        String rqlRequest = sb.toString();
+        RQLNode rqlResponse = this.getCmsClient().callCms(rqlRequest);
+        RQLNode linkNode = rqlResponse.getNode("LINK");
+        String relationGuid = linkNode.getAttribute("relationguid");
+
+        //2. set appearance schedule
+        sb = new StringBuilder("");
+        sb.append("<IODATA loginguid=\"").append(this.getLogonGuid()).append("\" sessionkey=\"").append(this.getSessionKey()).append("\">")
+                .append("<PAGE><LINKFROM action=\"save\" guid=\"").append(relationGuid)
+                .append("\" datebegin=\"").append(appearanceSchedule.getBegin().toMsDoubleString())
+                .append("\" dateend=\"").append(appearanceSchedule.getEnd().toMsDoubleString()).append("\" />")
+                .append("</PAGE></IODATA>");
+
+        rqlRequest = sb.toString();
+        getCmsClient().callCmsWithoutParsing(rqlRequest);
+
+        this.getMainMultiLink().setAppearanceSchedule(appearanceSchedule);
+    }
+
+
+    /**
+     * Liefert alle Sprachvarianten für diese Seite
+     *
+     * @return
+     * @throws RQLException
+     */
+    public List<LanguageVariant> getLanguageVariants() throws RQLException {
+        List<LanguageVariant> languageVariants = Collections.emptyList();
+
+        StringBuilder rqlRequest = new StringBuilder("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">");
+        rqlRequest.append("<PROJECT><LANGUAGEVARIANTS action=\"pageavailable\" pageguid=\"").append(this.getPageGuid()).append("\"/></PROJECT></IODATA>");
+
+        RQLNode response = getCmsClient().callCms(rqlRequest.toString());
+
+        if(response != null) {
+            RQLNodeList nodes = response.getNodes(LanguageVariant.RQL_ELEMENT_NAME);
+            if(nodes != null){
+                languageVariants = new ArrayList<LanguageVariant>();
+                for(int i = 0; i < nodes.size(); i++) {
+                    RQLNode node = nodes.get(i);
+                    LanguageVariant languageVariant = new LanguageVariant(
+                            this.project,
+                            node.getAttribute("guid"),
+                            node.getAttribute("name"),
+                            node.getAttribute("rfclanguageid"),
+                            node.getAttribute("ismainlanguage"),
+                            node.getAttribute("language")
+                    );
+                    languageVariants.add(languageVariant);
+                }
+            }
+        }
+
+        return languageVariants;
+    }
+
+    /**
+     * Ändert den aktuellen Benutzer einer Seite in den übergebenen Benutzer
+     *
+     * @param user Neuer Benutzer
+     * @throws RQLException
+     */
+    public void switchUserTo(User user) throws RQLException {
+
+        if(user == null)
+            throw new IllegalArgumentException("User must not be null");
+
+        StringBuilder rqlRequest = new StringBuilder("<IODATA loginguid=\"").append(getLogonGuid()).append("\" sessionkey=\"").append(getSessionKey()).append("\">")
+        .append("<PAGE  guid=\"").append(this.getPageGuid()).append("\">")
+        .append("<CHANGE><USER action=\"save\" guid=\"").append(user.getUserGuid()).append("\"/></CHANGE>")
+        .append("</PAGE></IODATA>");
+
+        getCmsClient().callCmsWithoutParsing(rqlRequest.toString());
+    }
 }

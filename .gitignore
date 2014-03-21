@@ -1,3 +1,6 @@
 /target
 .DS_Store
 *~
+/.idea
+*.iml
+/src/main/java/pinuts/examples/*
