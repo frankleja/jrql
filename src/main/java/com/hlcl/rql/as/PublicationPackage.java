@@ -427,8 +427,14 @@ public class PublicationPackage implements ProjectContainer {
 				if (StringHelper.endsWithOneOf(node.getAttribute("projectvariantname"), pvNameSuffixes, ",")) {
 					continue;
 				}
-				// add normal setting
-				publicationSettings.add(buildPublicationSetting(node));
+				try {
+					// add normal setting
+					publicationSettings.add(buildPublicationSetting(node));
+				} catch (ElementNotFoundException e) {
+					// ElementNotFoundException: 20140506 12:02 Language variant with guid ... could not be found in the project.
+					// This seems to occur for language variants that are not used in this project, ignore them here
+					// System.err.println(e.toString());
+				}
 			}
 		}
 		return publicationSettings;
