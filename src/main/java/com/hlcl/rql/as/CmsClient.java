@@ -1324,6 +1324,8 @@ public class CmsClient {
 				projectGuid = getProjectGuid(sessionKey);
 			}
 			setCurrentProject(new Project(this, sessionKey, projectGuid));
+			// validate against project
+			currentProject.validate();
 		}
 
 		return currentProject;
