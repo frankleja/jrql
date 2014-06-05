@@ -37,10 +37,6 @@ import javax.naming.directory.InitialDirContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -243,6 +239,29 @@ public class CmsClient {
 	// like http://reddot.hlcl.com/cms/hlclRemoteRQL.asp
 	private URL cmsServerConnectionUrl;
 
+	
+	/**
+	 * RQL Request/response-Logging is enabled.
+	 */
+	public final boolean debugRql;
+
+	
+	/**
+	 * Helps with the XML work.
+	 */
+	private final DocumentBuilderFactory dbf;
+	
+	
+	/**
+	 * Common constructor
+	 */
+	private CmsClient() {
+		this.debugRql = Boolean.valueOf(System.getProperty("debugRql"));
+		this.dbf = DocumentBuilderFactory.newInstance();
+		this.dbf.setIgnoringElementContentWhitespace(true);
+	}
+	
+	
 	/**
 	 * Erzeugt einen CmsServer, indem ein neuer User am CMS angemeldet wird.
 	 * 
@@ -252,7 +271,7 @@ public class CmsClient {
 	public CmsClient(PasswordAuthentication passwordAuthentication)
 			throws RQLException {
 
-		super();
+		this();
 		cmsServerConnectionUrl = null;
 		login(passwordAuthentication);
 	}
@@ -266,8 +285,7 @@ public class CmsClient {
 	public CmsClient(PasswordAuthentication passwordAuthentication,
 			URL cmsServerConnectionUrl) throws RQLException {
 
-		super();
-		// remember the CMS server to bind to
+		this();
 		this.cmsServerConnectionUrl = cmsServerConnectionUrl;
 
 		login(passwordAuthentication);
@@ -280,7 +298,7 @@ public class CmsClient {
 	 *            Anmelde-GUID des angemeldeten Nutzers
 	 */
 	public CmsClient(String logonGuid) throws RQLException {
-		super();
+		this();
 
 		this.logonGuid = logonGuid;
 		cmsServerConnectionUrl = null;
@@ -298,7 +316,7 @@ public class CmsClient {
 	 */
 	public CmsClient(String logonGuid, String connectedUserGuid)
 			throws RQLException {
-		super();
+		this();
 
 		this.logonGuid = logonGuid;
 		cmsServerConnectionUrl = null;
@@ -314,7 +332,7 @@ public class CmsClient {
 	 */
 	public CmsClient(String logonGuid, URL cmsServerConnectionUrl)
 			throws RQLException {
-		super();
+		this();
 
 		this.logonGuid = logonGuid;
 		// remember the CMS server to bind to
@@ -427,56 +445,46 @@ public class CmsClient {
 	 *             : s.o.
 	 */
 	private RQLNode callCmsPrimitive(String rqlQuery) throws RQLException {
-		InputStream is = null; // BURMEBJ001A, um im finally ein close() zu
-								// machen
-		RQLNode root = null;
+		InputStream is = null;
+		final RQLNode root;
 
 		try {
-			// BURMEBJ001D: eigentlicher CMS-Aufruf in getCMSResultAsStream()
-			// ausgelagert (s.u.).
-
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			dbf.setIgnoringElementContentWhitespace(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
-
-            Boolean shouldDebugRql = Boolean.valueOf(System.getProperty("debugRql"));
-
-            if(shouldDebugRql){
+			long before = 0;
+			long after = 0;
+			
+			
+            if (debugRql) {
                 System.out.println(">------ RQL request ----->\n" + StringHelper.prettyPrintXml(rqlQuery, 2));
+                before = System.currentTimeMillis();
             }
 
-			is = getCMSResultAsStream(rqlQuery); // BURMEBJ001A
+			is = getCMSResultAsStream(rqlQuery); // the actual HTTP call
 
-
-            if(shouldDebugRql){
-
+			final InputSource source;
+            if (debugRql) {
+            	after = System.currentTimeMillis();
+            	long delta = after - before;
+            	
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[4096];
                 int len;
                 while ((len = is.read(buffer)) > -1 ) {
                     baos.write(buffer, 0, len);
                 }
-                baos.flush();
+                baos.close();
 
-                InputStream is2 = new ByteArrayInputStream(baos.toByteArray());
                 InputStream is1 = new ByteArrayInputStream(baos.toByteArray());
+                source = new InputSource(is1);
 
-                InputSource source = new InputSource(is1);
-                // how it's related to the encoding within xml document?
-                source.setEncoding(getResponseReaderEncoding());
-
-                java.util.Scanner s = new java.util.Scanner(is2).useDelimiter("\\A");
-                String rqlResponse =  s.hasNext() ? s.next() : "";
-
-                System.out.println("<------ RQL response ------<\n" + StringHelper.prettyPrintXml(rqlResponse, 2) );
-
-                root = buildTree(db.parse(source).getDocumentElement()); // BURMEBJ001M
+                String rqlResponse = new String(baos.toByteArray(), getResponseReaderEncoding());
+                System.out.println("<------ RQL response ("+delta+" ms)------<\n" + StringHelper.prettyPrintXml(rqlResponse, 2) );
             } else {
-                InputSource source = new InputSource(is);
-                // how it's related to the encoding within xml document?
-                source.setEncoding(getResponseReaderEncoding());
-                root = buildTree(db.parse(source).getDocumentElement()); // BURMEBJ001M
+                source = new InputSource(is);
             }
+            // how it's related to the encoding within xml document?
+            source.setEncoding(getResponseReaderEncoding());
+            root = buildTree(db.parse(source).getDocumentElement());
 
 		} catch (ParserConfigurationException pce) {
 			throw new RQLException("RQLHelper.callCMS()", pce);
