@@ -15,7 +15,7 @@ public class ReddotMailer implements Mailer {
 
     CmsClient cmsClient;
 
-    private StringBuffer rqlBaseRequest = new StringBuffer("");
+    private StringBuilder rqlBaseRequest = new StringBuilder(256);
     private static final String rqlTail = "></ADMINISTRATION></IODATA>";
 
     private static final String RECIPIENT_DELIMITER = ",";

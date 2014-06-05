@@ -294,7 +294,7 @@ public class StringHelper {
 	 * 
 	 * @since ostermillerutils 1.02.25
 	 */
-	public static void buildFindAnyPattern(String[] terms, StringBuffer sb) {
+	public static void buildFindAnyPattern(String[] terms, StringBuilder sb) {
 		if (terms.length == 0)
 			throw new IllegalArgumentException("There must be at least one term to find.");
 		sb.append("(?:");
@@ -551,7 +551,7 @@ public class StringHelper {
 				url = StringHelper.correctUppercase(url);
 			}
 			String aTag = buildHtmlA(url, url, true);
-			StringBuffer b = new StringBuffer(s);
+			StringBuilder b = new StringBuilder(s);
 			s = b.replace(start, end, aTag).toString();
 
 			// next
@@ -621,7 +621,7 @@ public class StringHelper {
 				address = StringHelper.correctUppercase(address);
 			}
 			String aTag = buildHtmlA("mailto:" + address, address, false);
-			StringBuffer b = new StringBuffer(s);
+			StringBuilder b = new StringBuilder(s);
 			s = b.replace(start, end, aTag).toString();
 
 			// next
@@ -808,7 +808,7 @@ public class StringHelper {
 	 */
 	public static String deleteTrail(String s, String trail) {
 
-		StringBuffer b = new StringBuffer(s);
+		StringBuilder b = new StringBuilder(s);
 		if (s.endsWith(trail)) {
 			b.delete(s.lastIndexOf(trail), s.length());
 		}
@@ -833,7 +833,7 @@ public class StringHelper {
 		}
 
 		// for all characters do
-		StringBuffer sb = new StringBuffer(length);
+		StringBuilder sb = new StringBuilder(length);
 		for (int i = 0; i < length; i++) {
 			char c = s.charAt(i);
 			int cint = 0xffff & c;
@@ -1021,7 +1021,7 @@ public class StringHelper {
 			// nothing to escape in the string
 			return s;
 		}
-		StringBuffer sb = new StringBuffer(newLength);
+		StringBuilder sb = new StringBuilder(newLength);
 		for (int i = 0; i < length; i++) {
 			char c = s.charAt(i);
 			int cint = 0xffff & c;
@@ -1105,7 +1105,7 @@ public class StringHelper {
 			// nothing to escape in the string
 			return s;
 		}
-		StringBuffer sb = new StringBuffer(newLength);
+		StringBuilder sb = new StringBuilder(newLength);
 		for (int i = 0; i < length; i++) {
 			char c = s.charAt(i);
 			switch (c) {
@@ -1183,7 +1183,7 @@ public class StringHelper {
 			// nothing to escape in the string
 			return s;
 		}
-		StringBuffer sb = new StringBuffer(newLength);
+		StringBuilder sb = new StringBuilder(newLength);
 		for (int i = 0; i < length; i++) {
 			char c = s.charAt(i);
 			if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))) {
@@ -1240,7 +1240,7 @@ public class StringHelper {
 			// nothing to escape in the string
 			return s;
 		}
-		StringBuffer sb = new StringBuffer(newLength);
+		StringBuilder sb = new StringBuilder(newLength);
 		for (int i = 0; i < length; i++) {
 			char c = s.charAt(i);
 			switch (c) {
@@ -1534,7 +1534,7 @@ public class StringHelper {
 		}
 		int beginning = needed / 2;
 		int end = beginning + needed % 2;
-		StringBuffer sb = new StringBuffer(length);
+		StringBuilder sb = new StringBuilder(length);
 		for (int i = 0; i < beginning; i++) {
 			sb.append(c);
 		}
@@ -1624,7 +1624,7 @@ public class StringHelper {
 		if (needed <= 0) {
 			return s;
 		}
-		StringBuffer sb = new StringBuffer(length);
+		StringBuilder sb = new StringBuilder(length);
 		sb.append(s);
 		for (int i = 0; i < needed; i++) {
 			sb.append(c);
@@ -1673,7 +1673,7 @@ public class StringHelper {
 		if (needed <= 0) {
 			return s;
 		}
-		StringBuffer sb = new StringBuffer(length);
+		StringBuilder sb = new StringBuilder(length);
 		for (int i = 0; i < needed; i++) {
 			sb.append(c);
 		}
@@ -1764,7 +1764,7 @@ public class StringHelper {
 		}
 		// it looks like we actually have something to replace
 		// *sigh* allocate memory for it.
-		StringBuffer sb = new StringBuffer(length);
+		StringBuilder sb = new StringBuilder(length);
 
 		// Scan s and do the replacements
 		while (end != -1) {
@@ -1913,7 +1913,7 @@ public class StringHelper {
 	 * Converts the camelcase string s (SanFranciscoBay) into a words (=San Francisco Bay) separated by given separator.
 	 */
 	static public String convertCamelCase2words(String s, String separator) {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 		// go through all characters
 		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
@@ -2103,7 +2103,7 @@ public class StringHelper {
 		if (list.size() == 0) {
 			return "";
 		}
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		for (Iterator<String> iter = list.iterator(); iter.hasNext();) {
 			String s = iter.next();
 			buffer.append(s).append(delimiter);
@@ -2202,7 +2202,7 @@ public class StringHelper {
 	 * @since ostermillerutils 1.00.00
 	 */
 	public static String unescapeHTML(String s) {
-		StringBuffer result = new StringBuffer(s.length());
+		StringBuilder result = new StringBuilder(s.length());
 		int ampInd = s.indexOf("&");
 		int lastEnd = 0;
 		while (ampInd >= 0) {

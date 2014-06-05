@@ -552,9 +552,9 @@ public class CmsClient {
 					new InputStreamReader(getCMSResultAsStream(rqlQuery),
 							getResponseReaderEncoding()));
 
-			StringBuffer firstLine = new StringBuffer(); // fï¿½r die erste
+			StringBuilder firstLine = new StringBuilder(128); // fï¿½r die erste
 															// Zeile der Antwort
-			StringBuffer content = new StringBuffer(); // fï¿½r die restlichen
+			StringBuilder content = new StringBuilder(1024); // fï¿½r die restlichen
 														// Zeilen der Antwort
 			byte state = 0; // 0: erste Zeile, 1: Zeilenumbrï¿½che am Ende der
 							// ersten Zeile, 2: weitere Zeilen
@@ -1888,7 +1888,7 @@ public class CmsClient {
 			long start, long end, String additionalHeader, String additionalData)
 			throws RQLException {
 
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		// header
 		buffer.append("sourceId;date;time;duration in s;" + additionalHeader
 				+ "\n");

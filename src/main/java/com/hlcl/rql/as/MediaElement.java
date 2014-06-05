@@ -27,7 +27,7 @@ protected void checkBeforeChange(String filename) throws RQLException {
  */
 public String getAllowedSuffixes() {
 
-	StringBuffer buffer = new StringBuffer();
+	StringBuilder buffer = new StringBuilder();
 
 	if (allowedSuffixes != null) {
 		Iterator iterator = allowedSuffixes.iterator();

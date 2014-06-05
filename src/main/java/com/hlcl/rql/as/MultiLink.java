@@ -752,7 +752,7 @@ public abstract class MultiLink implements PageContainer {
 	public String getAllowedTemplateNames(String delimiter) throws RQLException {
 
 		java.util.List templates = getAllowedTemplates();
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder(64);
 
 		for (int i = 0; i < templates.size(); i++) {
 			Template t = (Template) templates.get(i);
@@ -922,7 +922,7 @@ public abstract class MultiLink implements PageContainer {
 	 */
 	public String getChildPagesTemplateNames(String namesSeparator) throws RQLException {
 
-		StringBuffer names = new StringBuffer("");
+		StringBuilder names = new StringBuilder(128);
 		PageArrayList childs = getChildPages();
 
 		// no childs found; could be empty or referenced link

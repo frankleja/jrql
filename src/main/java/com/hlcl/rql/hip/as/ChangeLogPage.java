@@ -78,7 +78,7 @@ public class ChangeLogPage extends ProjectPage {
 	 */
 	private String buildXml() throws RQLException {
 		// open
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 		result.append("<changes>");
 		for (Iterator iterator = getChanges().iterator(); iterator.hasNext();) {
 			ChangeLogEntry entry = (ChangeLogEntry) iterator.next();

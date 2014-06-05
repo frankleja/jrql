@@ -290,7 +290,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 
 		// build request for assignment
 		// begin
-		StringBuffer rqlRequest = new StringBuffer();
+		StringBuilder rqlRequest = new StringBuilder();
 		rqlRequest.append("<IODATA loginguid='").append(getLogonGuid()).append("'>");
 		rqlRequest.append("<ADMINISTRATION action='assign'>");
 		rqlRequest.append("<PROJECT guid='").append(getProjectGuid()).append("'>");
@@ -342,7 +342,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 
 		// build request for unlink
 		// begin
-		StringBuffer rqlRequest = new StringBuffer();
+		StringBuilder rqlRequest = new StringBuilder();
 		rqlRequest.append("<IODATA loginguid='").append(getLogonGuid()).append("'>");
 		rqlRequest.append("<ADMINISTRATION action='unlink'>");
 		rqlRequest.append("<PROJECT guid='").append(getProjectGuid()).append("'>");

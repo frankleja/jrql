@@ -70,7 +70,7 @@ public class ChangeLogEntry {
 	 * @throws RQLException 
 	 */
 	public String getChangeXmlTag() throws RQLException {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 		result.append("<change>");
 		result.append("<user>");
 		result.append(userName);

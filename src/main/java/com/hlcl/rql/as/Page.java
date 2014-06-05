@@ -5973,7 +5973,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		// update only if values given
 		if (!elementValuePairs.isEmpty()) {
 			// build request start
-			StringBuffer rqlRequest = new StringBuffer();
+			StringBuilder rqlRequest = new StringBuilder();
 			rqlRequest.append("<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>");
 			rqlRequest.append("<ELEMENTS action='save'>");
 
