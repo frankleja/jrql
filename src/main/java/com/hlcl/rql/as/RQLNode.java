@@ -169,7 +169,7 @@ public abstract class RQLNode {
 		} else if (l.size() == 1) {
 			return (RQLNode) l.get(0);
 		} else {
-			throw new RQLException("RQLHelper.getNode(): too many nodes found.");
+			throw new RQLException("RQLHelper.getNode(): too many (" + l.size() +") nodes found: " + nodeName);
 		}
 	}
 

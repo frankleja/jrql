@@ -38,6 +38,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -426,11 +427,30 @@ public class CmsClient {
 	 * @throws RQLException
 	 */
 	public RQLNode callCms(String rqlRequest) throws RQLException {
-		// System.out.println(rqlRequest); // TODO request logging
-		return callCmsPrimitive(rqlRequest);
+		URL url = getCmsServerConnectionUrl();
+
+		if (url.toString().endsWith("/RqlWebService.svc")) {
+			return callCms_SOAP(url, rqlRequest);
+		} else {
+			return callCms_ASP(url, rqlRequest);
+		}
 	}
 
 
+	private RQLNode callCms_SOAP(URL url, String rqlQuery) throws RQLException {
+		try {
+			String s = callCmsWithoutParsing_SOAP(url, rqlQuery);
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			return buildTree(db.parse(new InputSource(new StringReader(s))).getDocumentElement());
+		} catch (SAXException e) {
+			throw new RQLException(e.toString(), e);
+		} catch (IOException e) {
+			throw new RQLException(e.toString(), e);
+		} catch (ParserConfigurationException e) {
+			throw new RQLException(e.toString(), e);
+		}
+	}
+	
 
 	/**
 	 * Diese Methode fï¿½hr eine RQL-Anfrage mit der ï¿½bergebenen rqlQuery an
@@ -444,7 +464,7 @@ public class CmsClient {
 	 * @throws RQLException
 	 *             : s.o.
 	 */
-	private RQLNode callCmsPrimitive(String rqlQuery) throws RQLException {
+	private RQLNode callCms_ASP(URL url, String rqlQuery) throws RQLException {
 		InputStream is = null;
 		final RQLNode root;
 
@@ -459,7 +479,7 @@ public class CmsClient {
                 before = System.currentTimeMillis();
             }
 
-			is = getCMSResultAsStream(rqlQuery); // the actual HTTP call
+			is = getCMSResultAsStream_ASP(url, rqlQuery); // the actual HTTP call
 
 			final InputSource source;
             if (debugRql) {
@@ -525,11 +545,16 @@ public class CmsClient {
 	 * @see RQLNode
 	 */
 	public String callCmsWithoutParsing(String rqlRequest) throws RQLException {
-		// System.out.println(rqlRequest); // TODO request logging
-		return callCmsWithoutParsingPrimitive(rqlRequest);
+		URL url = getCmsServerConnectionUrl();
+
+		if (url.toString().endsWith("/RqlWebService.svc")) {
+			return callCmsWithoutParsing_SOAP(url, rqlRequest);
+		} else {
+			return callCmsWithoutParsingPrimitive_ASP(url, rqlRequest);
+		}
 	}
 
-	// BURMEBJ001A
+
 	/**
 	 * Diese Methode fï¿½hr eine RQL-Anfrage mit der ï¿½bergebenen rqlQuery an
 	 * das CMS aus. Das Ergebnis wird als String zurï¿½ckgegeben. Es wird davon
@@ -543,13 +568,13 @@ public class CmsClient {
 	 * @throws RQLException
 	 *             : s.o.
 	 */
-	private String callCmsWithoutParsingPrimitive(String rqlQuery)
+	private String callCmsWithoutParsingPrimitive_ASP(URL url, String rqlQuery)
 			throws RQLException {
 		BufferedReader br = null;
 
 		try {
 			br = new BufferedReader(
-					new InputStreamReader(getCMSResultAsStream(rqlQuery),
+					new InputStreamReader(getCMSResultAsStream_ASP(url, rqlQuery),
 							getResponseReaderEncoding()));
 
 			StringBuilder firstLine = new StringBuilder(128); // fï¿½r die erste
@@ -854,7 +879,7 @@ public class CmsClient {
 		return allUsersNodeListCache;
 	}
 
-	// BURMEBJ001A
+
 	/**
 	 * Diese Methode schickt die Ã¼bergebene rqlQuery an das CMS und liefert das
 	 * Ergebnis als InputStream zurï¿½ck. Die aufrufende Methode muï¿½ sich
@@ -865,12 +890,11 @@ public class CmsClient {
 	 * @return InputStream: s.o.
 	 * @throws RQLException
 	 */
-	private InputStream getCMSResultAsStream(String rqlQuery)
+	private InputStream getCMSResultAsStream_ASP(URL url, String rqlQuery)
 			throws RQLException {
 		OutputStreamWriter osr = null;
 
 		try {
-			URL url = getCmsServerConnectionUrl();
 			URLConnection conn = url.openConnection();
 			conn.setDoOutput(true);
 			osr = new OutputStreamWriter(conn.getOutputStream(),
@@ -899,11 +923,9 @@ public class CmsClient {
 	 * @return
 	 * @throws RQLException
 	 */
-	private String callCmsWithSoap(String rqlQuery) throws RQLException
+	private String callCmsWithoutParsing_SOAP(URL url, String rqlQuery) throws RQLException
 	{
 		try {
-			URL url = new URL("http://rd-11-test/CMS/WebService/RqlWebService.svc"); // TBI
-		
 			StringBuilder soapBody = new StringBuilder(2048);
 			soapBody.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
 			.append("<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:mes=\"http://tempuri.org/RDCMSXMLServer/message/\">")
@@ -912,29 +934,54 @@ public class CmsClient {
 			.append("<sParamA xsi:type=\"xsd:string\"><![CDATA[")
 			.append(rqlQuery) // TBI: Falls da CDATAs drinstehen, mussen wir evtl. was tun
 			// http://en.wikipedia.org/wiki/CDATA#Nesting
-			.append("]]></sParamA>")
-			.append("<sErrorA xsi:type=\"xsd:anyType\"/><sResultInfoA xsi:type=\"xsd:anyType\"/>") // unklar
+			.append("]]></sParamA></mes:Execute>")
 			.append("</soapenv:Body></soapenv:Envelope>");
 			
-			long before = System.currentTimeMillis();
-			URLConnection conn = url.openConnection();
-			conn.setDoOutput(true);
-			OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream(), getRequestWriterEncoding());
-			osr.write(soapBody.toString());
-			osr.flush();
-
-			InputSource source = new InputSource(conn.getInputStream());
-            source.setEncoding(getResponseReaderEncoding()); // FIXME: or fix UTF-8?
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            NodeList rs = db.parse(source).getElementsByTagName("Result");
-            long after = System.currentTimeMillis();
-            
-            if (rs.getLength() != 1) {
-            	throw new RQLException("Response did not contain 1 Result, but " + rs.getLength());
+			long before = 0;
+			long after = 0;
+			
+            if (debugRql) {
+                System.out.println(">------ RQL SOAP request ----->\n" + StringHelper.prettyPrintXml(rqlQuery, 2));
+                before = System.currentTimeMillis();
             }
 
-            // TBI: Wild guess
-            String rqlResponse = rs.item(0).getFirstChild().getNodeValue();
+			URLConnection conn = url.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestProperty("Content-Type", "text/xml;charset=UTF-8");
+			conn.setRequestProperty("SOAPAction", "http://tempuri.org/RDCMSXMLServer/action/XmlServer.Execute");
+			OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream(), getRequestWriterEncoding());
+			osr.write(soapBody.toString());
+			osr.close();
+
+			// Allow line-based reading
+			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), getResponseReaderEncoding()));
+
+			InputSource source = new InputSource(rd);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document soapResponse = db.parse(source);
+
+            String rqlResponse = item0FirstChildValue(soapResponse.getElementsByTagName("Result"), "");
+            // Consume the first line with the superflous XML-Header (if any)
+			String firstLine = new BufferedReader(new StringReader(rqlResponse)).readLine(); // peek ahead
+			if (firstLine.startsWith("<?xml") && firstLine.endsWith("?>")) {
+				rqlResponse = rqlResponse.substring(firstLine.length());
+			}
+
+			// Error signaling
+			String rqlError = item0FirstChildValue(soapResponse.getElementsByTagName("sErrorA"), "");
+			String rqlInfo = item0FirstChildValue(soapResponse.getElementsByTagName("sResultInfoA"), "");
+
+            if (debugRql) {
+            	after = System.currentTimeMillis();
+            	long delta = after - before;
+            	System.out.println("<------ RQL SOAP response ("+delta+" ms)------<"+rqlError+"<"+rqlInfo+"<\n" + StringHelper.prettyPrintXml(rqlResponse, 2) );
+            }
+            
+            if (!rqlError.isEmpty()) {
+            	// FIXME: Das koennte man vernueftig in RQLException aufheben
+            	throw new RQLException(rqlError + ": " + rqlInfo);
+            }
+            
             return rqlResponse;
 		} catch (ParserConfigurationException e) {
 			throw new RQLException(e.toString(), e);
@@ -943,6 +990,23 @@ public class CmsClient {
 		} catch (IOException e) {
 			throw new RQLException(e.toString(), e);
 		}
+	}
+	
+	
+	/**
+	 * We all love XML and DOM: Extract the first usable string from a number of nodes.
+	 * @return the defautlvalue if the structure is not as expected.
+	 */
+	private String item0FirstChildValue(NodeList l, String defValue) {
+		if (l.getLength() < 1)
+			return defValue;
+		
+		Node e = l.item(0).getFirstChild();
+		if (e == null)
+			return defValue;
+		
+		String out = e.getNodeValue();
+		return out == null ? defValue : out;
 	}
 	
 
