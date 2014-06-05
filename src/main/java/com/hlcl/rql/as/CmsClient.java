@@ -890,6 +890,61 @@ public class CmsClient {
 			}
 		}
 	}
+	
+	
+	/**
+	 * Poor man's SOAP call.
+	 * 
+	 * @param rqlQuery
+	 * @return
+	 * @throws RQLException
+	 */
+	private String callCmsWithSoap(String rqlQuery) throws RQLException
+	{
+		try {
+			URL url = new URL("http://rd-11-test/CMS/WebService/RqlWebService.svc"); // TBI
+		
+			StringBuilder soapBody = new StringBuilder(2048);
+			soapBody.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+			.append("<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:mes=\"http://tempuri.org/RDCMSXMLServer/message/\">")
+			.append("<soapenv:Header/><soapenv:Body>")
+			.append("<mes:Execute soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">")
+			.append("<sParamA xsi:type=\"xsd:string\"><![CDATA[")
+			.append(rqlQuery) // TBI: Falls da CDATAs drinstehen, mussen wir evtl. was tun
+			// http://en.wikipedia.org/wiki/CDATA#Nesting
+			.append("]]></sParamA>")
+			.append("<sErrorA xsi:type=\"xsd:anyType\"/><sResultInfoA xsi:type=\"xsd:anyType\"/>") // unklar
+			.append("</soapenv:Body></soapenv:Envelope>");
+			
+			long before = System.currentTimeMillis();
+			URLConnection conn = url.openConnection();
+			conn.setDoOutput(true);
+			OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream(), getRequestWriterEncoding());
+			osr.write(soapBody.toString());
+			osr.flush();
+
+			InputSource source = new InputSource(conn.getInputStream());
+            source.setEncoding(getResponseReaderEncoding()); // FIXME: or fix UTF-8?
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            NodeList rs = db.parse(source).getElementsByTagName("Result");
+            long after = System.currentTimeMillis();
+            
+            if (rs.getLength() != 1) {
+            	throw new RQLException("Response did not contain 1 Result, but " + rs.getLength());
+            }
+
+            // TBI: Wild guess
+            String rqlResponse = rs.item(0).getFirstChild().getNodeValue();
+            return rqlResponse;
+		} catch (ParserConfigurationException e) {
+			throw new RQLException(e.toString(), e);
+		} catch (SAXException e) {
+			throw new RQLException(e.toString(), e);
+		} catch (IOException e) {
+			throw new RQLException(e.toString(), e);
+		}
+	}
+	
 
 	/**
 	 * Liefert die URL zu dem CMS Server zurück, mit der sich dieser CmsClient
