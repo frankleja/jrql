@@ -953,28 +953,25 @@ public class CmsClient {
 			osr.write(soapBody.toString());
 			osr.close();
 
-			// Allow line-based reading
-			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), getResponseReaderEncoding()));
-
-			InputSource source = new InputSource(rd);
+			InputSource source = new InputSource(new InputStreamReader(conn.getInputStream(), getResponseReaderEncoding()));
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document soapResponse = db.parse(source);
 
+            // Error signaling (body may be empty)
+            String rqlError = item0FirstChildValue(soapResponse.getElementsByTagName("sErrorA"), "");
+            String rqlInfo = item0FirstChildValue(soapResponse.getElementsByTagName("sResultInfoA"), "");
             String rqlResponse = item0FirstChildValue(soapResponse.getElementsByTagName("Result"), "");
+            
             // Consume the first line with the superflous XML-Header (if any)
 			String firstLine = new BufferedReader(new StringReader(rqlResponse)).readLine(); // peek ahead
-			if (firstLine.startsWith("<?xml") && firstLine.endsWith("?>")) {
+			if (firstLine != null && firstLine.startsWith("<?xml") && firstLine.endsWith("?>")) {
 				rqlResponse = rqlResponse.substring(firstLine.length());
 			}
-
-			// Error signaling
-			String rqlError = item0FirstChildValue(soapResponse.getElementsByTagName("sErrorA"), "");
-			String rqlInfo = item0FirstChildValue(soapResponse.getElementsByTagName("sResultInfoA"), "");
 
             if (debugRql) {
             	after = System.currentTimeMillis();
             	long delta = after - before;
-            	System.out.println("<------ RQL SOAP response ("+delta+" ms)------<"+rqlError+"<"+rqlInfo+"<\n" + StringHelper.prettyPrintXml(rqlResponse, 2) );
+            	System.out.println("<------ RQL SOAP response ("+delta+" ms)------<"+rqlError+"<"+rqlInfo+"<\n" + (rqlResponse.isEmpty() ? "" : StringHelper.prettyPrintXml(rqlResponse, 2)));
             }
             
             if (!rqlError.isEmpty()) {
@@ -989,6 +986,9 @@ public class CmsClient {
 			throw new RQLException(e.toString(), e);
 		} catch (IOException e) {
 			throw new RQLException(e.toString(), e);
+		} catch (Error e) {
+			e.printStackTrace(System.out); // Debug
+			throw e;
 		}
 	}
 	
