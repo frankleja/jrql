@@ -3868,10 +3868,9 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 
 		// add possible selections to the option list
 		RQLNodeList selectionNodeList = elementNode.getNodes("SELECTION");
-		RQLNode selectionNode = null;
 
-		for (int i = 0; i < selectionNodeList.size(); i++) {
-			selectionNode = selectionNodeList.get(i);
+		for (int i = 0; selectionNodeList != null && i < selectionNodeList.size(); i++) {
+			RQLNode selectionNode = selectionNodeList.get(i);
 			optionList.addSelection(selectionNode.getAttribute("guid"), selectionNode.getAttribute("description"), selectionNode
 					.getAttribute("value"));
 		}
