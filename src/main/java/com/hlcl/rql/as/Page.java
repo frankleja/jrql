@@ -6085,6 +6085,10 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		 <PAGE action="save" headline="test wf nach wf weg dran cms ex" sessionkey="351998080iE024w3q4V7" dialoglanguageid="ENG" languagevariantid="ENG" templateguid="" mainlinkguid="25D2A30716D646DEAE4C71AAE0724F11" guid="E58B4BE5382E4372BAD74706414B3FC8" id="12391" attributeid="2" changed="-1" useconnection="1" userguid="4324D172EF4342669EAF0AD074433393" changeuserguid="4324D172EF4342669EAF0AD074433393" actionflag="65536" pageguid="E58B4BE5382E4372BAD74706414B3FC8" saveexplicituserguid="4324D172EF4342669EAF0AD074433393">	</PAGE>
 		 </IODATA>
 		 */
+		
+		// optimize cms call away, in case we happen to know the headline and its unchanged
+		if (this.headline != null && this.headline.equals(headline))
+			return;
 
 		// call CMS
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
