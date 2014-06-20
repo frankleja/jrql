@@ -245,7 +245,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * @see Element#deleteValue()
 	 * @see TextElement#deleteValue()
 	 */
-	private void addDeleteElementValue(String elementGuid) throws RQLException {
+	public void addDeleteElementValue(String elementGuid) throws RQLException {
 		deleteElementValuesRequest += "<ELT action='save' guid='" + elementGuid + "' value='#" + getSessionKey() + "'/>";
 	}
 
