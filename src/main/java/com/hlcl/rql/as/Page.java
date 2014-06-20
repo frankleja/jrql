@@ -43,7 +43,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	private RQLNodeList linksNodeList;
 	private String pageGuid;
 	private String pageId;
-	private String deleteElementValuesRequest = null;
+	private StringBuilder deleteElementValuesRequest = null;
 	private HashMap<Element, Object> setElementValuesMap = null;
 	private String databaseQueryCache = null;
 	private PublicationPackage publicationPackage = null;
@@ -246,7 +246,13 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * @see TextElement#deleteValue()
 	 */
 	public void addDeleteElementValue(String elementGuid) throws RQLException {
-		deleteElementValuesRequest += "<ELT action='save' guid='" + elementGuid + "' value='#" + getSessionKey() + "'/>";
+		if (deleteElementValuesRequest == null) {
+			throw new RQLException(
+					"You try to delete element values with one request, but you have to use the method #startDeleteElementValues() first.");
+		}
+
+		deleteElementValuesRequest.append("<ELT action='save' guid='").append(elementGuid)
+		.append("' value='#").append(getSessionKey()).append("'/>");
 	}
 
 	/**
@@ -1907,8 +1913,19 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 			throw new RQLException(
 					"You tried to delete element values with one request, but you have to use the method #startDeleteElementValues() first.");
 		}
-		deleteElementValuesRequest += "</IODATA>";
-		callCmsWithoutParsing(deleteElementValuesRequest);
+		int cmdLen = deleteElementValuesRequest.length();
+		
+		// no actual delete-requests were queued, do nothing
+		if (cmdLen == 0) {
+			deleteElementValuesRequest = null;
+			return;
+		}
+		
+		StringBuilder cmd = new StringBuilder(128 + cmdLen);
+		cmd.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>");
+		cmd.append(deleteElementValuesRequest);
+		cmd.append("</IODATA>");
+		callCmsWithoutParsing(cmd.toString());
 		deleteElementValuesRequest = null;
 	}
 
@@ -1944,8 +1961,9 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 			throw new RQLException(
 					"You tried to change element values with one request, but you have to use the method #startSetElementValues() first.");
 		}
-		// change the page elem values with only one request
-		setElementValues(setElementValuesMap);
+		// change the page elem values with only one request (if any)
+		if (setElementValuesMap.size() > 0)
+			setElementValues(setElementValuesMap);
 		// prepare for next start
 		setElementValuesMap = null;
 	}
@@ -6405,7 +6423,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * @see #addDeleteElementValue(Element)
 	 */
 	public void startDeleteElementValues() throws RQLException {
-		deleteElementValuesRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>";
+		deleteElementValuesRequest = new StringBuilder(256);
 	}
 
 	/**
