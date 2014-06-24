@@ -6255,6 +6255,26 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		deleteElementsNodeListCache();
 	}
 
+	
+	/**
+	 * Aendert den Wert des Mediaelementes dieser Seite, das auf dem gegebenen templateElement basiert.
+	 * <p>
+	 * Es findet keine Prüfung statt, ob das File auch in diesem Ordner existiert. Das erhöht die Performance.
+	 * 
+	 * @param templateElementName
+	 *            TemplateElement muss vom Typ 38 sein
+	 * @param file
+	 *            das file, das mit dem element basierend auf templateElementName, verknüpft werden soll
+	 */
+	public void setMediaValueWithoutCheck(String templateElementName, String file) throws RQLException {
+
+		getMediaElement(templateElementName).setFilenameWithoutCheck(file);
+
+		// force new read of elements node list
+		deleteElementsNodeListCache();
+	}
+
+	
 	/**
 	 * Aendert den Wert des Verwaltungseintrages mit dem gegebenen Namen.
 	 * <p>

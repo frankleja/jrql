@@ -396,8 +396,12 @@ public abstract class FileElement extends Element implements FolderContainer {
 		updateImageCache();
 
 		// if in asset manager folder refresh thumbnail and file attributes
-		if (getFolder().isAssetManagerFolder()) {
-			refreshAssetManagerFileInformation(filename);
+		try {
+			if (getFolder().isAssetManagerFolder()) {
+				refreshAssetManagerFileInformation(filename);
+			}
+		} catch (ElementNotFoundException e) {
+			// Unklar: Das sollte eigentlich nicht sein, abwe bei ~WithoutCheck... kann man es vielleicht probieren
 		}
 	}
 
