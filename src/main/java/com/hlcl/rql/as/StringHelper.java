@@ -2254,7 +2254,8 @@ public class StringHelper {
             transformer.transform(xmlInput, xmlOutput);
             return xmlOutput.getWriter().toString();
         } catch (Exception e) {
-            throw new RuntimeException(e); // simple exception handling, please review it
+        	// Some calls do not result in XML ...
+        	return input;
         }
     }
 }
