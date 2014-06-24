@@ -2318,18 +2318,48 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 				childTemplateName);
 	}
 
+	
 	/**
 	 * Liefert eine Liste mit allen Containerelementen dieser Seite. Orientiert sich am Template.
 	 */
 	public java.util.List<Container> getContainerElements() throws RQLException {
-		java.util.List<Container> result = new ArrayList<Container>();
-		java.util.List<TemplateElement> containerTmpltElems = getTemplate().getContainerTemplateElements();
-		for (Iterator iterator = containerTmpltElems.iterator(); iterator.hasNext();) {
-			TemplateElement templateElement = (TemplateElement) iterator.next();
-			result.add(getContainer(templateElement));
+		java.util.List<Container> result = new ArrayList<Container>(32);
+		for (TemplateElement e : getTemplate().getContainerTemplateElements()) {
+			result.add(getContainer(e));
 		}
 		return result;
 	}
+
+	
+	/**
+	 * Liefert eine Liste mit allen List-Elementen dieser Seite. Orientiert sich am Template.
+	 */
+	public java.util.List<com.hlcl.rql.as.List> getListElements() throws RQLException {
+		java.util.List<com.hlcl.rql.as.List> result = new ArrayList<com.hlcl.rql.as.List>(32);
+		
+		for (TemplateElement e : getTemplate().getListTemplateElements()) {
+			result.add(getList(e));
+		}
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Liefert alle Container und List-Elemente, die sich im Template finden lassen.
+	 * {@see #getContainerElements()}
+	 * {@see #getListElements()}
+	 */
+	public java.util.List<MultiLink> getChildElements() throws RQLException {
+		java.util.List<Container> l1 = getContainerElements();
+		java.util.List<com.hlcl.rql.as.List> l2 = getListElements();
+		
+		java.util.List<MultiLink> result = new ArrayList<MultiLink>(l1.size() + l2.size());
+		result.addAll(l1);
+		result.addAll(l2);
+		return result;
+	}
+	
 
 	/**
 	 * Returns a list of all content element of this page. Headline elements are not returned.
