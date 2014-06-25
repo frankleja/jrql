@@ -2609,7 +2609,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	 *            RedDot GUID des Links
 	 * @return Page
 	 */
-	private Page getPageFromLinkGuid(String linkGuid) throws RQLException {
+	public Page getPageFromLinkGuid(String linkGuid) throws RQLException {
 
 		checkSessionKey();
 		/*
