@@ -44,6 +44,7 @@ public class TemplateElement implements TemplateContainer {
 	static final int STANDARDFIELD_TEXT_TYPE = 1;
 	static final int STANDARDFIELD_USER_DEFINED = 999;
 	static final int STANDARDFIELD_EMAIL_TYPE = 50;
+	static final int STANDARDFIELD_URL_TYPE = 51;
 
 	static final int TEXT_ASCII_TYPE = 31;
 
@@ -173,6 +174,7 @@ public class TemplateElement implements TemplateContainer {
 		LABELED_TYPES.add(IMAGE_TYPE);
 		LABELED_TYPES.add(MEDIA_TYPE);
 		LABELED_TYPES.add(OPTIONLIST_TYPE);
+		LABELED_TYPES.add(STANDARDFIELD_URL_TYPE);
 		LABELED_TYPES.add(STANDARDFIELD_EMAIL_TYPE);
 		LABELED_TYPES.add(STANDARDFIELD_DATE_TYPE);
 		LABELED_TYPES.add(STANDARDFIELD_NUMERIC_TYPE);
@@ -186,6 +188,7 @@ public class TemplateElement implements TemplateContainer {
 		CONTENT_TYPES.add(IMAGE_TYPE);
 		CONTENT_TYPES.add(MEDIA_TYPE);
 		CONTENT_TYPES.add(OPTIONLIST_TYPE);
+		CONTENT_TYPES.add(STANDARDFIELD_URL_TYPE);
 		CONTENT_TYPES.add(STANDARDFIELD_EMAIL_TYPE);
 		CONTENT_TYPES.add(STANDARDFIELD_DATE_TYPE);
 		CONTENT_TYPES.add(STANDARDFIELD_NUMERIC_TYPE);
@@ -198,6 +201,7 @@ public class TemplateElement implements TemplateContainer {
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(IMAGE_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(MEDIA_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(OPTIONLIST_TYPE);
+		CONTENT_WITHOUT_HEADLINE_TYPES.add(STANDARDFIELD_URL_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(STANDARDFIELD_EMAIL_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(STANDARDFIELD_DATE_TYPE);
 		CONTENT_WITHOUT_HEADLINE_TYPES.add(STANDARDFIELD_NUMERIC_TYPE);
@@ -1288,7 +1292,7 @@ public class TemplateElement implements TemplateContainer {
 	 */
 	public boolean isStandardField() {
 
-		return isStandardFieldText() || isStandardFieldNumeric() || isStandardFieldDate() || isStandardFieldUserDefined() || isStandardFieldEmail();
+		return isStandardFieldText() || isStandardFieldNumeric() || isStandardFieldDate() || isStandardFieldUserDefined() || isStandardFieldEmail() || isStandardFieldUrl();
 	}
 
 	/**
@@ -1299,6 +1303,16 @@ public class TemplateElement implements TemplateContainer {
 		return getType() == STANDARDFIELD_EMAIL_TYPE;
 	}
 
+	
+	/**
+	 * Testet auf Standard URL-Felder.
+	 */
+	public boolean isStandardFieldUrl() {
+
+		return getType() == STANDARDFIELD_URL_TYPE;
+	}
+	
+	
 	/**
 	 * Liefert true genau dann, wenn dieses Template-Element ein Standardfeld Date ist.
 	 */

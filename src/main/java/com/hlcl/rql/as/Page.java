@@ -362,7 +362,17 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	public void addSetStandardFieldEmailValue(String templateElementName, String value) throws RQLException {
 		setElementValuesMap.put(getStandardFieldEmailElement(templateElementName), value);
 	}
-	
+
+	/**
+	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
+	 * 
+	 * @see #startSetElementValues()
+	 * @see #endSetElementValues()
+	 */
+	public void addSetStandardFieldUrlValue(String templateElementName, String value) throws RQLException {
+		setElementValuesMap.put(getStandardFieldUrlElement(templateElementName), value);
+	}
+
 	/**
 	 * Adds the given page element for the given template element to the list of elements which value will be changed on this page.
 	 * 
@@ -2424,6 +2434,8 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 				result.add(getOptionList(templateElement));
 			} else if (templateElement.isStandardFieldEmail()) {
 				result.add(getStandardFieldEmailElement(templateElement));
+			} else if (templateElement.isStandardFieldUrl()) {
+				result.add(getStandardFieldUrlElement(templateElement));
 			} else if (templateElement.isStandardFieldDate()) {
 				result.add(getStandardFieldDateElement(templateElement));
 			} else if (templateElement.isStandardFieldNumeric()) {
@@ -4385,6 +4397,11 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		return getStandardFieldEmailElement(getTemplateElementByName(templateElementName));
 	}
 
+	public StandardFieldUrlElement getStandardFieldUrlElement(String templateElementName) throws RQLException {
+
+		return getStandardFieldUrlElement(getTemplateElementByName(templateElementName));
+	}
+
 	/**
 	 * Liefert Standardfeld Date Elements dieser Seite, das auf dem gegebenen templateElement basiert.
 	 * 
@@ -4427,6 +4444,27 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 				elementNode.getAttribute("value"));
 	}
 
+	/**
+	 * Standardfeld URL.
+	 * 
+	 * @param templateElement muss vom Typ 51 sein.
+	 */
+	private StandardFieldUrlElement getStandardFieldUrlElement(TemplateElement templateElement) throws RQLException {
+
+		// check type of template element
+		if (!templateElement.isStandardFieldUrl()) {
+			throw new WrongTypeException("Template element " + templateElement.getName() + " is not of type Standard-Field URL.");
+		}
+
+		// call CMS
+		RQLNode elementNode = findElementNode(templateElement);
+
+		// wrap page element data
+		return new StandardFieldUrlElement(this, templateElement, elementNode.getAttribute("name"), elementNode.getAttribute("guid"),
+				elementNode.getAttribute("value"));
+	}
+
+	
 	/**
 	 * Liefert den Wert des Standardfeld Date Elements dieser Seite, das auf dem gegebenen templateElement basiert.
 	 * 

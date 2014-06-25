@@ -1542,10 +1542,17 @@ public class Template implements TemplateFolderContainer {
 	}
 
 	/**
-	 * Liefert eine java.util.List von StandardField Date Templateelementen.
+	 * Liefert eine java.util.List von StandardField Email Templateelementen.
 	 */
 	public java.util.List<TemplateElement> getStandardFieldEmailTemplateElements() throws RQLException {
 		return getTemplateElementsByType(TemplateElement.STANDARDFIELD_EMAIL_TYPE);
+	}
+
+	/**
+	 * Liefert eine java.util.List von StandardField URL Templateelementen.
+	 */
+	public java.util.List<TemplateElement> getStandardFieldUrlTemplateElements() throws RQLException {
+		return getTemplateElementsByType(TemplateElement.STANDARDFIELD_URL_TYPE);
 	}
 
 	/**
