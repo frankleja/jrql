@@ -2621,6 +2621,13 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 			// cache page details
 			setDetailsNode(rqlResponse.getNode("PAGE"));
 			setElementsNodeList(rqlResponse.getNodes("ELEMENT"));
+			
+			// TBI: URLs are different then proper pages
+			RQLNode urlNode = rqlResponse.getNode("URL");
+			if (urlNode != null) {
+				// <URL guid="E2E8F9B47C0542518111D9366780260B" src="http://www.pinuts.de/"/>
+			}
+			
 		}
 
 		return detailsNode;
@@ -4365,7 +4372,16 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		ReddotDate released = getReleasedOn();
 		return released == null ? "never" : released.getAsddMMyyyyHmma();
 	}
+	
+	
+	/**
+	 * Eine "redirect"-Seite ist in Wirklichkeit nur eine Mini-Seite (ohne Template, Workflow etc)
+	 */
+	public boolean isRedirect() throws RQLException {
+		return "1".equals(getDetailsNode().getAttribute("redirect"));
+	}
 
+	
 	/**
 	 * Liefert den RedDot Session key.
 	 * 
