@@ -386,6 +386,23 @@ public abstract class MultiLink implements PageContainer {
 		}
 	}
 
+	
+	
+	public void connectToExistingPage(String targetPageGuid) throws RQLException {
+		connectToExistingPage(new Page(this.getProject(), targetPageGuid));
+	}
+	
+	
+	public void connectToExistingPage(String targetPageGuid, boolean addAtBottom) throws RQLException {
+		connectToExistingPage(new Page(this.getProject(), targetPageGuid), addAtBottom);
+	}
+	
+	
+	public void connectToExistingPage(String targetPageGuid, boolean addAtBottom, boolean setMainLink) throws RQLException {
+		connectToExistingPage(new Page(this.getProject(), targetPageGuid), addAtBottom, setMainLink);
+	}
+	
+	
 	/**
 	 * Linkt die gegebenen Seiten (die Reihenfolge wird beibehalten) an diese Liste oder Container.
 	 * 
@@ -432,6 +449,31 @@ public abstract class MultiLink implements PageContainer {
 
         connectToExistingPages(pages, addAtBottom, setMainLink);
     }
+    
+    
+    /**
+     * Create a URL mini-page and put add it to this container. 
+     * 
+     * @param url actual link target
+     * @param target frame target (_top, _blank etc)
+     * @param headline name of this link, headine of the mini-page
+     */
+    public void connectToRedirectUrl(String url, String target, String headline) throws RQLException
+    {
+    	StringBuilder sb = new StringBuilder(128);
+    	
+		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>")
+		  .append("<LINK action='assign' guid='").append(getLinkGuid()).append("'>")
+		  .append("<PAGE action='addnew' target='")
+		  	.append(StringHelper.escapeHTML(target)).append("' headline='")
+		  	.append(StringHelper.escapeHTML(headline)).append("'>")
+		  .append("<URL action='assign' src='")
+		  	.append(StringHelper.escapeHTML(url)).append("' />")
+		  .append("</PAGE></LINK></IODATA>");
+		RQLNode rs = callCms(sb.toString()); // FIXME: check result?
+    }
+    
+    
 
 	/**
 	 * Kopiert alle Kindseiten (nur der 1. level) von sourceMultiLink an diese Liste. Die Werte der content elements werden mit

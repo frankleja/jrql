@@ -39,6 +39,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	// caches
 	private RQLNode detailsNode;
 	private RQLNodeList elementsNodeList;
+	private RQLNode urlNode; // redirect
 	private String headline;
 	private RQLNodeList linksNodeList;
 	private String pageGuid;
@@ -2626,6 +2627,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 			RQLNode urlNode = rqlResponse.getNode("URL");
 			if (urlNode != null) {
 				// <URL guid="E2E8F9B47C0542518111D9366780260B" src="http://www.pinuts.de/"/>
+				this.urlNode = urlNode;
 			}
 			
 		}
@@ -4381,6 +4383,20 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		return "1".equals(getDetailsNode().getAttribute("redirect"));
 	}
 
+	
+	/**
+	 * Redirect: The target frame.
+	 * @return possibly null.
+	 */
+	public String getRedirectTarget() throws RQLException {
+		return getDetailsNode().getAttribute("target");
+	}
+	
+	
+	public String getRedirectUrl() throws RQLException {
+		return urlNode.getAttribute("src");
+	}
+	
 	
 	/**
 	 * Liefert den RedDot Session key.
