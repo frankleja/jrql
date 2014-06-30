@@ -865,6 +865,7 @@ public abstract class MultiLink implements PageContainer {
 
 		for (int i = 0; i < pageNodeList.size(); i++) {
 			RQLNode pageNode = pageNodeList.get(i);
+			// FIXME: For redirect="1" there is an additional " (URL)" at the end of the headline ?!
 			pages.add(new Page(getProject(), pageNode.getAttribute("guid"), pageNode.getAttribute("id"), pageNode
 					.getAttribute("headline")));
 		}
