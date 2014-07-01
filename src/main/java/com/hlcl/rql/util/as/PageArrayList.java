@@ -20,7 +20,7 @@ import com.hlcl.rql.as.UserGroup;
  * 
  * @author lejafr
  */
-public class PageArrayList extends ArrayList implements java.util.List {
+public class PageArrayList extends ArrayList<Page> implements java.util.List<Page> {
 	private static final long serialVersionUID = -1289686304913077174L;
 
 	/**
@@ -34,7 +34,7 @@ public class PageArrayList extends ArrayList implements java.util.List {
 	 * Constructs a list containing the elements of the specified collection, in the order they are returned by the collection's
 	 * iterator. The <tt>ArrayList</tt> instance has an initial capacity of 110% the size of the specified collection.
 	 */
-	public PageArrayList(Collection c) {
+	public PageArrayList(Collection<Page> c) {
 		super(c);
 	}
 

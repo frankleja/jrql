@@ -470,7 +470,7 @@ public abstract class MultiLink implements PageContainer {
 		  .append("<URL action='assign' src='")
 		  	.append(StringHelper.escapeHTML(url)).append("' />")
 		  .append("</PAGE></LINK></IODATA>");
-		RQLNode rs = callCms(sb.toString()); // FIXME: check result?
+		callCms(sb.toString()); // check result?
     }
     
     
@@ -489,9 +489,7 @@ public abstract class MultiLink implements PageContainer {
 	protected void  copyChildrenWithContentFrom(MultiLink sourceMultiLink, String ignoreElementNames, String separator,
 			boolean copyAllContainersChildren) throws RQLException {
 
-		PageArrayList sourceChildren = sourceMultiLink.getChildrenReversed();
-		for (Iterator iterator = sourceChildren.iterator(); iterator.hasNext();) {
-			Page sourceChild = (Page) iterator.next();
+		for (Page sourceChild : sourceMultiLink.getChildrenReversed()) {
 			Template sourceTemplate = sourceChild.getTemplate();
 			Page targetChild = createAndConnectPage(sourceTemplate, sourceChild.getHeadline(), false);
 			// exclude referenced content elements and headline
@@ -500,10 +498,8 @@ public abstract class MultiLink implements PageContainer {
 			// check of containers needs to be handled
 			if (copyAllContainersChildren) {
 				// for all containers of source child do
-				java.util.List<Container> sourceChildContainer = sourceChild.getContainerElements();
-				for (Iterator iterator2 = sourceChildContainer.iterator(); iterator2.hasNext();) {
+				for (Container childSourceCtr : sourceChild.getContainerElements()) {
 					// get source and target ctr
-					Container childSourceCtr = (Container) iterator2.next();
 					Container childTargetCtr = targetChild.getContainer(childSourceCtr.getTemplateElementName());
 					// use this copy function for only 1st level copy
 					childTargetCtr.copyChildrenWithContentFrom(childSourceCtr, ignoreElementNames, separator);
@@ -534,7 +530,7 @@ public abstract class MultiLink implements PageContainer {
 	 */
 	public Page createAndConnectPage(String headline, boolean addAtBottom) throws RQLException {
 		// get the only one template
-		java.util.List templates = getAllowedTemplates();
+		java.util.List<Template> templates = getAllowedTemplates();
 		if (templates.size() != 1) {
 			throw new AmbiguousTemplateException("Create of new page on link " + this.getName() + " in page "
 					+ this.getPage().getHeadlineAndId()
@@ -669,7 +665,7 @@ public abstract class MultiLink implements PageContainer {
 	 * <p>
 	 * Zur Performancesteigerung nur intern genutzt.
 	 */
-	private void disconnectAllChilds(java.util.List childPages) throws RQLException {
+	private void disconnectAllChilds(java.util.List<Page> childPages) throws RQLException {
 		/* 
 		 V5 request (disconnect pages)
 		 <IODATA loginguid="78905ACA0C614D15BC6DB1F6748405E4" sessionkey="925818745bOSRp7gXR85">
@@ -793,7 +789,7 @@ public abstract class MultiLink implements PageContainer {
 	 */
 	public String getAllowedTemplateNames(String delimiter) throws RQLException {
 
-		java.util.List templates = getAllowedTemplates();
+		java.util.List<Template> templates = getAllowedTemplates();
 		StringBuilder buffer = new StringBuilder(64);
 
 		for (int i = 0; i < templates.size(); i++) {
@@ -846,6 +842,7 @@ public abstract class MultiLink implements PageContainer {
 		return (Page) children.get(0);
 	}
 
+
 	/**
 	 * Liefert alle an diesen Multilink angehängten Seiten zurück.
 	 * 
@@ -865,13 +862,23 @@ public abstract class MultiLink implements PageContainer {
 
 		for (int i = 0; i < pageNodeList.size(); i++) {
 			RQLNode pageNode = pageNodeList.get(i);
-			// FIXME: For redirect="1" there is an additional " (URL)" at the end of the headline ?!
-			pages.add(new Page(getProject(), pageNode.getAttribute("guid"), pageNode.getAttribute("id"), pageNode
-					.getAttribute("headline")));
+			String headline = pageNode.getAttribute("headline");
+
+			// For redirect="1" there is an additional " (URL)" at the end of the headline ...
+			if ("1".equals(pageNode.getAttribute("redirect"))) {
+				String suffix = " (URL)";
+				if (headline != null && headline.endsWith(suffix)) {
+					headline = headline.substring(0, headline.length() - suffix.length());
+				}
+			}
+			Page p = new Page(getProject(), pageNode.getAttribute("guid"),
+					          pageNode.getAttribute("id"), headline);
+			pages.add(p);
 		}
 
 		return pages;
 	}
+
 
 	/**
 	 * Liefert alle an diesen Multilink angehängten Seiten zurück deren Template dem gegebenen entspricht.
@@ -1252,8 +1259,8 @@ public abstract class MultiLink implements PageContainer {
 	 */
 	public boolean isAtLeastOneChildMoveableToTarget(Page targetPage, boolean includeReferences) throws RQLException {
 
-		java.util.Set targetTemplates = targetPage.getTemplate().collectPreassignedTemplatesOfAllMultiLinkElements(includeReferences);
-		java.util.List ownTemplates = getAllowedTemplates();
+		java.util.Set<Template> targetTemplates = targetPage.getTemplate().collectPreassignedTemplatesOfAllMultiLinkElements(includeReferences);
+		java.util.List<Template> ownTemplates = getAllowedTemplates();
 
 		// try to find at least one match
 		for (int i = 0; i < ownTemplates.size(); i++) {
@@ -1710,7 +1717,6 @@ public abstract class MultiLink implements PageContainer {
 	/**
 	 * Verschiebt alle Seiten deren Überschrift mit dem gegebenen Prefix beginnen ans Ende dieser Liste.
 	 */
-	@SuppressWarnings("unchecked")
 	public void movePagesHeadlineStartsWithToLastPosition(String prefix) throws RQLException {
 		PageArrayList allChildren = getChildPages();
 		PageArrayList prefixPages = allChildren.selectAllPagesHeadlineStartsWith(prefix);
