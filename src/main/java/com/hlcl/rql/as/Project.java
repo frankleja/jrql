@@ -2399,7 +2399,6 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	 * Liefert einen Iterator über alle MultiLinks zurück, die auf die gegebene Seiten- oder Link-GUID (auch Frame) verweisen.
 	 * Templateelemente, die ebenfalls diese Seite (oder Link) referenzieren werden nicht geliefert (fehlen bereits im RQL). Sie werden
 	 * auch nicht durch die RD Funktion show reference list geliefert!
-	 * <p>
 	 * 
 	 * @see MultiLink#referenceTo(Page)
 	 */
@@ -2407,6 +2406,18 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		return new MultiLinksReferencingIterator(pageOrLinkGuid);
 	}
 
+	
+	/**
+	 * Liefert eine Liste von MultiLinks, die auf die gegebene Seiten-/Link-GUID verweisen.
+	 * Templateelemente, die ebenfalls diese Seite (oder Link) referenzieren werden nicht geliefert (fehlen bereits im RQL). Sie werden
+	 * auch nicht durch die RD Funktion show reference list geliefert!
+	 */
+	public java.util.List<MultiLink> getMultiLinksReferencing(String pageOrLinkGuid) throws RQLException {
+		MultiLinksReferencingIterator mi = new MultiLinksReferencingIterator(pageOrLinkGuid);
+		return mi.chunk;
+	}
+	
+	
 	/**
 	 * Liefert den Namen des Projekts. Nur mit Servermanager Lizenz nutzbar!
 	 * 
@@ -4150,7 +4161,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	 * <p>
 	 * Hier als zentrale Stelle für die Verwendung in Anchor und MultiLink.
 	 */
-	void referenceLinkToLink(String sourceLinkGuid, String targetLinkGuid) throws RQLException {
+	public void referenceLinkToLink(String sourceLinkGuid, String targetLinkGuid) throws RQLException {
 		/* 
 		 V5 request
 		 <IODATA loginguid="1EEC6EB5414B4B86BA4301DF962EB7FC" sessionkey="10218343231Wo485iUG7s">
