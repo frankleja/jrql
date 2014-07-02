@@ -12,22 +12,26 @@ import com.hlcl.rql.util.as.ScriptParameters;
  * @author LEJAFR
  */
 public class Project extends RqlKeywordObject implements CmsClientContainer {
+
+
 	/**
 	 * Iterator over all MultiLinks referencing the given GUID.
 	 */
 	private class MultiLinksReferencingIterator implements Iterator<MultiLink> {
 
 		private java.util.List<MultiLink> chunk;
-		// Index of element to be returned by subsequent call to next.
-		int cursor = 0;
+		private Iterator<MultiLink> it;
 		private String pageOrLinkGuid;
 
+		
 		/**
 		 * Constructor for the given page or link GUID.
+		 * @throws RQLException 
 		 */
-		private MultiLinksReferencingIterator(String pageOrLinkGuid) {
+		private MultiLinksReferencingIterator(String pageOrLinkGuid) throws RQLException {
 			this.pageOrLinkGuid = pageOrLinkGuid;
-			this.chunk = null;
+			readChunk();
+			it = chunk.iterator();
 		}
 
 		/**
@@ -60,69 +64,52 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 			return rqlResponse.getNodes("PAGE");
 		}
 
+		
 		/**
 		 * Returns true if more MultiLinks are available.
 		 */
 		public boolean hasNext() {
-			try {
-				// read the 1st chunk
-				if (chunk == null) {
-					readChunk();
-				}
-				// handle subsequent reads
-				if (cursor == chunk.size()) {
-					readChunk();
-				}
-			} catch (RQLException ex) {
-				// wrap the rql exception into a valid runtime exeption
-				String msg = "RQLException: " + ex.getMessage();
-				Throwable re = ex.getReason();
-				if (re != null) {
-					msg += re.getClass().getName() + ": " + re.getMessage();
-				}
-				throw new RuntimeException(msg);
-			}
-			// check availability
-			return cursor < chunk.size();
+			return it.hasNext();
 		}
 
+		
 		/**
 		 * Returns the next MultiLink referencing the given GUID at the current position.
 		 */
 		public MultiLink next() {
-			MultiLink result = chunk.get(cursor);
-			cursor++;
-			return result;
+			return it.next();
 		}
 
+		
 		/**
 		 * Read a chunk from RD and convert into list of multi links.
 		 */
 		private void readChunk() throws RQLException {
 			// initializing
 			chunk = new ArrayList<MultiLink>();
-			cursor = 0;
 
 			// call CMS
 			RQLNodeList pageNodes = getNodeList();
 
 			// filter all multilinks only and wrap them
-			if (pageNodes != null) {
-				for (int i = 0; i < pageNodes.size(); i++) {
-					RQLNode pageNode = pageNodes.get(i);
-					Page page = getPageByGuid(pageNode.getAttribute("guid"));
-					RQLNodeList linkNodes = pageNode.getNodes("LINK");
-					for (int j = 0; j < linkNodes.size(); j++) {
-						RQLNode linkNode = linkNodes.get(j);
-						int type = Integer.parseInt(linkNode.getAttribute("type"));
-						if (type == TemplateElement.LIST_TYPE || type == TemplateElement.CONTAINER_TYPE) {
-							try {
-								MultiLink multiLink = page.getMultiLinkByGuid(linkNode.getAttribute("guid"));
-								chunk.add(multiLink);
-							} catch (ElementNotFoundException enfe) {
-								// ignore not found links in the page; database
-								// inconsistency grrrhh
-							}
+			if (pageNodes == null) {
+				return;
+			}
+
+			for (int i = 0; i < pageNodes.size(); i++) {
+				RQLNode pageNode = pageNodes.get(i);
+				Page page = getPageByGuid(pageNode.getAttribute("guid"));
+				RQLNodeList linkNodes = pageNode.getNodes("LINK");
+				for (int j = 0; j < linkNodes.size(); j++) {
+					RQLNode linkNode = linkNodes.get(j);
+					int type = Integer.parseInt(linkNode.getAttribute("type"));
+					if (type == TemplateElement.LIST_TYPE || type == TemplateElement.CONTAINER_TYPE) {
+						try {
+							MultiLink multiLink = page.getMultiLinkByGuid(linkNode.getAttribute("guid"));
+							chunk.add(multiLink);
+						} catch (ElementNotFoundException enfe) {
+							// ignore not found links in the page; database
+							// inconsistency grrrhh
 						}
 					}
 				}
@@ -2416,7 +2403,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	 * 
 	 * @see MultiLink#referenceTo(Page)
 	 */
-	Iterator<MultiLink> getMultiLinksReferencingIterator(String pageOrLinkGuid) throws RQLException {
+	public Iterator<MultiLink> getMultiLinksReferencingIterator(String pageOrLinkGuid) throws RQLException {
 		return new MultiLinksReferencingIterator(pageOrLinkGuid);
 	}
 
