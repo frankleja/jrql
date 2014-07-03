@@ -395,7 +395,7 @@ public class StringHelper {
 	 *            case sensitive search or not; to ignore case set to false
 	 * @return a list of elements of findList
 	 */
-	public static java.util.List collectContainedText(String s, String findList, String delimiter, boolean caseSensitive) {
+	public static java.util.List<String> collectContainedText(String s, String findList, String delimiter, boolean caseSensitive) {
 		return collectContainedText(s, findList, delimiter, caseSensitive, false);
 	}
 
@@ -417,11 +417,11 @@ public class StringHelper {
 	 *            =true, try a HTML encode find text search in addition
 	 * @return a list of elements of findList
 	 */
-	public static java.util.List collectContainedText(String s, String findList, String delimiter, boolean caseSensitive,
+	public static java.util.List<String> collectContainedText(String s, String findList, String delimiter, boolean caseSensitive,
 			boolean htmlEncodeFindList) {
 		// let s unchanged to return find text in correct case
 		String[] listArray = StringHelper.split(findList, delimiter);
-		java.util.List result = new ArrayList();
+		java.util.List<String> result = new ArrayList<String>();
 		for (int i = 0; i < listArray.length; i++) {
 			String find = (String) listArray[i];
 			// html encode find text
@@ -825,11 +825,11 @@ public class StringHelper {
 		// prepare
 		int length = s.length();
 		// reverse html entities, map Integer to strings
-		Map encoder = new HashMap(htmlEntities.size());
-		Set keys = htmlEntities.keySet();
-		for (Iterator iter = keys.iterator(); iter.hasNext();) {
-			String key = (String) iter.next();
-			encoder.put((Integer) htmlEntities.get(key), key);
+		Map<Integer, String> encoder = new HashMap<Integer, String>(htmlEntities.size());
+		Set<String> keys = htmlEntities.keySet();
+		for (Iterator<String> iter = keys.iterator(); iter.hasNext();) {
+			String key = iter.next();
+			encoder.put(htmlEntities.get(key), key);
 		}
 
 		// for all characters do
@@ -854,7 +854,7 @@ public class StringHelper {
 				// > 32
 				// replace from encoder map
 				Integer key = new Integer(cint);
-				String entityOrNull = (String) encoder.get(key);
+				String entityOrNull = encoder.get(key);
 				if (entityOrNull == null) {
 					// append unencoded
 					sb.append(c);
@@ -1556,9 +1556,9 @@ public class StringHelper {
 	 *            string to split
 	 * @return list of trimmed strings; length same as given in positions
 	 */
-	public static java.util.List posSplit(String positionsStr, String separator, String line) {
+	public static java.util.List<String> posSplit(String positionsStr, String separator, String line) {
 
-		java.util.List fields = new ArrayList();
+		java.util.List<String> fields = new ArrayList<String>();
 
 		String[] positions = split(positionsStr, separator);
 		for (int i = 0; i < positions.length; i++) {
@@ -1793,8 +1793,8 @@ public class StringHelper {
 	public static String replaceListValues(String s, String findList, String delimiter, String replace) {
 		java.util.List<String> finds = StringHelper.split(findList, delimiter.charAt(0));
 		// try to replace all in findList
-		for (Iterator iterator = finds.iterator(); iterator.hasNext();) {
-			String find = (String) iterator.next();
+		for (Iterator<String> iterator = finds.iterator(); iterator.hasNext();) {
+			String find = iterator.next();
 			s = StringHelper.replace(s, find, replace);
 		}
 		return s;
@@ -2216,7 +2216,7 @@ public class StringHelper {
 						value = Integer.parseInt(escape.substring(1), 10);
 					} else {
 						if (htmlEntities.containsKey(escape)) {
-							value = ((Integer) (htmlEntities.get(escape))).intValue();
+							value = (htmlEntities.get(escape)).intValue();
 						}
 					}
 				} catch (NumberFormatException x) {

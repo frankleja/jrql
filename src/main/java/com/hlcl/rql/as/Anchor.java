@@ -1,13 +1,15 @@
 package com.hlcl.rql.as;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Diese Klasse beschreibt einen RedDot Anchor (Textlink oder Bildlink, jeweils auch dynamisch).
  * 
  * @author LEJAFR
  */
-public abstract class Anchor implements PageContainer {
+public abstract class Anchor implements PageContainer, StructureElement {
 	private String anchorGuid;
 	private String name;
 
@@ -342,11 +344,12 @@ public abstract class Anchor implements PageContainer {
 	/**
 	 * Liefert immer true. Alle subklassen sind anchor.
 	 */
+	@Override
 	public final boolean isAnchor() {
-
 		return true;
 	}
 
+	
 	/**
 	 * Erstellt eine RD Referenz von diesem Link (als Source) zu der gegebenen target Seite.
 	 */
@@ -407,6 +410,61 @@ public abstract class Anchor implements PageContainer {
 	 */
 	public void referenceTo(MultiLink targetMultiLink) throws RQLException {
 		getProject().referenceLinkToLink(getAnchorGuid(), targetMultiLink.getLinkGuid());
+	}
+
+	
+	@Override
+	public boolean isContainer() {
+		return false;
+	}
+
+	@Override
+	public boolean isList() {
+		return false;
+	}
+
+	@Override
+	public List<Page> getChildPages() throws RQLException {
+		List<Page> out = new ArrayList<Page>(1);
+		out.add(getPage());
+		return out;
+	}
+
+	@Override
+	public String getGuid() {
+		return anchorGuid;
+	}
+
+	@Override
+	public void disconnectAllChilds() throws RQLException {
+		disconnectChild();
+	}
+
+	
+	/**
+	 * Ignores atBottom and setMainLink as this is not implemented here.
+	 */
+	@Override
+	public void connectToExistingPage(String targetGuid, boolean atBottom, boolean setMainLink) throws RQLException {
+		// call CMS
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+				+ " <LINKSFROM action='save' pageguid='" + targetGuid + "'>" + "   <LINK guid='" + getAnchorGuid() + "'/>"
+				+ " </LINKSFROM>" + "</IODATA>";
+
+		// ignore response
+		callCms(rqlRequest);
+	}
+
+	
+	public void connectToExistingPage(Page target, boolean atBottom, boolean setMainLink) throws RQLException {
+		connectToExistingPage(page.getPageGuid(), atBottom, setMainLink);
+	}
+
+
+	@Override
+	public void connectToRedirectUrl(String url, String target, String headline) throws RQLException {
+		// FIXME: Ignores target/headline - should probably work like MultiLink::connectToRedirectUrl
+		setUrl(url);
 	}
 
 }

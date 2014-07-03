@@ -734,6 +734,7 @@ public class Template implements TemplateFolderContainer {
 		return getTemplateFolder().getCmsClient();
 	}
 
+	
 	/**
 	 * Liefert eine java.util.List von Container Templateelementen.
 	 */

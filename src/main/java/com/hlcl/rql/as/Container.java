@@ -10,7 +10,7 @@ public class Container extends MultiLink {
 	/**
 	 * Liefert immer true, da dieser Link ein Container ist.
 	 */
-	public boolean isContainer() {
+	public final boolean isContainer() {
 
 		return true;
 	}

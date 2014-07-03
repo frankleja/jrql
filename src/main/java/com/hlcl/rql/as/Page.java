@@ -632,21 +632,21 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * @param caseSensitive
 	 *            case sensitive search or not; to ignore case set to false
 	 */
-	public Set collectContainedText(String findList, String delimiter, boolean searchHeadline, boolean caseSensitive)
+	public Set<String> collectContainedText(String findList, String delimiter, boolean searchHeadline, boolean caseSensitive)
 			throws RQLException {
 
-		Set result = new HashSet();
+		Set<String> result = new HashSet<String>();
 		// check only filled StandardFieldText elements first
-		java.util.List sftElems = getFilledStandardFieldTextElements();
-		for (Iterator iter = sftElems.iterator(); iter.hasNext();) {
-			StandardFieldTextElement element = (StandardFieldTextElement) iter.next();
+		java.util.List<StandardFieldTextElement> sftElems = getFilledStandardFieldTextElements();
+		for (Iterator<StandardFieldTextElement> iter = sftElems.iterator(); iter.hasNext();) {
+			StandardFieldTextElement element = iter.next();
 			result.addAll(element.collectContainedText(findList, delimiter, caseSensitive));
 		}
 
 		// check only filled TextElements too
-		java.util.List textElems = getFilledTextElements();
-		for (Iterator iter = textElems.iterator(); iter.hasNext();) {
-			TextElement element = (TextElement) iter.next();
+		java.util.List<TextElement> textElems = getFilledTextElements();
+		for (Iterator<TextElement> iter = textElems.iterator(); iter.hasNext();) {
+			TextElement element = iter.next();
 			result.addAll(element.collectContainedText(findList, delimiter, caseSensitive));
 		}
 
@@ -663,7 +663,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * 
 	 * ACHTUNG: Funktioniert nicht, da das links action=load für die Projektstartseite nichts liefert.
 	 */
-	public java.util.List collectMainLinkChainUntilRoot() throws RQLException {
+	public java.util.List<ProjectContainer> collectMainLinkChainUntilRoot() throws RQLException {
 		/* 
 		 V6.5 request
 		 <IODATA loginguid="E572DB5C192D47DF87B6A91D1DF77B54" sessionkey="1021834323qeTOO46l1Ir">
@@ -715,7 +715,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		// collect and build pages and multi links
-		java.util.List result = new ArrayList();
+		java.util.List<ProjectContainer> result = new ArrayList<ProjectContainer>();
 		RQLNodeList segmentNodes = rqlResponse.getNodes("SEGMENT");
 		for (int i = 0; i < segmentNodes.size(); i++) {
 			RQLNode node = (RQLNode) segmentNodes.get(i);
@@ -1148,14 +1148,14 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * @param skipChildTmpltElemName
 	 *            Bei vorhandensein dieses Elementes in einer Seite, werden keine Kinder dieser Seite untersucht
 	 */
-	public java.util.List copyTextToAllChilds(String valueTemplateElementName, String textValue, String pageIndicatorTmpltElemName,
+	public java.util.List<Page> copyTextToAllChilds(String valueTemplateElementName, String textValue, String pageIndicatorTmpltElemName,
 			String skipChildTmpltElemName) throws RQLException {
 
 		// set to this page
 		setTextValue(valueTemplateElementName, textValue);
 
 		// copy to all childs, if possible
-		java.util.List multiLinkedPages = new ArrayList();
+		java.util.List<Page> multiLinkedPages = new ArrayList<Page>();
 		return copyTextToAllChilds(valueTemplateElementName, textValue, pageIndicatorTmpltElemName, skipChildTmpltElemName,
 				multiLinkedPages);
 	}
@@ -1182,8 +1182,8 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * @param multiLinkedPages
 	 *            Liste aller Seiten, die nicht beschrieben werden konnten
 	 */
-	private java.util.List copyTextToAllChilds(String valueTemplateElementName, String textValue, String pageIndicatorTmpltElemName,
-			String skipChildTmpltElemName, java.util.List multiLinkedPages) throws RQLException {
+	private java.util.List<Page> copyTextToAllChilds(String valueTemplateElementName, String textValue, String pageIndicatorTmpltElemName,
+			String skipChildTmpltElemName, java.util.List<Page> multiLinkedPages) throws RQLException {
 
 		java.util.List childPages = getChildPages();
 
@@ -2252,10 +2252,10 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	public PageArrayList getChildPagesIgnoreShadowedMultilinks(String shadowElementsNameSuffix) throws RQLException {
 
 		// collect from all multilinks, which are not reference sources
-		java.util.List multiLinks = getMultiLinksWithoutShadowedOnes(shadowElementsNameSuffix, false);
+		java.util.List<MultiLink> multiLinks = getMultiLinksWithoutShadowedOnes(shadowElementsNameSuffix, false);
 		PageArrayList childPages = new PageArrayList();
 		for (int i = 0; i < multiLinks.size(); i++) {
-			MultiLink multiLink = (MultiLink) multiLinks.get(i);
+			MultiLink multiLink = multiLinks.get(i);
 			childPages.addAll(multiLink.getChildPages());
 		}
 		return childPages;
@@ -2375,20 +2375,36 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	
 	
 	/**
-	 * Liefert alle Container und List-Elemente, die sich im Template finden lassen.
+	 * Liefert eine Liste mit allen TextAnchor-Elementen dieser Seite. Orientiert sich am Template.
+	 */
+	public List<TextAnchor> getTextAnchorElements() throws RQLException {
+		java.util.List<TextAnchor> result = new ArrayList<TextAnchor>(32);
+		for (TemplateElement e : getTemplate().getTextAnchorTemplateElements()) {
+			result.add(getTextAnchor(e));
+		}
+		return result;
+	}
+
+
+	/**
+	 * Liefert alle Anchor-, Container- und List-Elemente, die sich im Template finden lassen.
+	 * Note: Frame Elements are not supported, yet.
+	 * 
 	 * {@see #getContainerElements()}
 	 * {@see #getListElements()}
+	 * {@see #getTextAnchorElements()}
 	 */
-	public java.util.List<MultiLink> getChildElements() throws RQLException {
+	public java.util.List<StructureElement> getChildElements() throws RQLException {
 		java.util.List<Container> l1 = getContainerElements();
 		java.util.List<com.hlcl.rql.as.List> l2 = getListElements();
+		java.util.List<TextAnchor> l3 = getTextAnchorElements();
 		
-		java.util.List<MultiLink> result = new ArrayList<MultiLink>(l1.size() + l2.size());
+		java.util.List<StructureElement> result = new ArrayList<StructureElement>(l1.size() + l2.size() + l3.size());
 		result.addAll(l1);
 		result.addAll(l2);
 		return result;
 	}
-	
+
 
 	/**
 	 * Returns a list of all content element of this page. Headline elements are not returned.
@@ -2941,10 +2957,10 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * 
 	 * @see #getStandardFieldTextElements()
 	 */
-	public java.util.List getFilledStandardFieldTextElements() throws RQLException {
+	public java.util.List<StandardFieldTextElement> getFilledStandardFieldTextElements() throws RQLException {
 
 		RQLNodeList nodes = getElementNodeList();
-		java.util.List elements = new ArrayList();
+		java.util.List<StandardFieldTextElement> elements = new ArrayList<StandardFieldTextElement>();
 
 		if (nodes != null) {
 			// for all template elements do
@@ -3753,11 +3769,11 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 *            Referenzquelle sind (nur diese haben Childs!)
 	 * @return java.util.List mit List oder Container Objekten
 	 */
-	public java.util.List getMultiLinksWithoutShadowedOnes(String shadowElementsNameSuffix, boolean includeReferences)
+	public java.util.List<MultiLink> getMultiLinksWithoutShadowedOnes(String shadowElementsNameSuffix, boolean includeReferences)
 			throws RQLException {
 
 		RQLNodeList linkNodes = getLinksNodeList();
-		java.util.List multiLinks = new ArrayList();
+		java.util.List<MultiLink> multiLinks = new ArrayList<MultiLink>();
 
 		// treat as empty
 		if (linkNodes == null) {
@@ -3803,7 +3819,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 			throws RQLException {
 
 		// get links
-		java.util.List links = getMultiLinksWithoutShadowedOnes(shadowElementsNameSuffix, includeReferences);
+		java.util.List<MultiLink> links = getMultiLinksWithoutShadowedOnes(shadowElementsNameSuffix, includeReferences);
 
 		return sortLinks(links, includeReferences);
 	}
@@ -4121,8 +4137,8 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 
 		// collect all pages where these links are on
 		PageArrayList result = new PageArrayList(links.size());
-		for (Iterator iter = links.iterator(); iter.hasNext();) {
-			MultiLink link = (MultiLink) iter.next();
+		for (Iterator<MultiLink> iter = links.iterator(); iter.hasNext();) {
+			MultiLink link = iter.next();
 			result.add(link.getPage());
 		}
 		return result;
@@ -4612,11 +4628,11 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * Liefert eine Liste mit allen Standardfeld Textelementen dieser Seite, gefüllt oder nicht spielt keine Rolle. Orientiert sich an
 	 * der Seite, nicht am Template. Auch werden neue, noch nicht aktivierte, Elemente nicht gefunden.
 	 */
-	public java.util.List getStandardFieldTextElements() throws RQLException {
+	public java.util.List<StandardFieldTextElement> getStandardFieldTextElements() throws RQLException {
 		RQLNodeList nodes = getElementNodeList();
 
 		// for all template elements do
-		java.util.List elements = new ArrayList();
+		java.util.List<StandardFieldTextElement> elements = new ArrayList<StandardFieldTextElement>();
 		for (int i = 0; i < nodes.size(); i++) {
 			RQLNode node = (RQLNode) nodes.get(i);
 			// skip not standard field text elements
@@ -4634,12 +4650,12 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * sich am Template, so dass auch Elemente mit Form=false geliefert werden sollten. Nicht aktivierte Elemente erzeugen eine
 	 * <code>NewElementNotRefreshedException</code>.
 	 */
-	public java.util.List getStandardFieldTextElementsBySuffix(String templateNameSuffix) throws RQLException {
+	public java.util.List<StandardFieldTextElement> getStandardFieldTextElementsBySuffix(String templateNameSuffix) throws RQLException {
 
 		java.util.List templateElements = getTemplate().getTemplateElementsBySuffix(templateNameSuffix);
 
 		// for all template elements do
-		java.util.List elements = new ArrayList();
+		java.util.List<StandardFieldTextElement> elements = new ArrayList<StandardFieldTextElement>();
 		for (int i = 0; i < templateElements.size(); i++) {
 			TemplateElement templateElement = (TemplateElement) templateElements.get(i);
 			// use only standard field text elements
@@ -5996,9 +6012,9 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * 
 	 * @return java.util.List Liste of MultiLinks, Teilmenge von assumedTargetLinks oder leere Liste
 	 */
-	public java.util.List selectConnectToLinks(java.util.List assumedTargetLinks) throws RQLException {
+	public java.util.List<MultiLink> selectConnectToLinks(java.util.List assumedTargetLinks) throws RQLException {
 
-		java.util.List result = new ArrayList();
+		java.util.List<MultiLink> result = new ArrayList<MultiLink>();
 		Template template = getTemplate();
 
 		// for all given links check
@@ -6073,7 +6089,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 *            string value is empty.
 	 * @throws CombinedUpdateNotSupportedException
 	 */
-	public void setElementValues(Map elementValuePairs) throws RQLException {
+	public void setElementValues(Map<Element, Object> elementValuePairs) throws RQLException {
 		/* 
 		 V5 request
 		 <IODATA loginguid="087F79DA22DF4EF385A7A18FDBB238CD" sessionkey="421139875y5k2iP8GF85">
@@ -6514,9 +6530,9 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		}
 
 		// create a map; key=template element guid, value=link itself
-		Map linksMap = new HashMap(links.size());
-		for (Iterator iter = links.iterator(); iter.hasNext();) {
-			MultiLink link = (MultiLink) iter.next();
+		Map<String, MultiLink> linksMap = new HashMap<String, MultiLink>(links.size());
+		for (Iterator<MultiLink> iter = links.iterator(); iter.hasNext();) {
+			MultiLink link = iter.next();
 			linksMap.put(link.getTemplateElement().getTemplateElementGuid(), link);
 		}
 
@@ -6528,7 +6544,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		java.util.List<MultiLink> result = new ArrayList<MultiLink>(links.size());
 		for (Iterator iter = templateElements.iterator(); iter.hasNext();) {
 			TemplateElement templateElement = (TemplateElement) iter.next();
-			MultiLink linkOrNull = (MultiLink) linksMap.get(templateElement.getTemplateElementGuid());
+			MultiLink linkOrNull = linksMap.get(templateElement.getTemplateElementGuid());
 			if (linkOrNull != null) {
 				// link found, add into result
 				result.add(linkOrNull);

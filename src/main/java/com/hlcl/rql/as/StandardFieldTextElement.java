@@ -30,7 +30,7 @@ public class StandardFieldTextElement extends Element {
 	 *@param	caseSensitive		case sensitive search or not; to ignore case set to false
 	 *@return	a list of elements of findList 
 	 */
-	public java.util.List collectContainedText(String findList, String delimiter, boolean caseSensitive) throws RQLException {
+	public java.util.List<String> collectContainedText(String findList, String delimiter, boolean caseSensitive) throws RQLException {
 		// use text as it is
 		return StringHelper.collectContainedText(getText(), findList, delimiter, caseSensitive);
 	}

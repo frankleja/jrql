@@ -19,7 +19,7 @@ import com.hlcl.rql.util.as.TemplatesPageFilter;
  * 
  * @author LEJAFR
  */
-public abstract class MultiLink implements PageContainer {
+public abstract class MultiLink implements PageContainer, StructureElement {
 	// private static int SORT_CRITERIA_ACCORDING_TO_ELEMENT = 2;
 	private static int SORT_CRITERIA_PAGE_INFORMATION = 1;
 	// private static String SORT_CRITERIA_PAGE_INFORMATION_CREATION_DATE = "3";
@@ -1038,10 +1038,16 @@ public abstract class MultiLink implements PageContainer {
 
 	/**
 	 * Liefert die GUID dieses Links.
-	 * 
-	 * @return java.lang.String
 	 */
-	public java.lang.String getLinkGuid() {
+	public String getLinkGuid() {
+		return linkGuid;
+	}
+
+	
+	/**
+	 * Liefert die GUID dieses Links.
+	 */
+	public String getGuid() {
 		return linkGuid;
 	}
 
@@ -1301,6 +1307,15 @@ public abstract class MultiLink implements PageContainer {
 	 * Liefert immer false. Nur die Subklasse List liefert true.
 	 */
 	public boolean isList() {
+
+		return false;
+	}
+
+	
+	/**
+	 * Liefert immer false. Nur das Sub-Interface Anchro liefert true.
+	 */
+	public boolean isAnchor() {
 
 		return false;
 	}

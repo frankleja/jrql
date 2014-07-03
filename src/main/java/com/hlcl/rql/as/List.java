@@ -73,7 +73,7 @@ public class List extends MultiLink {
 	/**
 	 * Liefert immer true, da dieser Link eine Liste ist.
 	 */
-	public boolean isList() {
+	public final boolean isList() {
 
 		return true;
 	}

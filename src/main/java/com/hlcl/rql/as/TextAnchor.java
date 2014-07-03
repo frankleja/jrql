@@ -19,4 +19,5 @@ public class TextAnchor extends Anchor {
 	public TextAnchor(Page page, String name, String anchorGuid) {
 		super(page, name, anchorGuid);
 	}
+
 }
