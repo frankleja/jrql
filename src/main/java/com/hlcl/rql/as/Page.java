@@ -100,7 +100,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * @param headline
 	 *            headline of this page
 	 */
-	public Page(Project project, Template template, String pageGuid, String pageId, String headline) throws RQLException{
+	public Page(Project project, Template template, String pageGuid, String pageId, String headline) throws RQLException {
 
         // check if given
         if (pageGuid.trim().length() == 0) {
@@ -6849,5 +6849,31 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
         .append("</PAGE></IODATA>");
 
         getCmsClient().callCmsWithoutParsing(rqlRequest.toString());
+    }
+    
+    
+    /**
+     * Find some structural element with the given name.
+     * The implementation is a little strange.
+     * 
+     * @param name name of a template element
+     * @return never null
+     * @throws WrongTypeException if name is not a structure element.
+     */
+    public StructureElement getStructureElement(String name) throws RQLException {
+    	try {
+    		return getMultiLink(name);
+    	} catch (WrongTypeException e) {
+    		/* okay, perhaps it's something else... */
+    	}
+    	
+    	try {
+    		return getTextAnchor(name);
+    	} catch (WrongTypeException e) {
+    		/* okay, perhaps it's something else... */
+    	}
+    	
+    	// are there more?
+    	throw new WrongTypeException("Not a StructureElement: " + name);
     }
 }

@@ -1,6 +1,7 @@
 package com.hlcl.rql.as;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
  * 
  * @author BURMEBJ
  */
-public class RQLNodeList {
+public class RQLNodeList implements Iterable<RQLNode> {
 	/**
 	 * Die Liste für die interne Verwaltung.
 	 */
@@ -50,5 +51,10 @@ public class RQLNodeList {
 	 */
 	public int size() {
 		return internalList.size();
+	}
+
+	@Override
+	public Iterator<RQLNode> iterator() {
+		return internalList.iterator();
 	}
 }

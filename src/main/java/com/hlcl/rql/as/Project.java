@@ -2419,6 +2419,36 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	
 	
 	/**
+	 * Frontend to REFERENCE action="list" - find from where somehting is being referred to. 
+	 * 
+	 * @param toHere GUID of a page OR multilink.
+	 * @return a possible empty list.
+	 */
+	public java.util.List<Reference> getReferences(String toHere) throws RQLException {
+		// call CMS
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'><PROJECT>"
+				+ " <REFERENCE action='list' guid='" + toHere + "'/></PROJECT></IODATA>";
+		RQLNode rqlResponse = callCms(rqlRequest);
+		RQLNodeList pageNodes = rqlResponse.getNodes("PAGE");
+		int num = pageNodes == null ? 0 : pageNodes.size();
+
+		java.util.List<Reference> out = new ArrayList<Reference>(num * 2);
+		if (num == 0)
+			return out; // prevent NPE from iteration
+		
+		for (RQLNode pageNode : pageNodes) {
+			for (RQLNode linkNode : pageNode.getNodes("LINK")) {
+				Reference r = new Reference(this, toHere);
+				r.fromResult(pageNode, linkNode);
+				out.add(r);
+			}
+		}
+		
+		return out;
+	}
+	
+	
+	/**
 	 * Liefert den Namen des Projekts. Nur mit Servermanager Lizenz nutzbar!
 	 * 
 	 * @see #validate()
