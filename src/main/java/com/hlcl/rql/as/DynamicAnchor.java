@@ -46,7 +46,7 @@ public abstract class DynamicAnchor implements PageContainer {
 	private TextAnchor add(String name, String anchorGuid) {
 
 		// create new anchor
-		TextAnchor textAnchor = new TextAnchor(getPage(), templateElement, name, anchorGuid); // FIXME: most probably wrong TemplateElement
+		TextAnchor textAnchor = new TextAnchor(getPage(), templateElement, name, anchorGuid, false); // FIXME: most probably wrong TemplateElement
 		// add to anchors list
 		anchors.add(textAnchor);
 
@@ -268,7 +268,7 @@ public abstract class DynamicAnchor implements PageContainer {
 	void set(int position, String name, String anchorGuid) {
 
 		// create new anchor
-		TextAnchor textAnchor = new TextAnchor(getPage(), templateElement, name, anchorGuid);
+		TextAnchor textAnchor = new TextAnchor(getPage(), templateElement, name, anchorGuid, false); // FIXME: wild guesses
 
 		// add to anchors list
 		anchors.set(position - 1, textAnchor);

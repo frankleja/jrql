@@ -4226,7 +4226,20 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 				+ "</LINK></IODATA>";
 		callCmsWithoutParsing(rqlRequest);
 	}
+	
+	
+	/**
+	 * Erstellt eine RD Referenz von der gegebenen Link GUID sourceLinkGuid zu der gebebenen Page GUID targetPageGuid.
+	 */
+	public void referenceLinkToPage(String sourceLinkGuid, String targetPageGuid) throws RQLException {
+		// call CMS
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+				+ " <LINK action='reference' guid='" + sourceLinkGuid + "'>" + "  <PAGE guid='" + targetPageGuid + "' />"
+				+ "</LINK>" + "</IODATA>";
+		callCmsWithoutParsing(rqlRequest);
+	}
 
+	
 	/**
 	 * Sendet eine Mail an alle aktuall an diesem Projekt angemeldeten User.
 	 */

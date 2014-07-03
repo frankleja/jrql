@@ -12,6 +12,8 @@ public interface StructureElement {
 	boolean isList();
 	boolean isAnchor();
 	
+	boolean isReferenceSource();
+
 	java.util.List<Page> getChildPages() throws RQLException;
 
 	String getGuid();

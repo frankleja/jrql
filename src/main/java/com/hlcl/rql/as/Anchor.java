@@ -15,6 +15,7 @@ public abstract class Anchor implements PageContainer, StructureElement {
 
 	private Page page;
 	private TemplateElement templateElement;
+	private boolean isReferenceSource;
 
 	/**
 	 * Container constructor comment.
@@ -26,13 +27,14 @@ public abstract class Anchor implements PageContainer, StructureElement {
 	 * @param anchorGuid
 	 *            GUID des Ankers auf Seite page
 	 */
-	public Anchor(Page page,TemplateElement templateElement, String name, String anchorGuid) {
+	public Anchor(Page page,TemplateElement templateElement, String name, String anchorGuid, boolean isReferenceSource) {
 		super();
 
 		this.page = page;
 		this.templateElement = templateElement;
 		this.name = name;
 		this.anchorGuid = anchorGuid;
+		this.isReferenceSource = isReferenceSource;
 	}
 
 	/**
@@ -428,10 +430,15 @@ public abstract class Anchor implements PageContainer, StructureElement {
 	@Override
 	public List<Page> getChildPages() throws RQLException {
 		List<Page> out = new ArrayList<Page>(1);
-		out.add(getPage());
+		out.add(getChildPage());
 		return out;
 	}
-
+	
+	@Override
+	public boolean isReferenceSource() {
+		return isReferenceSource;
+	}
+	
 	@Override
 	public String getGuid() {
 		return anchorGuid;
