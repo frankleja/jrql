@@ -2579,6 +2579,13 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		return result;
 	}
 
+	
+	/**
+	 * For direct lookups of pages.
+	 */
+	protected final Map<String, Page> pageCache = new TreeMap<String, Page>();
+	
+	
 	/**
 	 * Erzeugt eine Page für die gegebene pageGuid. Benötigt den session key!
 	 * 
@@ -2589,7 +2596,12 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	public Page getPageByGuid(String pageGuid) throws RQLException {
 
 		checkSessionKey();
-		return new Page(this, pageGuid);
+		Page cached = pageCache.get(pageGuid);
+		if (cached == null) {
+			cached = new Page(this, pageGuid);
+			pageCache.put(pageGuid, cached);
+		}
+		return cached;
 	}
 
 	/**
@@ -4290,6 +4302,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		callCmsWithoutParsing(rqlRequest);
 		// force new read
 		languageVariantsCache = null;
+		pageCache.clear();
 
 		return languageVariant;
 	}

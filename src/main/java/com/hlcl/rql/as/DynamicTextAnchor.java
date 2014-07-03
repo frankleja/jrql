@@ -12,8 +12,8 @@ public class DynamicTextAnchor extends DynamicAnchor {
 	 * @param	page	Seite, die diesen Dynamischen Anker beinhaltet.
 	 * @param	size	Anzahl der Links in diesem Set.
 	 */
-	public DynamicTextAnchor(Page page, int size) {
-		super(page, size);
+	public DynamicTextAnchor(Page page, TemplateElement templateElement, int size) {
+		super(page, templateElement, size);
 	}
 
 	/**

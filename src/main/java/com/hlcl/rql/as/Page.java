@@ -2183,6 +2183,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		linksNodeList = null;
 		template = null;
 		publicationPackage = null;
+		project.pageCache.remove(pageGuid);
 	}
 
 	/**
@@ -2402,6 +2403,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		java.util.List<StructureElement> result = new ArrayList<StructureElement>(l1.size() + l2.size() + l3.size());
 		result.addAll(l1);
 		result.addAll(l2);
+		result.addAll(l3);
 		return result;
 	}
 
@@ -2765,7 +2767,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		}
 
 		// wrap list data
-		DynamicTextAnchor dynTextAnchor = new DynamicTextAnchor(this, size);
+		DynamicTextAnchor dynTextAnchor = new DynamicTextAnchor(this, dynamicTextAnchorTemplateElement, size);
 		for (int i = 0; i < linkNodes.size(); i++) {
 			linkNode = linkNodes.get(i);
 			if (linkNode.getAttribute("templateelementguid").equals(guid) && linkNode.getAttribute("elttype").equals("26")) {
@@ -3021,7 +3023,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 
 		// wrap list data
 		// add templateElement too?
-		return new Frame(this, linkNode.getAttribute("name"), linkNode.getAttribute("guid"));
+		return new Frame(this, frameTemplateElement, linkNode.getAttribute("name"), linkNode.getAttribute("guid"));
 	}
 
     protected void loadKeywords() {
@@ -4870,9 +4872,8 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		// call CMS
 		RQLNode anchorNode = findLinkNode(textAnchorTemplateElement);
 
-		// wrap list data
-		// add listTemplateElement too?
-		return new TextAnchor(this, anchorNode.getAttribute("value"), anchorNode.getAttribute("guid"));
+		// note: attribute "value" contains local name
+		return new TextAnchor(this, textAnchorTemplateElement, anchorNode.getAttribute("name"), anchorNode.getAttribute("guid"));
 	}
 
 	/**

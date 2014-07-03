@@ -16,8 +16,8 @@ public class TextAnchor extends Anchor {
 	 * @param anchorGuid
 	 *            GUID des Ankers auf Seite page
 	 */
-	public TextAnchor(Page page, String name, String anchorGuid) {
-		super(page, name, anchorGuid);
+	public TextAnchor(Page page, TemplateElement templateElement, String name, String anchorGuid) {
+		super(page, templateElement, name, anchorGuid);
 	}
 
 }

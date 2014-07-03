@@ -14,6 +14,7 @@ public abstract class Anchor implements PageContainer, StructureElement {
 	private String name;
 
 	private Page page;
+	private TemplateElement templateElement;
 
 	/**
 	 * Container constructor comment.
@@ -25,10 +26,11 @@ public abstract class Anchor implements PageContainer, StructureElement {
 	 * @param anchorGuid
 	 *            GUID des Ankers auf Seite page
 	 */
-	public Anchor(Page page, String name, String anchorGuid) {
+	public Anchor(Page page,TemplateElement templateElement, String name, String anchorGuid) {
 		super();
 
 		this.page = page;
+		this.templateElement = templateElement;
 		this.name = name;
 		this.anchorGuid = anchorGuid;
 	}

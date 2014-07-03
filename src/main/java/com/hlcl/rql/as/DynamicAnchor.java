@@ -11,9 +11,12 @@ import com.hlcl.rql.util.as.PageArrayList;
  * @author LEJAFR
  */
 public abstract class DynamicAnchor implements PageContainer {
-	private java.util.List anchors;
+	
+	private java.util.List<Anchor> anchors;
 
 	private Page page;
+
+	private TemplateElement templateElement;
 
 	/**
 	 * Erzeugt einen dynamischen Anker.
@@ -23,15 +26,16 @@ public abstract class DynamicAnchor implements PageContainer {
 	 * @param size
 	 *            Anzahl der Links in diesem Set.
 	 */
-	public DynamicAnchor(Page page, int size) {
+	public DynamicAnchor(Page page, TemplateElement templateElement, int size) {
 		super();
 
 		this.page = page;
-		anchors = new ArrayList(size);
+		this.templateElement = templateElement;
+		this.anchors = new ArrayList<Anchor>(size);
 
 		// init the number of elements
 		for (int i = 0; i < size; i++) {
-			anchors.add("");
+			anchors.add(null);
 		}
 
 	}
@@ -42,7 +46,7 @@ public abstract class DynamicAnchor implements PageContainer {
 	private TextAnchor add(String name, String anchorGuid) {
 
 		// create new anchor
-		TextAnchor textAnchor = new TextAnchor(getPage(), name, anchorGuid);
+		TextAnchor textAnchor = new TextAnchor(getPage(), templateElement, name, anchorGuid); // FIXME: most probably wrong TemplateElement
 		// add to anchors list
 		anchors.add(textAnchor);
 
@@ -136,9 +140,9 @@ public abstract class DynamicAnchor implements PageContainer {
 		Anchor anchor = null;
 
 		// loop through and return first found
-		Iterator iterator = getAnchors().iterator();
+		Iterator<Anchor> iterator = getAnchors().iterator();
 		while (iterator.hasNext()) {
-			anchor = (Anchor) iterator.next();
+			anchor = iterator.next();
 			if (anchor.getName().equals(anchorName)) {
 				return anchor;
 			}
@@ -150,7 +154,7 @@ public abstract class DynamicAnchor implements PageContainer {
 	/**
 	 * Liefert die Liste der Anchors
 	 */
-	private java.util.List getAnchors() {
+	private java.util.List<Anchor> getAnchors() {
 
 		return anchors;
 	}
@@ -159,7 +163,7 @@ public abstract class DynamicAnchor implements PageContainer {
 	 * Liefert den ersten Anchor zurück.
 	 */
 	public Anchor first() {
-		return (Anchor) anchors.get(0);
+		return anchors.get(0);
 	}
 
 	/**
@@ -167,12 +171,12 @@ public abstract class DynamicAnchor implements PageContainer {
 	 */
 	public PageArrayList getChildPages() throws RQLException {
 
-		java.util.List anchors = getAnchors();
+		java.util.List<Anchor> anchors = getAnchors();
 		PageArrayList result = new PageArrayList(anchors.size());
 
 		// collect all anchors child pages
-		for (Iterator iter = anchors.iterator(); iter.hasNext();) {
-			Anchor anchor = (Anchor) iter.next();
+		for (Iterator<Anchor> iter = anchors.iterator(); iter.hasNext();) {
+			Anchor anchor = iter.next();
 			Page childOrNull = anchor.getChildPage();
 			if (childOrNull != null) {
 				result.add(childOrNull);
@@ -193,9 +197,9 @@ public abstract class DynamicAnchor implements PageContainer {
 	 */
 	private Anchor getLastAnchor() {
 
-		java.util.List list = getAnchors();
+		java.util.List<Anchor> list = getAnchors();
 
-		return (Anchor) list.get(list.size() - 1);
+		return list.get(list.size() - 1);
 	}
 
 	/**
@@ -264,7 +268,7 @@ public abstract class DynamicAnchor implements PageContainer {
 	void set(int position, String name, String anchorGuid) {
 
 		// create new anchor
-		TextAnchor textAnchor = new TextAnchor(getPage(), name, anchorGuid);
+		TextAnchor textAnchor = new TextAnchor(getPage(), templateElement, name, anchorGuid);
 
 		// add to anchors list
 		anchors.set(position - 1, textAnchor);
