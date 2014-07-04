@@ -427,12 +427,19 @@ public abstract class Anchor implements PageContainer, StructureElement {
 		return false;
 	}
 
+	
+	/**
+	 * Eine Liste mit 0 oder 1 seiten daran.
+	 */
 	@Override
 	public List<Page> getChildPages() throws RQLException {
 		List<Page> out = new ArrayList<Page>(1);
-		out.add(getChildPage());
+		Page p = getChildPage(); 
+		if (p != null)
+			out.add(p);
 		return out;
 	}
+	
 	
 	@Override
 	public boolean isReferenceSource() {
