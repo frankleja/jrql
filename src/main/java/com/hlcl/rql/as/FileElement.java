@@ -197,7 +197,7 @@ public abstract class FileElement extends Element implements FolderContainer {
 				}
 				// check if sub folder or incorrect folder guid
 				AssetManagerFolder templateAssetMgr = (AssetManagerFolder) templateFolder;
-				if (templateAssetMgr.containsSubFolderByGuid(getFolderGuid())) {
+				if (!templateAssetMgr.containsSubFolderByGuid(getFolderGuid())) {
 					// get the folder guid via element again to correct folderguid bug
 					String newFolderGuid = readFolderGuid();
 					if (templateFolder.getFolderGuid().equals(newFolderGuid)) {
