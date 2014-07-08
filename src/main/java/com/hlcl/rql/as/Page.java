@@ -3560,6 +3560,26 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		return buildMultiLink(getMainLinkNode());
 	}
 
+	
+	/**
+	 * Subclasses of FileElement.
+	 *  
+	 * @return MediaElement or ImageElement
+	 * @throws RQLException
+	 */
+	public FileElement getFileElement(String templateElementName) throws RQLException {
+		TemplateElement e = getTemplateElementByName(templateElementName);
+		
+		if (e.isImage()) {
+			return getImageElement(e);
+		} else if (e.isMedia()) {
+			return getMediaElement(e);
+		} else {
+			throw new WrongTypeException("Template element " + templateElementName + " is not of type Media or Image.");
+		}
+	}
+	
+	
 	/**
 	 * Liefert das Media Element dieser Seite, das auf dem gegebenen templateElement basiert.
 	 * 

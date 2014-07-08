@@ -8,7 +8,6 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
 
@@ -462,6 +461,23 @@ public abstract class FileElement extends Element implements FolderContainer {
 		setFolderGuid(subFolder.getFolderGuid());
 	}
 
+
+	/**
+	 * Aendert den Wert dieses Fileelements, wenn es aus einem Unterordner stammt.
+	 * 
+	 * @see Element#setValue(String)
+	 */
+	public void setValue(String filename, String subFolderGuid) throws RQLException {
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+				+ "  <ELEMENTS action='save'>" + "      <ELT guid='" + getElementGuid() + "' value='"
+				+ StringHelper.escapeHTML(filename) + "' subdirguid='" + subFolderGuid + "'/>" + "  </ELEMENTS>"
+				+ "</IODATA>";
+		callCms(rqlRequest);
+
+		this.value = filename;
+		setFolderGuid(subFolderGuid);
+	}
+	
 	/**
 	 * Setzt eine Anforderung in der session, dass der ImageCache für dieses File angepasst werden soll. Das eigentliche Update des
 	 * ImageCaches wie über die URL http://reddot.hlcl.com/cms/ImageCache/* erfolgt verzögert bei Anzeige einer Seite im SmartEdit.
