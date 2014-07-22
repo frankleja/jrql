@@ -2004,4 +2004,19 @@ public class TemplateElement implements TemplateContainer {
 		String v = getDetailsNode().getAttribute("eltextendedrestriction");
 		return v != null && v.equals("1");
 	}
+	
+	
+	/**
+	 * Links: Load definitions of what can be created here.
+	 * 
+	 * @return never null.
+	 */
+	public TemplateGroups loadExtendedRestrictions() throws RQLException {
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+				+ "  <TEMPLATELIST action='load' linkguid='"+templateElementGuid+"' assigntemplates='1' withpagedefinitions='1' />"
+				+ "</IODATA>";
+		RQLNode rqlResponse = callCms(rqlRequest);
+
+		return new TemplateGroups(getProject(), rqlResponse.getNode("TEMPLATEGROUPS"));
+	}
 }

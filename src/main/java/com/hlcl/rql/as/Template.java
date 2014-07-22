@@ -32,6 +32,8 @@ public class Template implements TemplateFolderContainer {
 	private TemplateFolder templateFolder;
 	private String templateGuid;
 
+	private Boolean selectInNewPage = null;
+
 	/**
 	 * Erzeugt ein neues Template.
 	 * 
@@ -2309,4 +2311,19 @@ public class Template implements TemplateFolderContainer {
 		return !isLanguageVariantDependent();
 	}
 
+	
+	/**
+	 * Links: Soll dieses Tempate erlaubt sein?
+	 */
+	public void setSelectInNewPage(boolean v) {
+		this.selectInNewPage = v;
+	}
+
+	
+	public boolean getSelectInNewPage() {
+		if (selectInNewPage == null)
+			throw new IllegalStateException("setSelectInNewPage() has never been called.");
+
+		return this.selectInNewPage.booleanValue();
+	}
 }
