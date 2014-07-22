@@ -477,7 +477,7 @@ public class User implements CmsClientContainer {
 	/**
 	 * Liefert eine Liste aller für diesen User zugelassenen Projekte.
 	 */
-	public java.util.List getProjects() throws RQLException {
+	public java.util.List<Project> getProjects() throws RQLException {
 
 		CmsClient client = getCmsClient();
 

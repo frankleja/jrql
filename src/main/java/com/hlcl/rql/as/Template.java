@@ -1036,13 +1036,13 @@ public class Template implements TemplateFolderContainer {
 	 * 
 	 * @return java.util.List of TemplateElements
 	 */
-	public java.util.List getMultiLinkTemplateElements() throws RQLException {
+	public java.util.List<TemplateElement> getMultiLinkTemplateElements() throws RQLException {
 
 		return getMultiLinkTemplateElements(true);
 	}
 
 	/**
-	 * Liefert alle MultiLink Templateelemente.
+	 * Liefert alle MultiLink Templateelemente (LIST_TYPE, CONTAINER_TYPE).
 	 * 
 	 * @param includeReferences
 	 *            =true, auch Elemente, die Referenzquelle sind werden geliefert (haben keine Childs!) =false, ohne Element, die
@@ -1050,34 +1050,72 @@ public class Template implements TemplateFolderContainer {
 	 * @return java.util.List of TemplateElements
 	 */
 	public java.util.List<TemplateElement> getMultiLinkTemplateElements(boolean includeReferences) throws RQLException {
-
-		// find template element
-		RQLNodeList templateElementNodeList = getTemplateElementNodeList();
-		java.util.List<TemplateElement> multiLinkElements = new ArrayList<TemplateElement>();
-		RQLNode elementNode = null;
-		int type = 0;
+		RQLNodeList allElements = getTemplateElementNodeList();
+		java.util.List<TemplateElement> out = new ArrayList<TemplateElement>(allElements == null ? 0 : allElements.size());
 
 		// no multi links in template
-		if (templateElementNodeList == null) {
-			return multiLinkElements;
+		if (allElements == null) {
+			return out;
 		}
 
-		for (int i = 0; i < templateElementNodeList.size(); i++) {
-			elementNode = templateElementNodeList.get(i);
+		for (RQLNode elementNode : allElements) {
 
 			// include list or container only
-			type = Integer.parseInt(elementNode.getAttribute("elttype"));
+			int type = Integer.parseInt(elementNode.getAttribute("elttype"));
 			if (type == TemplateElement.LIST_TYPE || type == TemplateElement.CONTAINER_TYPE) {
 				if (!includeReferences && elementNode.getAttribute("eltrefelementguid") != null) {
 					continue;
 				}
 				// wrap template data
-				multiLinkElements.add(buildTemplateElement(elementNode));
+				out.add(buildTemplateElement(elementNode));
 			}
 		}
-		return multiLinkElements;
+		return out;
 	}
 
+
+	/**
+	 * Liefert alle Struktur-Templateelemente (LIST_TYPE, CONTAINER_TYPE, TEXT_ANCHOR,s tatic).
+	 * 
+	 * @param includeReferences
+	 *            =true, auch Elemente, die Referenzquelle sind werden geliefert (haben keine Childs!) =false, ohne Element, die
+	 *            Referenzquelle sind (nur diese haben Childs!)
+	 * @return java.util.List of TemplateElements
+	 */
+	public java.util.List<TemplateElement> getStructureTemplateElements(boolean includeReferences) throws RQLException {
+		RQLNodeList allElements = getTemplateElementNodeList();
+		java.util.List<TemplateElement> out = new ArrayList<TemplateElement>(allElements == null ? 0 : allElements.size());
+
+		// no multi links in template
+		if (allElements == null) {
+			return out;
+		}
+
+		for (RQLNode elementNode : allElements) {
+
+			// include list or container only
+			int type = Integer.parseInt(elementNode.getAttribute("elttype"));
+			if (type == TemplateElement.LIST_TYPE || type == TemplateElement.CONTAINER_TYPE || type == TemplateElement.ANCHOR_TEXT_TYPE) {
+				if (!includeReferences && elementNode.getAttribute("eltrefelementguid") != null) {
+					continue;
+				}
+				// wrap template data
+				TemplateElement e = buildTemplateElement(elementNode);
+				if (type == TemplateElement.ANCHOR_TEXT_TYPE && e.isTextAnchor()) {
+					out.add(e);
+				} else if (type != TemplateElement.ANCHOR_TEXT_TYPE) {
+					out.add(e);
+				} else {
+					// dynamic text anchor
+				}
+			}
+		}
+		return out;
+	}
+
+	
+	
+	
 	/**
 	 * Liefert alle MultiLink Templateelemente mit vorgegebenen namen.
 	 * 

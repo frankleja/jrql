@@ -1994,4 +1994,14 @@ public class TemplateElement implements TemplateContainer {
 		return false;
 	}
 
+	
+	/**
+	 * Structure elements: Check for extended restrictions.
+	 * 
+	 * @return true if eltextendedrestriction="1"
+	 */
+	public boolean hasExtendedRestrictions() throws RQLException {
+		String v = getDetailsNode().getAttribute("eltextendedrestriction");
+		return v != null && v.equals("1");
+	}
 }

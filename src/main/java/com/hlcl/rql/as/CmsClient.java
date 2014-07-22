@@ -2055,6 +2055,15 @@ public class CmsClient {
 		currentProject = project;
 	}
 
+
+	/**
+	 * Pretend that no project is currently selected, so that switching the project
+	 * performs a validation.
+	 */
+	public void noCurrentProject() {
+		setCurrentProject(null);
+	}
+	
 	/**
 	 * Hält die Ausführung für die gegebenen Sekunden an.
 	 */
