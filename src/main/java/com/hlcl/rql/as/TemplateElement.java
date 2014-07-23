@@ -227,6 +227,7 @@ public class TemplateElement implements TemplateContainer {
 	private String folderSuffixes;
 	private boolean isDynamic;
 	private String labelText; // the eltrddescription attribute value
+	private boolean isMandatory;
 
 	private String name;
 
@@ -261,7 +262,7 @@ public class TemplateElement implements TemplateContainer {
 	 *            the folder guid if this element is a image or media element, sonst empty
 	 */
 	public TemplateElement(Template template, String name, String templateElementGuid, String type, String isDynamic,
-			String folderSuffixes, String textEditorSettings, String textFixedStylesheet, String labelText, String folderGuid) {
+			String folderSuffixes, String textEditorSettings, String textFixedStylesheet, String labelText, String folderGuid, boolean isMandatory) {
 		super();
 
 		this.template = template;
@@ -271,13 +272,11 @@ public class TemplateElement implements TemplateContainer {
 		this.isDynamic = "1".equals(isDynamic) ? true : false;
 		this.folderSuffixes = folderSuffixes;
 		this.textEditorSettings = textEditorSettings == null ? new BigInteger("0") : new BigInteger(textEditorSettings); // 0 means
-		// all
-		// buttons
-		// are
-		// allowed
+		// all buttons are allowed
 		this.textFixedStylesheet = textFixedStylesheet;
 		this.labelText = labelText;
 		this.folderGuid = folderGuid;
+		this.isMandatory = isMandatory;
 	}
 
 	/**
@@ -1637,6 +1636,11 @@ public class TemplateElement implements TemplateContainer {
 	public void setIsMandatory(boolean isMandatory) throws RQLException {
 
 		save("eltrequired", StringHelper.convertTo01(isMandatory));
+	}
+	
+	
+	public boolean getIsMandatory() {
+		return isMandatory;
 	}
 
 	/**

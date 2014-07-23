@@ -172,7 +172,7 @@ public class Template implements TemplateFolderContainer {
 			result = new TemplateElement(this, elementNode.getAttribute("eltname"), elemGuid, elementNode.getAttribute("elttype"),
 					elementNode.getAttribute("eltisdynamic"), elementNode.getAttribute("eltsuffixes"), elementNode
 							.getAttribute("elteditoroptions"), elementNode.getAttribute("eltstylesheetdata"), elementNode
-							.getAttribute("eltrddescription"), elementNode.getAttribute("eltfolderguid"));
+							.getAttribute("eltrddescription"), elementNode.getAttribute("eltfolderguid"), "1".equals(elementNode.getAttribute("eltrequired")));
 			templateElementsCache.put(elemGuid, result);
 		}
 		return result;
