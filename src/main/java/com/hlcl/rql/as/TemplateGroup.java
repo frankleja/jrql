@@ -17,5 +17,15 @@ public class TemplateGroup {
 		this.templateGroupGuid = templateGroupGuid;
 		this.name = name;
 	}
+
+
+	public String getName() {
+		return name;
+	}
+	
+	
+	public String getTemplateGroupGuid() {
+		return templateGroupGuid;
+	}
 	
 }

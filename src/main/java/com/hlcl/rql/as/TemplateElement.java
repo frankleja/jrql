@@ -3,6 +3,7 @@ package com.hlcl.rql.as;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -2018,5 +2019,26 @@ public class TemplateElement implements TemplateContainer {
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		return new TemplateGroups(getProject(), rqlResponse.getNode("TEMPLATEGROUPS"));
+	}
+	
+	
+	/**
+	 * Links: Change the list of templates that can be used here.
+	 * 
+	 * @param checkbox the global checkbox, should be set when list is not empty.
+	 * @param templateGuids The GUIDs to allows
+	 */
+	public void saveExtendedRestrictions(boolean checkbox, Collection<String> templateGuids) throws RQLException {
+		StringBuilder sb = new StringBuilder(256);
+		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>");
+		sb.append("<TEMPLATE><ELEMENT action='assign' guid='").append(templateElementGuid).append("'>");
+		sb.append("<TEMPLATES extendedrestriction='").append(checkbox?"1":"0").append("'>");
+		for (String guid : templateGuids) {
+			sb.append("<TEMPLATE guid='").append(guid).append("' />");
+		}
+		sb.append("</TEMPLATES>");
+		sb.append("</ELEMENT></TEMPLATE>");
+		sb.append("</IODATA>");
+		callCms(sb.toString());
 	}
 }
