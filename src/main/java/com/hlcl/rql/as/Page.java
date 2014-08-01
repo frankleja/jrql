@@ -6773,10 +6773,12 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 
         try {
             mainMultiLink = this.getMainMultiLink();
-        } catch(UnlinkedPageException upe){}
+        }
+        catch (UnlinkedPageException upe) {}
+        catch (WrongTypeException e) {} // it's a Text Anchor
 
-        if(mainMultiLink != null){
-            if(mainMultiLink.getAppearanceSchedule() != null) {
+        if (mainMultiLink != null) {
+            if (mainMultiLink.getAppearanceSchedule() != null) {
                 this.assignMainLinkAppearanceSchedule(AppearanceSchedule.clearedSchedule());
             }
         }
