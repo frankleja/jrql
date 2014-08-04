@@ -1380,6 +1380,21 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 
 		return getList(listTemplateElementName).createAndConnectPage(template, headline, addAtBottom);
 	}
+	
+	
+	
+	/**
+	 * Erzeugt eine neue Seit und hängt sie an einen TextAnchor an.
+	 * 
+	 * @param textAnchorTemplateElementName name des anchor elements
+	 * @param template fuer die neu anzulegende seite
+	 * @param headline der neuen seite.
+	 */
+	public Page createAndConnextPageAtAnchor(String textAnchorTemplateElementName, Template template, String headline)
+			throws RQLException {
+		return getTextAnchor(textAnchorTemplateElementName).createAndConnectPage(template, headline);
+	}
+	
 
 	/**
 	 * Löscht diese Seite. Dieses Page Objekt darf danach nicht mehr benutzt werden.
@@ -4786,7 +4801,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	/**
 	 * Liefert das TemplateElement aus dem Template auf dem diese Seite basiert.
 	 */
-	private TemplateElement getTemplateElementByGuid(String templateElementGuid) throws RQLException {
+	public TemplateElement getTemplateElementByGuid(String templateElementGuid) throws RQLException {
 
 		return getTemplate().getTemplateElementByGuid(templateElementGuid);
 	}
@@ -4794,7 +4809,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	/**
 	 * Liefert das TemplateElement aus dem Template auf dem diese Seite basiert.
 	 */
-	private TemplateElement getTemplateElementByName(String templateElementName) throws RQLException {
+	public TemplateElement getTemplateElementByName(String templateElementName) throws RQLException {
 
 		return getTemplate().getTemplateElementByName(templateElementName);
 	}
