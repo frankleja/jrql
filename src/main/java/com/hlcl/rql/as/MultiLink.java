@@ -248,6 +248,18 @@ public abstract class MultiLink implements PageContainer, StructureElement {
         this.changeOrder(new PageArrayList(pages));
     }
 
+    
+    /**
+     * Kopiert Sortiereinstellungen von einer Liste auf die andere.
+     * 
+     * @param s Einstellungen, die auch von einem anderen Objekt stammen koennen.
+     * @throws RQLException
+     */
+    public void changeSortSetting(SortSetting s) throws RQLException {
+    	changeSortSetting(s.maxcount(), s.sortmode(), s.sortelement(), s.sortelementname());
+    }
+    
+    
 	/**
 	 * Ändert den Sortierungsmodus dieses Multilinks (nur für Liste getestet!).
 	 * 
@@ -262,7 +274,7 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 	 *            der hier angehängten Seiten
 	 * @throws RQLException
 	 */
-	private void changeSortMode(int maxCount, int sortMode, int sortCriteriaType, String sortCriteriaValue) throws RQLException {
+	public void changeSortSetting(int maxCount, int sortMode, int sortCriteriaType, String sortCriteriaValue) throws RQLException {
 		/* 
 		 V5 request
 		 <IODATA loginguid="2B2D9227CD704459809D56073EC405CA">
@@ -287,10 +299,18 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 		// call CMS
 		String maxCountAttribute = maxCount == 0 ? "maxCount='#" + getSessionKey() + "' " : "maxCount='" + Integer.toString(maxCount)
 				+ "'";
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "	<PROJECT sessionkey='" + getSessionKey() + "'>"
-				+ "		<PAGE>" + "   		<ELEMENT guid='" + getLinkGuid() + "'>" + "				<SORTSETTING action='save' " + maxCountAttribute
+
+		String rqlRequest = 
+				  "<IODATA loginguid='" + getLogonGuid() + "'>"
+				+ "	<PROJECT sessionkey='" + getSessionKey() + "'>"
+				+ "		<PAGE>"
+				+ "   		<ELEMENT guid='" + getLinkGuid() + "'>"
+				+ "				<SORTSETTING action='save' " + maxCountAttribute
 				+ " sortmode='" + sortMode + "' sortelement='" + sortCriteriaType + "' sortelementname='" + sortCriteriaValue + "'/>"
-				+ "				<DISPLAYFILTERS action='save' perkeyword='0' />" + " 			</ELEMENT>" + " 		</PAGE>" + "	</PROJECT>"
+				+ "				<DISPLAYFILTERS action='save' perkeyword='0' />"
+				+ " 			</ELEMENT>"
+				+ " 		</PAGE>"
+				+ "	</PROJECT>"
 				+ "</IODATA>";
 
 		// ignore result
@@ -1147,11 +1167,52 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 	public String getSessionKey() {
 		return getPage().getSessionKey();
 	}
+	
+	
+	/**
+	 * Raw wrapper for the sort settings on this list.
+	 */
+	public static class SortSetting {
+		
+		private RQLNode sortNode;
+
+		private SortSetting(RQLNode sortNode) {
+			this.sortNode = sortNode;
+		}
+
+		
+		/**
+		 * @return 0 for "unlimited".
+		 */
+		public int maxcount() {
+			String s = sortNode.getAttribute("maxcount");
+			return s == null ? 0 : Integer.parseInt(s);
+		}
+
+		
+		public int sortmode() {
+			String s = sortNode.getAttribute("sortmode");
+			return s == null ? SORT_MODE_MANUAL : Integer.parseInt(s);
+		}
+		
+		
+		public int sortelement() {
+			String s = sortNode.getAttribute("sortelement");
+			return s == null ? SORT_CRITERIA_PAGE_INFORMATION : Integer.parseInt(s);
+		}
+		
+		
+		public String sortelementname() {
+			return sortNode.getAttribute("sortelementname");
+		}
+		
+	}
+
 
 	/**
-	 * Liefert den Sortierungsmodus dieses Multilinks zurück.
+	 * Laed die Sortiereinstellungen dieses Links.
 	 */
-	private int getSortMode() throws RQLException {
+	public SortSetting getSortSetting() throws RQLException {
 		/* 
 		 V5 request
 		 <IODATA loginguid="FE4D2C44BAEC43DD9CAB3D4DC262763E">
@@ -1178,20 +1239,19 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>" + "	<PROJECT sessionkey='" + getSessionKey() + "'>"
-				+ "		<PAGE>" + "   		<ELEMENT guid='" + getLinkGuid() + "'>" + "				<SORTSETTING action='load' />" + " 			</ELEMENT>"
-				+ " 		</PAGE>" + "	</PROJECT>" + "</IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "'>"
+				+ "	<PROJECT sessionkey='" + getSessionKey() + "'>"
+				+ "		<PAGE>"
+				+ "   		<ELEMENT guid='" + getLinkGuid() + "'>"
+				+ "				<SORTSETTING action='load' />"
+				+ " 			</ELEMENT>"
+				+ " 		</PAGE>"
+				+ "	</PROJECT>"
+				+ "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		// get sortmode
-		RQLNode sortNode = rqlResponse.getNode("SORTSETTING");
-		String sortModeOrNull = sortNode.getAttribute("sortmode");
-		// prevent NumberFormatException
-		if (sortModeOrNull != null)
-			return Integer.parseInt(sortModeOrNull);
-		else
-			// treat as manually sorted
-			return SORT_MODE_MANUAL;
+		return new SortSetting(rqlResponse.getNode("SORTSETTING"));
 	}
 
 	/**
@@ -1325,7 +1385,7 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 	 */
 	public boolean isManuallySorted() throws RQLException {
 
-		return getSortMode() == 1;
+		return getSortSetting().sortmode() == 1;
 	}
 
 	/**
@@ -1793,7 +1853,7 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 	 */
 	public void setSortModeAllAscendingByHeadline() throws RQLException {
 
-		changeSortMode(0, SORT_MODE_ASCENDING, SORT_CRITERIA_PAGE_INFORMATION, SORT_CRITERIA_PAGE_INFORMATION_HEADLINE);
+		changeSortSetting(0, SORT_MODE_ASCENDING, SORT_CRITERIA_PAGE_INFORMATION, SORT_CRITERIA_PAGE_INFORMATION_HEADLINE);
 	}
 
 	/**
@@ -1801,7 +1861,7 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 	 */
 	public void setSortModeManually() throws RQLException {
 
-		changeSortMode(0, SORT_MODE_MANUAL, 0, null);
+		changeSortSetting(0, SORT_MODE_MANUAL, 0, null);
 	}
 
 	/**

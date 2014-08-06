@@ -345,12 +345,19 @@ public abstract class Anchor implements PageContainer, StructureElement {
 		return getChildPage() != null;
 	}
 
+	
 	/**
 	 * Liefert immer true. Alle subklassen sind anchor.
 	 */
 	@Override
 	public final boolean isAnchor() {
 		return true;
+	}
+
+
+	@Override
+	public final boolean isMultiLink() {
+		return false;
 	}
 
 	

@@ -13,6 +13,7 @@ public interface StructureElement {
 	boolean isAnchor();
 	
 	boolean isReferenceSource();
+	boolean isMultiLink();
 
 	java.util.List<Page> getChildPages() throws RQLException;
 
