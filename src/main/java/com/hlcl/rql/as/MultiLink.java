@@ -297,7 +297,7 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 		 */
 
 		// call CMS
-		String maxCountAttribute = maxCount == 0 ? "maxCount='#" + getSessionKey() + "' " : "maxCount='" + Integer.toString(maxCount)
+		String maxCountAttribute = maxCount == 0 ? "maxcount='#" + getSessionKey() + "' " : "maxcount='" + Integer.toString(maxCount)
 				+ "'";
 
 		String rqlRequest = 
