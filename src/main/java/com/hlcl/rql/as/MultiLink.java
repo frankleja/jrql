@@ -680,12 +680,13 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 		disconnectAllChilds(getChildPages());
 	}
 
+
 	/**
 	 * Löst die Verlinkung der gegebenen Kindseiten von diesem Link.
 	 * <p>
 	 * Zur Performancesteigerung nur intern genutzt.
 	 */
-	private void disconnectAllChilds(java.util.List<Page> childPages) throws RQLException {
+	public void disconnectAllChilds(java.util.List<Page> childPages) throws RQLException {
 		/* 
 		 V5 request (disconnect pages)
 		 <IODATA loginguid="78905ACA0C614D15BC6DB1F6748405E4" sessionkey="925818745bOSRp7gXR85">
@@ -708,18 +709,18 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 		 */
 
 		// only needed if children given
-		if (childPages.size() > 0) {
-			// disconnect all given childs from here
-			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-					+ " <LINK action='save' guid='" + getLinkGuid() + "'>" + "  <PAGES>";
-			for (int i = 0; i < childPages.size(); i++) {
-				Page child = (Page) childPages.get(i);
-				rqlRequest += "<PAGE deleted ='1' guid='" + child.getPageGuid() + "' />";
-			}
-			rqlRequest += "  </PAGES>" + " </LINK>" + "</IODATA>";
-			callCms(rqlRequest);
+		if (childPages.size() == 0) return;
+			
+		StringBuilder sb = new StringBuilder(128);
+		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>")
+		.append(" <LINK action='save' guid='").append(getLinkGuid()).append("'><PAGES>");
+		for (Page child : childPages) {
+			sb.append("<PAGE deleted ='1' guid='").append(child.getPageGuid()).append("' />");
 		}
+		sb.append("</PAGES></LINK></IODATA>");
+		callCms(sb.toString());
 	}
+
 
 	/**
 	 * Löst die Verlinkung der gegebenen Kindseite von diesem Link.
@@ -764,18 +765,16 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 	 * einfach irgnoriert.
 	 */
 	public void disconnectChilds(String[] pageGuids) throws RQLException {
+		if (pageGuids.length == 0) return; 
 
-		// try only if not empty
-		if (pageGuids.length != 0) {
-			// wrap into page list
-			java.util.List<Page> childs = new java.util.ArrayList<Page>();
-			for (int i = 0; i < pageGuids.length; i++) {
-				String pageGuid = pageGuids[i];
-				childs.add(getProject().getPageByGuid(pageGuid));
-			}
-			// disconnect all with only one RQL
-			disconnectAllChilds(childs);
+		StringBuilder sb = new StringBuilder(128);
+		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>")
+				.append(" <LINK action='save' guid='").append(getLinkGuid()).append("'><PAGES>");
+		for (String childGuid : pageGuids) {
+			sb.append("<PAGE deleted ='1' guid='").append(childGuid).append("' />");
 		}
+		sb.append("</PAGES></LINK></IODATA>");
+		callCms(sb.toString());
 	}
 
 	/**
