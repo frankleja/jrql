@@ -206,20 +206,18 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 			return;
 
 		// build new request
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ "  <LINK action='save' guid='" + getLinkGuid() + "' orderby='5'>" + "	<PAGES action='saveorder'>";
-
-		// add all childs in given order
-		Page child = null;
-		for (int i = 0; i < childs.size(); i++) {
-			child = (Page) childs.get(i);
-			rqlRequest = rqlRequest + "<PAGE guid='" + child.getPageGuid() + "'/>";
+		StringBuilder sb = new StringBuilder(256);
+		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>")
+		  .append(" <LINK action='save' guid='").append(getLinkGuid()).append("' orderby='5'>");
+		sb.append("  <PAGES action='saveorder'>");
+		
+		for (Page child : childs) {
+			sb.append("<PAGE guid='").append(child.getPageGuid()).append("'/>");
 		}
 
 		// add request tail
-		rqlRequest = rqlRequest + "</PAGES>" + "</LINK>" + "</IODATA>";
-
-		callCms(rqlRequest);
+		sb.append("</PAGES></LINK></IODATA>");
+		callCms(sb.toString());
 	}
 
     /**
@@ -239,13 +237,53 @@ public abstract class MultiLink implements PageContainer, StructureElement {
      * @throws RQLException
      */
     public void applyChildPageOrderByPageGuids(java.util.List<String> pageGuids) throws RQLException {
+		/* 
+		 V5 request (save page order)
+		 <IODATA loginguid="FE4D2C44BAEC43DD9CAB3D4DC262763E" sessionkey="42113976861d16oBRlOJ">
+		 <LINK action="save" guid="A71E9253472845629DBA1C5C813A953E" orderby="5">
+		 <PAGES  action="saveorder">
+		 <PAGE guid="8CE42BC44CDE4BAB9F6BE54C377A6A93" />
+		 <PAGE guid="202ECB7C834542C582F6A30410195664" />
+		 <PAGE guid="F45146658C6347CDBB4A2311902985E3" />
+		 <PAGE guid="9CE9B1A9C1AB462E8B96963548D191FF" />
+		 </PAGES>
+		 </LINK>
+		 </IODATA>
+		 V5 response
+		 <IODATA>
+		 <LINK action="save" sessionkey="421139565e46x3Bm8C61" dialoglanguageid="ENG" languagevariantid="ENG" defaultlanguagevariantid="ENG">
+		 <PAGES linkguid="" targetlinkguid="" parenttable="PGE" sessionkey="421139565e46x3Bm8C61" languagevariantid="ENG" orderby="" action="saveorder">
+		 <PAGE guid="8CE42BC44CDE4BAB9F6BE54C377A6A93"/>
+		 <PAGE guid="202ECB7C834542C582F6A30410195664"/>
+		 <PAGE guid="F45146658C6347CDBB4A2311902985E3"/>
+		 <PAGE guid="9CE9B1A9C1AB462E8B96963548D191FF"/>
+		 </PAGES>
+		 </LINK>
+		 </IODATA>
+		 */
+		// check if MultiLink is manually sorted!
+		if (!isManuallySorted()) {
+			throw new WrongSortModeException("The Multi-Link with the GUID " + getLinkGuid() + " on page "
+					+ getPage().getHeadlineAndId() + " is not manually sorted, therefore you cannot sort childs.");
+		}
 
-        java.util.List<Page> pages = new ArrayList<Page>(pageGuids.size());
-        for (String pageGuid : pageGuids) {
-            pages.add(new Page(this.getProject(), pageGuid));
-        }
+		// do noting, if no or only one page linked
+		if (pageGuids.size() <= 1)
+			return;
 
-        this.changeOrder(new PageArrayList(pages));
+		// build new request
+		StringBuilder sb = new StringBuilder(256);
+		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>")
+		  .append(" <LINK action='save' guid='").append(getLinkGuid()).append("' orderby='5'>");
+		sb.append("  <PAGES action='saveorder'>");
+		
+		for (String childGuid : pageGuids) {
+			sb.append("<PAGE guid='").append(childGuid).append("'/>");
+		}
+
+		// add request tail
+		sb.append("</PAGES></LINK></IODATA>");
+		callCms(sb.toString());
     }
 
     
