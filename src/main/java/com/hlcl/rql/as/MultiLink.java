@@ -85,6 +85,49 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 		getProject().assignAuthorizationPackage("LINK", getLinkGuid(), authorizationPackage);
 	}
 
+	
+	
+	/**
+	 * Determine the current Detailed Authorization Package on this link.
+	 * Note: This is reverse hacked technology as it uses a TREESEGMENT call that is used by the GUI.
+	 * 
+	 * @return null if there currently is no package assigned.
+	 * @throws RQLException if for some reason the package could not be resolved
+	 */
+	public AuthorizationPackage getCurrentAuthorizationPackage() throws RQLException {
+		/*
+		 * <TREESEGMENT type="link" action="load" guid="F30B44C09F594E9F8D80874D6E85EF86" descent="unknown" parentguid="06F150CFA30F4FBDAD9DBA0A7CC5E7E7" denyprojectsettings="1" denyadministerpublication="1" />
+	     */
+		String rqlRequest1 = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+				+ " <TREESEGMENT type='link' action='load' guid='" + linkGuid + "' descent='unknown' denyprojectsettings='1' denyadministerpublication='1' />"
+				+ "</IODATA>";
+		RQLNode r1 = callCms(rqlRequest1);
+		RQLNodeList segments = r1.getNodes("SEGMENT");
+		
+		if (segments == null)
+			return null;
+		
+		String apGuid = null;
+		
+		/*
+		 * <IODATA>
+  	     *  <TREESEGMENTS>
+    	 *   <SEGMENT parentguid="F30B44C09F594E9F8D80874D6E85EF86" guid="9278C050BD8C4A1FB2C2DACF82CEA8AE" type="project.1061" image="DetailRestrictions.gif" expand="1" value="Link (no URLs, no Keywords)" col1value="Link (no URLs, no Keywords)" col2fontcolor="\#808080" col2value="Detailed Authorization Package" col1fontweight="normal" col2fontweight="normal">
+    	 *   </SEGMENT>
+    	 *   <SEGMENT ...
+    	 *   <TREELEMENT...
+		 */
+		for (RQLNode segment : segments) {
+			if (!"project.1061".equals(segment.getAttribute("type"))) continue;
+			if (!linkGuid.equals(segment.getAttribute("parentguid"))) continue;
+			apGuid = segment.getAttribute("guid");
+			// String title = segment.getAttribute("value");
+			// System.out.println("=== Found authorization package: " + title);
+		}
+		return getProject().getDetailedAuthorizationPackageForLinkByGuid(apGuid);
+	}
+	
+	
 	/**
 	 * Ordnet diesem MultiLink das gegebene Exportpaket zu.
 	 * 

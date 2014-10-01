@@ -6860,7 +6860,19 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
         getCmsClient().callCmsWithoutParsing(sb.toString());
     }
     
+    
+    /**
+     * Weist einem beliebigen Linkt dieser Seite einen Erscheinungszeitraum zu.
+     * 
+     * @param linkGuid link of the structural element to manipulate.
+     * @param appearanceSchedule the schedule to set.
+     * @throws RQLException if this page is not linked to the given link guid.
+     */
+    public void assignLinkAppearanceSchedule(MultiLink link, AppearanceSchedule appearanceSchedule) throws RQLException {
+    	assignLinkAppearanceSchedule(link.getLinkGuid(), appearanceSchedule);
+    }
 
+    
     /**
      * Liefert alle Sprachvarianten für diese Seite
      *

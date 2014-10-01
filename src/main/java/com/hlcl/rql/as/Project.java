@@ -1980,6 +1980,15 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	}
 
 	/**
+	 * Liefert das Detailberechtigungspaket (Typ=Link=2) mit der angegeben guid zurueck.
+	 * 
+	 * @throws ElementNotFoundException
+	 */
+	public AuthorizationPackage getDetailedAuthorizationPackageForLinkByGuid(String packageGuid) throws RQLException {
+		return findAuthorizationPackageByGuid(AuthorizationPackage.DETAILED_LINK_TYPE, packageGuid);
+	}
+
+	/**
 	 * Liefert das Detailberechtigungspaket (Typ=Page=1) mit dem gegebenen Namen zurück.
 	 * 
 	 * @param packageName
