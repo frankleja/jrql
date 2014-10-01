@@ -3291,7 +3291,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	/**
 	 * Liefert die RQLNodeList der Links zurueck an die diese Seite gelinkt ist. Wird null zurückgegeben, ist diese Seite unverlinkt,
 	 * frei.
-	 * 
+	 * @return "LINK" nodes or null if not linked.
 	 */
 	private RQLNodeList getLinkedFromNodeList() throws RQLException {
 		/* 
@@ -6806,29 +6806,19 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
      * @throws RQLException
      */
     public void assignMainLinkAppearanceSchedule(AppearanceSchedule appearanceSchedule) throws RQLException {
-        StringBuilder sb = new StringBuilder("");
-
-        sb.append("<IODATA loginguid=\"").append(this.getLogonGuid())
-                .append("\" sessionkey=\"").append(this.getSessionKey()).append("\">")
-                .append("<PAGE guid=\"").append(this.getPageGuid()).append("\"><LINKSFROM action=\"load\" /></PAGE>")
-                .append("</IODATA>");
-
-        //1. retrieve relationguid
-        String rqlRequest = sb.toString();
-        RQLNode rqlResponse = this.getCmsClient().callCms(rqlRequest);
-        RQLNode linkNode = rqlResponse.getNode("LINK");
+    	// 1. relationguid des mainlinks finden 
+    	RQLNode linkNode = getMainLinkNode(); 
         String relationGuid = linkNode.getAttribute("relationguid");
 
-        //2. set appearance schedule
-        sb = new StringBuilder("");
+        // 2. set appearance schedule
+        StringBuilder sb = new StringBuilder(128);
         sb.append("<IODATA loginguid=\"").append(this.getLogonGuid()).append("\" sessionkey=\"").append(this.getSessionKey()).append("\">")
                 .append("<PAGE><LINKFROM action=\"save\" guid=\"").append(relationGuid)
                 .append("\" datebegin=\"").append(appearanceSchedule.getBegin().toMsDoubleString())
                 .append("\" dateend=\"").append(appearanceSchedule.getEnd().toMsDoubleString()).append("\" />")
                 .append("</PAGE></IODATA>");
 
-        rqlRequest = sb.toString();
-        getCmsClient().callCmsWithoutParsing(rqlRequest);
+        getCmsClient().callCmsWithoutParsing(sb.toString());
 
         this.getMainMultiLink().setAppearanceSchedule(appearanceSchedule);
     }
