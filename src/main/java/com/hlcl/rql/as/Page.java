@@ -6823,6 +6823,43 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
         this.getMainMultiLink().setAppearanceSchedule(appearanceSchedule);
     }
 
+    
+    /**
+     * Weist einem beliebigen Linkt dieser Seite einen Erscheinungszeitraum zu.
+     * 
+     * @param linkGuid link of the structural element to manipulate.
+     * @param appearanceSchedule the schedule to set.
+     * @throws RQLException if this page is not linked to the given link guid.
+     */
+    public void assignLinkAppearanceSchedule(String linkGuid, AppearanceSchedule appearanceSchedule) throws RQLException {
+    	// All the Links
+    	RQLNodeList nodeList = getLinkedFromNodeList();
+    	if (nodeList == null)
+    		throw new RQLException("Page is not linked.");
+    	
+    	// Our Link
+    	RQLNode linkNode = null;
+    	for (RQLNode n : nodeList) {
+    		if (linkGuid.equals(n.getAttribute("guid")))
+    			linkNode = n;
+    	}
+    	
+    	if (linkNode == null)
+    		throw new RQLException("Page is not linked to element " + linkGuid);
+    				
+        String relationGuid = linkNode.getAttribute("relationguid");
+
+        // Set appearance schedule
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("<IODATA loginguid=\"").append(this.getLogonGuid()).append("\" sessionkey=\"").append(this.getSessionKey()).append("\">")
+                .append("<PAGE><LINKFROM action=\"save\" guid=\"").append(relationGuid)
+                .append("\" datebegin=\"").append(appearanceSchedule.getBegin().toMsDoubleString())
+                .append("\" dateend=\"").append(appearanceSchedule.getEnd().toMsDoubleString()).append("\" />")
+                .append("</PAGE></IODATA>");
+
+        getCmsClient().callCmsWithoutParsing(sb.toString());
+    }
+    
 
     /**
      * Liefert alle Sprachvarianten für diese Seite
