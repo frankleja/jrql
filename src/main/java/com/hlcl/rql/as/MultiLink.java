@@ -124,6 +124,10 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 			// String title = segment.getAttribute("value");
 			// System.out.println("=== Found authorization package: " + title);
 		}
+
+		if (apGuid == null)
+			return null;
+
 		return getProject().getDetailedAuthorizationPackageForLinkByGuid(apGuid);
 	}
 	
