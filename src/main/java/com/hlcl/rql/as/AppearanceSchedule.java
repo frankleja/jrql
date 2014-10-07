@@ -88,6 +88,12 @@ public class AppearanceSchedule {
         return end;
     }
 
+    
+    public void adjustToLocalTime() {
+    	if (begin != null) begin.adjustToLocalTime();
+    	if (end != null) end.adjustToLocalTime();
+    }
+    
 
     @Override
     public boolean equals(Object o) {

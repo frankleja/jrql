@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 /**
  * Diese Klasse beschreibt ein RedDot Datum. RedDot nutzt eine Datumsdarstellung von Microsoft im float Format.
@@ -190,6 +191,19 @@ public class ReddotDate extends java.util.Date {
 		return new ReddotDate(date);
 	}
 
+	
+	/**
+	 * The stored java time is relative to epoch in GMT.
+	 * For OT it may be relative to local time. 
+	 */
+	public void adjustToLocalTime() {
+		TimeZone tz = TimeZone.getDefault();
+		long time = getTime();
+		int offset = tz.getOffset(time);
+		setTime(time - offset); // FIXME: or + :)
+	}
+
+	
 	/**
 	 * Allocates a <code>Date</code> object and initializes it so that it represents the time at which it was allocated, measured to
 	 * the nearest millisecond.
@@ -204,7 +218,7 @@ public class ReddotDate extends java.util.Date {
 	 * ReddotDate constructor comment.
 	 */
 	public ReddotDate(Date date) {
-		super(date.getTime());
+		super(date.getTime()); // Epoch-GMT-based
 	}
 
 	/**
