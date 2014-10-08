@@ -200,7 +200,7 @@ public class ReddotDate extends java.util.Date {
 		TimeZone tz = TimeZone.getDefault();
 		long time = getTime();
 		int offset = tz.getOffset(time);
-		setTime(time - offset); // FIXME: or + :)
+		setTime(time + offset);
 	}
 
 	
