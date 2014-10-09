@@ -3037,8 +3037,8 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		RQLNode linkNode = findLinkNode(frameTemplateElement);
 
 		// wrap list data
-		// add templateElement too?
-		return new Frame(this, frameTemplateElement, linkNode.getAttribute("name"), linkNode.getAttribute("guid"), linkNode.getAttribute("islink").equals("10"));
+		// return new Frame(this, frameTemplateElement, linkNode.getAttribute("name"), linkNode.getAttribute("guid"), linkNode.getAttribute("islink").equals("10"));
+		return new Frame(this, frameTemplateElement, linkNode);
 	}
 
     protected void loadKeywords() {
@@ -4908,7 +4908,8 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		RQLNode anchorNode = findLinkNode(textAnchorTemplateElement);
 
 		// note: attribute "value" contains local name
-		return new TextAnchor(this, textAnchorTemplateElement, anchorNode.getAttribute("name"), anchorNode.getAttribute("guid"), anchorNode.getAttribute("islink").equals("10"));
+		//return new TextAnchor(this, textAnchorTemplateElement, anchorNode.getAttribute("name"), anchorNode.getAttribute("guid"), anchorNode.getAttribute("islink").equals("10"));
+		return new TextAnchor(this, textAnchorTemplateElement, anchorNode);
 	}
 
 	/**

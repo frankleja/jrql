@@ -10,7 +10,9 @@ import java.util.List;
  * @author LEJAFR
  */
 public abstract class Anchor implements PageContainer, StructureElement {
+
 	private String anchorGuid;
+	private RQLNode anchorNode;
 	private String name;
 
 	private Page page;
@@ -18,14 +20,7 @@ public abstract class Anchor implements PageContainer, StructureElement {
 	private boolean isReferenceSource;
 
 	/**
-	 * Container constructor comment.
-	 * 
-	 * @param page
-	 *            Seite, die diesen Anker beinhaltet.
-	 * @param name
-	 *            Name des Ankers auf Seite page
-	 * @param anchorGuid
-	 *            GUID des Ankers auf Seite page
+	 * @deprecated
 	 */
 	public Anchor(Page page,TemplateElement templateElement, String name, String anchorGuid, boolean isReferenceSource) {
 		super();
@@ -35,6 +30,20 @@ public abstract class Anchor implements PageContainer, StructureElement {
 		this.name = name;
 		this.anchorGuid = anchorGuid;
 		this.isReferenceSource = isReferenceSource;
+		this.anchorNode = null;
+	}
+
+	
+	/**
+	 * Use this one!
+	 */
+	public Anchor(Page page, TemplateElement textAnchorTemplateElement,
+			RQLNode anchorNode) {
+		this(page, textAnchorTemplateElement,
+			 anchorNode.getAttribute("name"),
+			 anchorNode.getAttribute("guid"),
+			 anchorNode.getAttribute("islink").equals("10"));
+		this.anchorNode = anchorNode;
 	}
 
 	/**

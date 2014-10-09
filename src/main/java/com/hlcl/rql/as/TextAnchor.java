@@ -6,6 +6,8 @@ package com.hlcl.rql.as;
  * @author lejafr
  */
 public class TextAnchor extends Anchor {
+	
+	
 	/**
 	 * Container constructor comment.
 	 * 
@@ -18,6 +20,18 @@ public class TextAnchor extends Anchor {
 	 */
 	public TextAnchor(Page page, TemplateElement templateElement, String name, String anchorGuid, boolean isReferenceSource) {
 		super(page, templateElement, name, anchorGuid, isReferenceSource);
+	}
+
+	
+	/**
+	 * Construct from the actual node.
+	 * 
+	 * @param page containing htis link.
+	 * @param textAnchorTemplateElement the element definition
+	 * @param anchorNode the "<LINKS action="load"/>" response
+	 */
+	public TextAnchor(Page page, TemplateElement textAnchorTemplateElement, RQLNode anchorNode) {
+		super(page, textAnchorTemplateElement, anchorNode);
 	}
 
 }
