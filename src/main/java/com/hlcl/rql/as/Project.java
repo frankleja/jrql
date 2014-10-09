@@ -445,6 +445,19 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		return getCmsClient().callCmsWithoutParsing(rqlRequest);
 	}
 
+	
+	/**
+	 * Make some kind of call. This method adds the IODATA node.
+	 * 
+	 * @param netXml netto call, without
+	 * @return the unparsed result.
+	 * @throws RQLException
+	 */
+	public String testCall(String netXml) throws RQLException {
+		return getCmsClient().callCmsWithoutParsing("<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + netXml + "</IODATA>");
+	}
+
+
 	/**
 	 * Ein Projekt kann teilweise auch ohne session key genutzt werden.
 	 * <p>
