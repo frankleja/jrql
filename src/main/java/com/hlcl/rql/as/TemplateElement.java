@@ -1137,7 +1137,7 @@ public class TemplateElement implements TemplateContainer {
 			throw new WrongTypeException("Template element " + getName()
 					+ " is not of type standard field date. The date format type can be retrieved only for this type of elements.");
 		}
-		return getDetailsNode().getAttribute("eltformatno").equals("-1");
+		return "-1".equals(getDetailsNode().getAttribute("eltformatno"));
 	}
 
 	/**
