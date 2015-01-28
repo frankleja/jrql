@@ -484,6 +484,23 @@ public class User implements CmsClientContainer {
 		return client.wrapProjectNodes(client.getProjectsNodeList(this));
 	}
 
+	
+	/**
+	 * Liefert eine Liste aller für diesen User zugelassenen Projekte (nur GUIDs).
+	 */
+	public java.util.List<String> getProjectGuids() throws RQLException {
+		RQLNodeList nl = getCmsClient().getProjectsNodeList(this);
+		java.util.List<String> out = new ArrayList<String>(nl.size());
+
+		for (int i = 0; i < nl.size(); i++) {
+			RQLNode node = nl.get(i);
+			out.add(node.getAttribute("guid"));
+		}
+
+		return out;
+	}
+
+	
 	/**
 	 * Liefert alle Benutzergruppen passend zum gegebenen Prefix, denen dieser Benutzer im aktuellen Projekt zugeordnet ist.
 	 */
