@@ -2684,13 +2684,16 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * Diese Änderung werden aber nicht beim Speichern eines neuen Seitenstatus verwendet!
 	 * 
 	 * @see #changeState
+	 * @throw InvalidGuidException if page has no flags (probably does not exist).
 	 */
 	private BigInteger getDetailsStateFlag() throws RQLException {
 
 		// force re-read of details node to get current state
 		deleteDetailsNodeCache();
-
-		return new BigInteger(getDetailsNode().getAttribute("flags"));
+		String flags = getDetailsNode().getAttribute("flags");
+		if (flags == null)
+			throw new InvalidGuidException("No flags, page does not exist in current language.");
+		return new BigInteger(flags);
 	}
 
 	/**
