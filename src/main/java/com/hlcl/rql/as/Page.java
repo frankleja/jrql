@@ -1390,9 +1390,18 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 	 * @param template fuer die neu anzulegende seite
 	 * @param headline der neuen seite.
 	 */
-	public Page createAndConnextPageAtAnchor(String textAnchorTemplateElementName, Template template, String headline)
+	public Page createAndConnectPageAtAnchor(String textAnchorTemplateElementName, Template template, String headline)
 			throws RQLException {
 		return getTextAnchor(textAnchorTemplateElementName).createAndConnectPage(template, headline);
+	}
+
+	
+	/**
+	 * Compat: Someone made a typo once.
+	 */
+	public Page createAndConnextPageAtAnchor(String textAnchorTemplateElementName, Template template, String headline)
+			throws RQLException {
+		return createAndConnectPageAtAnchor(textAnchorTemplateElementName, template, headline);
 	}
 	
 
