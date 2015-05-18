@@ -133,6 +133,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 
 	static final String ASSETMANAGER_SUBFOLDER_DELIMITER = "/";
 
+	
 	private RQLNodeList affixesCache;
 	private CmsClient cmsClient;
 	private RQLNode detailsNodeCache;
@@ -150,10 +151,10 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 
 	private RQLNodeList templateFoldersCache;
 	// cache
-	private Map<String, Template> templatesCache; // maps template guids to template objects
+	private final Map<String, Template> templatesCache = new HashMap<String, Template>(); // maps template guids to template objects
 	private Map<String, ScriptParameters> parametersCache; // maps class names to parameters, ProjectPage
 	private Map<String, PageArrayList> pagesCache; // maps an id to a list of pages
-	private Map<String, Folder> foldersCache; // maps folder guids to folder
+	private final Map<String, Folder> foldersCache = new HashMap<String, Folder>();; // maps folder guids to folder
 	// objects
 	private RQLNodeList userGroupNodeListCache;
 	private String clipboardTableHtml = null;
@@ -171,8 +172,6 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		this.cmsClient = cmsClient;
 		this.sessionKey = null;
 		this.projectGuid = projectGuid;
-
-		initializeCaches();
 	}
 
 	/**
@@ -191,8 +190,6 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		this.cmsClient = cmsClient;
 		this.sessionKey = sessionKey;
 		this.projectGuid = projectGuid;
-
-		initializeCaches();
 	}
 
 	/**
@@ -4090,15 +4087,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		return result;
 	}
 
-	/**
-	 * Initialisiert alle Caches dieses Projektes.
-	 */
-	private void initializeCaches() {
-
-		templatesCache = new HashMap<String, Template>();
-		foldersCache = new HashMap<String, Folder>();
-	}
-
+	
 	/**
 	 * Macht dieses Project ungültig. D.h. es kann nach Aufruf dieser Methode nicht mehr für Zugriffe benutzt werden. Wird am
 	 * <code>CmsClient</code> das Project gewechselt, wird diese Methode aufgerufen.
@@ -4108,16 +4097,36 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		cmsClient = null;
 		sessionKey = null;
 		projectGuid = null;
-
-		// cache
-		templatesCache = null;
-		projectVariantsCache = null;
-		languageVariantsCache = null;
-		publishingTargetsCache = null;
-		detailsNodeCache = null;
-		templateFoldersCache = null;
+		flushLocalCaches();
 	}
 
+	
+	/**
+	 * Clear/empty local caches.
+	 * FIXME: This should distinguis between language-dependant and global caches,
+	 * 	      but for now we are lucky to get rid of everything that may lead to
+	 * 	      de-sync.
+	 */
+	void flushLocalCaches()
+	{
+		affixesCache = null;
+		detailsNodeCache = null;
+		languageVariantsCache = null;
+		projectTreesegmentsCache = null;
+		projectVariantsCache = null;
+		publicationSettingsCache = null;
+		projectSettingsCache = null;
+		publishingTargetsCache = null;
+		publicationFoldersCache = null;
+		templateFoldersCache = null;
+		templatesCache.clear();
+		parametersCache = null;
+		pagesCache = null;
+		foldersCache.clear();
+		userGroupNodeListCache = null;
+	}
+
+	
 	/**
 	 * Liefert true, falls die augenblickliche Sprachvariante die Hauptsprachvariante ist, sonst false.
 	 */
@@ -4330,15 +4339,14 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		</IODATA>
 		 */
 
+		// force re-read of almost everything (do it before-hand for error case)
+		flushLocalCaches();
+
 		// call CMS
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<PROJECT>"
 				+ "   <LANGUAGEVARIANT action='setactive' guid='" + languageVariant.getLanguageVariantGuid() + "' />" + " </PROJECT>"
 				+ "</IODATA>";
 		callCmsWithoutParsing(rqlRequest);
-		// force new read
-		languageVariantsCache = null;
-		pageCache.clear();
-
 		return languageVariant;
 	}
 
