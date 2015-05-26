@@ -126,10 +126,11 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	}
 
 	// workflow page states
-	static final String WF_LIST_STATE_MY_PAGES_IN_WORKFLOW = "134217728"; // 2^27
-	static final String WF_LIST_STATE_PAGES_SAVED_AS_DRAFT = "262144"; // 2^18
-	static final String WF_LIST_STATE_PAGES_WAITING_FOR_CORRECTION = "131072"; // 2^17
-	static final String WF_LIST_STATE_PAGES_WAITING_FOR_RELEASE = "64"; // 2^6
+	// mephistopheles78
+	static final String WF_LIST_STATE_MY_PAGES_IN_WORKFLOW = "pagesinworkflow";
+	static final String WF_LIST_STATE_PAGES_SAVED_AS_DRAFT = "checkedout";
+	static final String WF_LIST_STATE_PAGES_WAITING_FOR_CORRECTION = "waitingforcorrection";
+	static final String WF_LIST_STATE_PAGES_WAITING_FOR_RELEASE = "waitingforrelease";
 
 	static final String ASSETMANAGER_SUBFOLDER_DELIMITER = "/";
 
@@ -2763,9 +2764,15 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<AUTHORIZATION>"
-				+ "   <PAGES action='list' actionflag='" + workflowState
-				+ (userOrNull != null ? "' userguid='" + userOrNull.getUserGuid() : "") + "'/>" + " </AUTHORIZATION>" + "</IODATA>";
+		// mephistopheles78
+		String users = (userOrNull != null ? "myself" : "all");
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" +
+				"<PAGE action='xsearch'>" +
+				"<SEARCHITEMS>" + 
+				"<SEARCHITEM key='pagestate' value='" + workflowState + "' users='" + users + "' operator='eq' /> "+
+				"</SEARCHITEMS>" +	
+				"</PAGE>" +
+				"</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 		return rqlResponse.getNodes("PAGE");
 	}
@@ -3834,12 +3841,13 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		 */
 
 		// call CMS
+		// mephistopheles78
 		if (templateFoldersCache == null) {
 			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-					+ "<TEMPLATEGROUPS action='load' />" + "</IODATA>";
+					+ "<PROJECT><FOLDERS action='list' /></PROJECT>" + "</IODATA>"; // changed from + "<TEMPLATEGROUPS action='load' />" + "</IODATA>";
 			RQLNode rqlResponse = callCms(rqlRequest);
 
-			templateFoldersCache = rqlResponse.getNodes("GROUP");
+			templateFoldersCache = rqlResponse.getNodes("FOLDER");  //changed from GROUP to FOLDER
 		}
 		return templateFoldersCache;
 
