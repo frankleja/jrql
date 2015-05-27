@@ -1,6 +1,5 @@
 package com.hlcl.rql.as;
 
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Map;
@@ -428,7 +427,7 @@ public class TextElement implements PageContainer, ContentElement {
 
 		// url encode ascii
 		if (urlEncode) {
-			rdValue = urlEncode(rdValue);
+			rdValue = StringHelper.escapeXml(rdValue);
 		}
 
 		// call CMS
@@ -439,13 +438,7 @@ public class TextElement implements PageContainer, ContentElement {
 		// force re-read of text
 		textValue = null;
 	}
-
-	/**
-	 * URL encoding, wobei + wieder gegen space ersetzt wird.
-	 */
-	private String urlEncode(String s) throws RQLException {
-		return URLEncoder.encode(s).replace('+', ' ');
-	}
+	
 
 	/**
 	 * Liefert den Quellcode des Textelements für HTML Texte. Liefert genau den eingegebenen Text für ASCII Texte zurück.
