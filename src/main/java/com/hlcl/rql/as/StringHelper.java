@@ -8,7 +8,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -339,32 +338,6 @@ public class StringHelper {
 	 */
 	public static String buildHtmlComment(String text) {
 		return "<!--" + text + "-->";
-	}
-
-	/**
-	 * Creates the HTML source code for a simple mailto: anchor tag: <a href="mailto:....">....</a>
-	 * 
-	 * @param address
-	 *            the mail address
-	 * @param label
-	 *            the clickable text of the link
-	 */
-	public static String buildHtmlMailto(String address, String label) {
-		return buildHtmlA("mailto:" + address, label, false);
-	}
-
-	/**
-	 * Creates the HTML source code for a simple mailto: anchor tag: <a href="mailto:....">....</a>
-	 * 
-	 * @param address
-	 *            the mail address
-	 * @param subject
-	 *            the subject information
-	 * @param label
-	 *            the clickable text of the link
-	 */
-	public static String buildHtmlMailto(String address, String subject, String label) {
-		return buildHtmlMailto(address + "?subject=" + encodeMailTexts(subject), label);
 	}
 
 	/**
@@ -868,16 +841,6 @@ public class StringHelper {
 	}
 
 	/**
-	 * Encode mail subject and body texts. Use URLEncoder, but replace the + with space again.
-	 * 
-	 * @param subjectOrBodyText
-	 *            text to convert
-	 */
-	public static String encodeMailTexts(String subjectOrBodyText) {
-		return URLEncoder.encode(subjectOrBodyText).replace('+', ' ');
-	}
-
-	/**
 	 * Liefert true, wenn der gegebene name auf mindestens einen der gegebenen suffixe endet.
 	 * 
 	 * @param suffixes
@@ -935,6 +898,35 @@ public class StringHelper {
 		return endsWithOneOf(name, split(listOfSuffixes, delimiter));
 	}
 
+	
+	/**
+     * Simplistic Text adjustment so that a string can be inserted into HTML and XML.
+     * 
+     * @param in input arbitrary string, may be null
+     * @return never null, wraps to the empty string.
+     */
+    public static String escapeXml(String in)
+    {
+        int len = in.length();
+        if (in == null || len == 0)
+            return "";
+        
+        StringBuilder sb = new StringBuilder(len + 64);
+        for (int i = 0; i < len; i++) {
+            char c = in.charAt(i);
+            
+            switch (c) {
+            case '"': sb.append("&quot;"); break;
+            case '<': sb.append("&lt;"); break;
+            case '&': sb.append("&amp;"); break;
+            default: sb.append(c);  break;
+            }
+        }
+        
+        return sb.toString();
+    }
+    
+    
 	/**
 	 * Replaces characters that may be confused by a HTML parser with their equivalent character entity references.
 	 * <p>
@@ -1066,7 +1058,8 @@ public class StringHelper {
 				}
 			}
 		}
-		return sb.toString();
+		String out = sb.toString(); 
+		return out;
 	}
 
 	/**
@@ -2243,6 +2236,7 @@ public class StringHelper {
 	}
 
     public static String prettyPrintXml(String input, int indent) {
+    	// return input; // Get rid of error another level of wrong quoting
         try {
             Source xmlInput = new StreamSource(new StringReader(input));
             StringWriter stringWriter = new StringWriter();

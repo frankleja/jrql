@@ -947,14 +947,16 @@ public class CmsClient {
 
 			URLConnection conn = url.openConnection();
 			conn.setDoOutput(true);
-			conn.setRequestProperty("Content-Type", "text/xml;charset=UTF-8");
+			conn.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
 			conn.setRequestProperty("SOAPAction", "http://tempuri.org/RDCMSXMLServer/action/XmlServer.Execute");
-			OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream(), getRequestWriterEncoding());
+			OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
 			osr.write(soapBody.toString());
 			osr.close();
 
-			InputSource source = new InputSource(new InputStreamReader(conn.getInputStream(), getResponseReaderEncoding()));
-            DocumentBuilder db = dbf.newDocumentBuilder();
+			// String ctype = conn.getContentType(); // TBI: Use this encoding, don't assume UTF-8
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			InputSource source = new InputSource(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			//InputSource source = new InputSource(conn.getInputStream()); // there is no XML PI-header
             Document soapResponse = db.parse(source);
 
             // Error signaling (body may be empty)
@@ -965,6 +967,7 @@ public class CmsClient {
             // Consume the first line with the superflous XML-Header (if any)
 			String firstLine = new BufferedReader(new StringReader(rqlResponse)).readLine(); // peek ahead
 			if (firstLine != null && firstLine.startsWith("<?xml") && firstLine.endsWith("?>")) {
+				System.out.println("* RQL firstline was: " + firstLine);
 				rqlResponse = rqlResponse.substring(firstLine.length());
 			}
 
@@ -975,7 +978,7 @@ public class CmsClient {
             }
             
             if (!rqlError.isEmpty()) {
-            	// FIXME: Das koennte man vernueftig in RQLException aufheben
+            	// FIXME: Das koennte man vernuenftig in RQLException aufheben
             	throw new RQLException(rqlError + ": " + rqlInfo);
             }
             
@@ -995,7 +998,7 @@ public class CmsClient {
 	
 	/**
 	 * We all love XML and DOM: Extract the first usable string from a number of nodes.
-	 * @return the defautlvalue if the structure is not as expected.
+	 * @return the defValue if the structure is not as expected.
 	 */
 	private String item0FirstChildValue(NodeList l, String defValue) {
 		if (l.getLength() < 1)
