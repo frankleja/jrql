@@ -1722,7 +1722,7 @@ public class Template implements TemplateFolderContainer {
 					+ "    <TEMPLATE action='load' guid='" + getTemplateGuid() + "'>"
 					+ "      <ELEMENTS childnodesasattributes='1' action='load'/>" + "    </TEMPLATE>" + "  </PROJECT>" + "</IODATA>";
 			RQLNode rqlResponse = callCms(rqlRequest);
-			elementNodeList = rqlResponse.getNodes("ELEMENT");
+			elementNodeList = rqlResponse.getNode("ELEMENTS").getNodes("ELEMENT");
 		}
 		return elementNodeList;
 	}
