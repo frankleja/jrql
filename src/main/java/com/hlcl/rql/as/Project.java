@@ -150,6 +150,11 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	private String sessionKey;
 	private String startPageGuid = null;
 
+	/**
+	 * For direct lookups of pages.
+	 */
+	protected final Map<String, Page> pageCache = new TreeMap<String, Page>();
+
 	private RQLNodeList templateFoldersCache;
 	// cache
 	private final Map<String, Template> templatesCache = new HashMap<String, Template>(); // maps template guids to template objects
@@ -2601,12 +2606,6 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 
 	
 	/**
-	 * For direct lookups of pages.
-	 */
-	protected final Map<String, Page> pageCache = new TreeMap<String, Page>();
-	
-	
-	/**
 	 * Erzeugt eine Page für die gegebene pageGuid. Benötigt den session key!
 	 * 
 	 * @param pageGuid
@@ -4126,6 +4125,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		projectSettingsCache = null;
 		publishingTargetsCache = null;
 		publicationFoldersCache = null;
+		pageCache.clear();
 		templateFoldersCache = null;
 		templatesCache.clear();
 		parametersCache = null;
