@@ -4354,8 +4354,12 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<PROJECT>"
 				+ "   <LANGUAGEVARIANT action='setactive' guid='" + languageVariant.getLanguageVariantGuid() + "' />" + " </PROJECT>"
 				+ "</IODATA>";
-		callCmsWithoutParsing(rqlRequest);
-		return languageVariant;
+		RQLNode rs = callCms(rqlRequest);
+		if (rs.isTag("IODATA") && "ok".equalsIgnoreCase(rs.getText().trim())) {
+			return languageVariant;
+		} else {
+			throw new RQLException("Failed to switch to language" + languageVariant.toString());
+		}
 	}
 
 	/**

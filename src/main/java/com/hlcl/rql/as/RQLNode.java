@@ -192,4 +192,16 @@ public abstract class RQLNode {
 	 * Deliver all attributes of this tag as an key value map.
 	 */
 	public abstract Map<String, String> getAttributes();
+	
+
+	/**
+	 * Test if this is an XML element of the given name.
+	 * 
+	 * @param elementName the "tag" to look for.
+	 */
+	public boolean isTag(String elementName)
+	{
+		return isTagNode() && elementName.equals(getName());
+	}
+
 }

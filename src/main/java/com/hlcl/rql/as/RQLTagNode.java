@@ -176,4 +176,6 @@ class RQLTagNode extends RQLNode {
 	public boolean isTagNode() {
 		return true;
 	}
+	
+	
 }
