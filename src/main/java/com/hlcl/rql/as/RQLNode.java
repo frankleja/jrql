@@ -150,6 +150,21 @@ public abstract class RQLNode {
 		return returnList;
 	}
 
+	
+	/**
+	 * Diese Methode durchsucht diesen RQLNode und alle Nachkommen (children, ...)
+	 * nach Tags mit dem Namen nodeName. 
+	 * 
+	 * @param nodeName element to look for
+	 * @return RQLNodeList a possibly empty list.
+	 */
+	public RQLNodeList getNodesRecursive(String nodeName) {
+		RQLNodeList returnList = new RQLNodeList();
+		addNodesToList(nodeName, returnList);
+		return returnList;
+	}
+
+		
 	/**
 	 * Diese Methode durchsucht diesen RQLNode und dessen Nachkommen (children, ...)
 	 * darauf, ob es ein Tag mit dem Namen nodeName gibt. Wenn genau ein solches Tag 
