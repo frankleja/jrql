@@ -4482,6 +4482,16 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	}
 
 	/**
+	 * Check if this project ist still locked (during import). 
+	 */
+	public boolean isLockedBySystem() throws RQLException
+	{
+		RQLNode n = getDetailsNode();
+		return "1".equals(n.getAttribute("lockedbysystem"));
+	}
+	
+	
+	/**
 	 * Meldet den eingeloggten Benutzer am Projekt an.
 	 */
 	void validate() throws RQLException {
