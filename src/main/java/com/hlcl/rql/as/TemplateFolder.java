@@ -126,16 +126,16 @@ public class TemplateFolder implements ProjectContainer {
 	public Template getTemplateByName(String name) throws RQLException {
 
 		RQLNodeList templateList = getTemplateNodeList();
-		RQLNode templateNode = null;
-
-		for (int i = 0; i < templateList.size(); i++) {
-			templateNode = templateList.get(i);
-
-			if (templateNode.getAttribute("name").equals(name)) {
-				// wrap template data
-				return new Template(this, name, templateNode.getAttribute("guid"), templateNode.getAttribute("description"));
+		
+		if (templateList != null) {
+			for (RQLNode templateNode : templateList) {
+				if (templateNode.getAttribute("name").equals(name)) {
+					// wrap template data
+					return new Template(this, name, templateNode.getAttribute("guid"), templateNode.getAttribute("description"));
+				}
 			}
 		}
+
 		throw new ElementNotFoundException("Template named " + name + " could not be found in the template folder " + getName() + ".");
 	}
 
