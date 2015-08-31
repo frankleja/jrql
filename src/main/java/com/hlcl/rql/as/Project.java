@@ -4548,4 +4548,23 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		}
 		return users;
 	}
+
+
+	/**
+	 * Create a page that is not connected (unlinked).
+	 *
+	 * @param template base new page on this template.
+	 * @param headline for the current language variant.
+	 * @return a new page.
+	 * @throws RQLException
+	 */
+	public Page createUnlinkedPage(Template template, String headline) throws RQLException {
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" +
+				"<PAGE action=\"addnew\" templateguid=\"" + template.getTemplateGuid()+"\" headline=\""+
+				StringHelper.escapeHTML(headline) + "\"/>"+
+				"</IODATA>";
+		RQLNode rqlResponse = callCms(rqlRequest);
+		RQLNode pageNode = rqlResponse.getNode("PAGE");
+		return new Page(this, template, pageNode.getAttribute("guid"), pageNode.getAttribute("pageid"), headline);
+	}
 }
