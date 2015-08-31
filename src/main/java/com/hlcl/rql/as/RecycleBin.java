@@ -259,4 +259,18 @@ public class RecycleBin implements ProjectContainer {
 		// ignore time, only date
 		return ReddotDate.parseSmartTreeDate(parts[0]);
 	}
+	
+	
+	/**
+	 * Delete all pages in the recycle bin in all language variants. Makes the recycle bin completely empty
+	 * 
+	 * @throws RQLException maybe
+	 */
+	public void emptyAll() throws RQLException {
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+				+ "<PAGES action=\"deleteallfinally\" alllanguages=\"1\" />"
+				+ "</IODATA>";
+		callCms(rqlRequest);
+		// no error handling
+	}
 }
