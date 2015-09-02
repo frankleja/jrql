@@ -148,13 +148,28 @@ public class TemplateFolder implements ProjectContainer {
 		return templateFolderGuid;
 	}
 
+	
+	private RQLNodeList getTemplateNodeList() throws RQLException {
+		// check cache first
+		if (templateNodeList == null) {
+			// call CMS
+			String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+			+ "<TEMPLATES action='list' folderguid='" + getTemplateFolderGuid() + "' />"
+			+ "</IODATA>"; // FIXME: all='1' is not sure
+			RQLNode rqlResponse = callCms(rqlRequest);
+			templateNodeList = rqlResponse.getNodes("TEMPLATE");
+		}
+		return templateNodeList;
+	}
+
+
 	/**
 	 * Liefert die RQLNodeList mit allen Templates dieses Folders zurück.
 	 *  
 	 * @return	RQLNodeList
 	 * @see		RQLNodeList
 	 */
-	private RQLNodeList getTemplateNodeList() throws RQLException {
+	private RQLNodeList getTemplateNodeList_old() throws RQLException {
 
 		/* 
 		 V5 request
