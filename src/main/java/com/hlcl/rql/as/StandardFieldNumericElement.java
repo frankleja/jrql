@@ -14,8 +14,13 @@ public class StandardFieldNumericElement extends Element {
 	 *            valueObj Objekt passend zum Elementtyp
 	 */
 	String convertToStringValue(Object valueObj) {
-
-		return ((Integer) valueObj).toString();
+		if (valueObj == null) {
+			return "";
+		} else if (valueObj instanceof String) {
+			return (String) valueObj;
+		} else {
+			return ((Integer) valueObj).toString();
+		}
 	}
 
 	/**

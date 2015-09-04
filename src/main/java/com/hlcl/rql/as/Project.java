@@ -3,6 +3,7 @@ package com.hlcl.rql.as;
 import java.util.*;
 
 import com.hlcl.rql.util.as.PageArrayList;
+import com.hlcl.rql.util.as.ProjectException;
 import com.hlcl.rql.util.as.RqlKeywordObject;
 import com.hlcl.rql.util.as.ScriptParameters;
 
@@ -3774,6 +3775,9 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 			RQLNode rqlResponse = callCms(rqlRequest);
 			RQLNode templateNode = rqlResponse.getNode("TEMPLATE");
 
+			if (templateNode == null)
+				throw new ProjectException("No template with guid: " + templateGuid);
+			
 			// wrap template data
 			template = new Template(getTemplateFolderByGuid(templateNode.getAttribute("folderguid")), templateNode
 					.getAttribute("name"), templateNode.getAttribute("guid"), templateNode.getAttribute("description"));

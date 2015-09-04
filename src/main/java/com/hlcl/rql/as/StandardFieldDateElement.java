@@ -19,8 +19,11 @@ public class StandardFieldDateElement extends Element {
 	String convertToStringValue(Object valueObj) {
 		if (valueObj == null) {
 			return "";
+		} else if (valueObj instanceof String) {
+			return (String) valueObj;
+		} else {
+			return ((ReddotDate) valueObj).toMsDoubleString();
 		}
-		return ((ReddotDate) valueObj).toMsDoubleString();
 	}
 
 	/**
