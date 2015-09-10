@@ -10,10 +10,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.PropertyResourceBundle;
+import java.util.Queue;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -44,6 +46,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.hlcl.rql.util.as.RqlProfiler;
 
 /**
  * Die Klasse beschreibt einen Client zum RedDot Content Management Server.
@@ -251,6 +255,12 @@ public class CmsClient {
 	 * Helps with the XML work.
 	 */
 	private final DocumentBuilderFactory dbf;
+	
+	
+	/**
+	 * If set, wer are profiling individual calls.
+	 */
+	protected RqlProfiler rqlProfiler = null;
 	
 	
 	/**
@@ -937,14 +947,15 @@ public class CmsClient {
 			.append("]]></sParamA></mes:Execute>")
 			.append("</soapenv:Body></soapenv:Envelope>");
 			
-			long before = 0;
-			long after = 0;
+			final long before;
+			final long after;
+			final long delta;
 			
             if (debugRql) {
                 System.out.println(">------ RQL SOAP request ----->\n" + StringHelper.prettyPrintXml(rqlQuery, 2));
-                before = System.currentTimeMillis();
             }
 
+            before = System.currentTimeMillis();
 			URLConnection conn = url.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
@@ -971,10 +982,16 @@ public class CmsClient {
 				rqlResponse = rqlResponse.substring(firstLine.length());
 			}
 
+			after = System.currentTimeMillis();
+			delta = after - before;
+			
             if (debugRql) {
-            	after = System.currentTimeMillis();
-            	long delta = after - before;
             	System.out.println("<------ RQL SOAP response ("+delta+" ms)------<"+rqlError+"<"+rqlInfo+"<\n" + (rqlResponse.isEmpty() ? "" : StringHelper.prettyPrintXml(rqlResponse, 2)));
+            }
+            
+            if (rqlProfiler != null) {
+            	String key = this.parseAction(rqlQuery);
+            	rqlProfiler.add(key, delta);
             }
             
             if (!rqlError.isEmpty()) {
@@ -993,6 +1010,57 @@ public class CmsClient {
 			e.printStackTrace(System.out); // Debug
 			throw e;
 		}
+	}
+	
+	
+	/**
+	 * Build some kind of key for an RQL query.
+	 * 
+	 * @param rqlQuery 
+	 * @return something that tells us what is going on.
+	 */
+	private String parseAction(String rqlQuery) throws ParserConfigurationException, SAXException, IOException {
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		RQLNode root = buildTree(db.parse(new InputSource(new StringReader(rqlQuery))).getDocumentElement());
+		StringBuilder sb = new StringBuilder(256);
+		Queue<RQLNode> q = new LinkedList<RQLNode>();
+		q.add(root); // IODATA
+
+		while (true) {
+			RQLNode n = q.poll();
+			if (n == null) break;
+
+			// Name of this node
+			String name = n.getName();
+			if (name == null) continue; // text node
+
+			// ignore duplicates, no matter the depth
+			if (sb.toString().endsWith(name)) { // hooray for garbage
+				sb.append("...");
+			} else { 			// Append it
+				if (!name.equals("IODATA")) {
+					if (sb.length() != 0)
+						sb.append(" / ");
+					sb.append(n.getName());
+				}
+			}
+			
+			// we need to know the action
+			String action = n.getAttribute("action");
+			if (action != null) {
+				sb.append(" ").append(action);
+			}
+			
+			// children
+			RQLNodeList l = n.getChildren();
+			if (l == null) continue;
+			
+			for (RQLNode c : l) {
+				q.add(c);
+			}
+		}
+		
+		return sb.toString();
 	}
 	
 	
@@ -2207,4 +2275,29 @@ public class CmsClient {
         return ReddotMailer.forCmsClient(this);
     }
 
+    
+    
+    /**
+     * Replace the current rql profiler with the given one
+     * 
+     * @param context some kind of marker what we are profiling here.
+     */
+    public void startProfiling(String context) {
+    	this.rqlProfiler = new RqlProfiler(context);
+    }
+    
+    
+    /**
+     * Stop profiling this client
+     * 
+     * @return the collected data so far, null when not profiling.
+     */
+    public RqlProfiler stopProfiling() {
+    	RqlProfiler out = this.rqlProfiler;
+    	this.rqlProfiler = null;
+    	if (out != null)
+    		out.after = System.currentTimeMillis();
+    	return out;
+    }
+    
 }
