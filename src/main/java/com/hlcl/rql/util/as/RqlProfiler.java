@@ -7,7 +7,7 @@ import java.util.*;
  * Statement profiler for various RQL calls over time.
  * Count what has been called how often and how long it took.
  * This helps finding potential call-optimization strategies.
- * Thread-safe, with or without CmsClient connection.
+ * Not thread safe, unsynchronized.
  * 
  * @author Raimund Jacob-Bloedorn
  */
@@ -190,7 +190,15 @@ public class RqlProfiler {
 	
 	
 	/**
-	 * Get and lazily allocate an entry, unsynchronized.
+	 * Capture the offical "after" time.
+	 */
+	public void stop() {
+		this.after = System.currentTimeMillis();
+	}
+	
+	
+	/**
+	 * Get and lazily allocate an entry.
 	 */
 	private Call find(String key) {
 		Call c = data.get(key);
@@ -208,16 +216,12 @@ public class RqlProfiler {
 	 * @param other
 	 */
 	public void add(RqlProfiler other) {
-		synchronized (data) {
-			synchronized (other.data) {
-				for (Call o: other.data.values()) {
-					Call c = find(o.what);
-					c.add(o);
-				}
-				
-				total.add(other.total);
-			}
+		for (Call o: other.data.values()) {
+			Call c = find(o.what);
+			c.add(o);
 		}
+				
+		total.add(other.total);
 	}
 	
 	
@@ -228,11 +232,9 @@ public class RqlProfiler {
 	 * @param time the time that was spent.
 	 */
 	public void add(String what, long time) {
-		synchronized (data) {
-			Call c = find(what);
-			c.add(time);
-			total.add(time);;
-		}
+		Call c = find(what);
+		c.add(time);
+		total.add(time);;
 	}
 	
 	
@@ -240,17 +242,13 @@ public class RqlProfiler {
 	 * The total number of different statements that have been collected.
 	 */
 	public int size() {
-		synchronized (data) {
-			return data.size();
-		}
+		return data.size();
 	}
 	
 	
 	private Collection<Call> getTopMost(TreeSet<Call> s, int limit) {
-		synchronized (data) {
-			for (Call c : data.values()) {
-				s.add(c.clone());
-			}
+		for (Call c : data.values()) {
+			s.add(c.clone());
 		}
 		
 		if (limit <= 0)

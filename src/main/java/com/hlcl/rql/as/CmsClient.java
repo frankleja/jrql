@@ -2296,7 +2296,7 @@ public class CmsClient {
     	RqlProfiler out = this.rqlProfiler;
     	this.rqlProfiler = null;
     	if (out != null)
-    		out.after = System.currentTimeMillis();
+    		out.stop();
     	return out;
     }
     
