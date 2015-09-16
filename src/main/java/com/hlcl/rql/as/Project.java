@@ -4571,4 +4571,14 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		RQLNode pageNode = rqlResponse.getNode("PAGE");
 		return new Page(this, template, pageNode.getAttribute("guid"), pageNode.getAttribute("pageid"), headline);
 	}
+	
+	
+	/**
+	 * This project locally caches page lookups.
+	 * Clear the local caches to make other peoples changes visible. 
+	 */
+	public void flushLocalPageCache() {
+		pageCache.clear();
+	}
+	
 }
