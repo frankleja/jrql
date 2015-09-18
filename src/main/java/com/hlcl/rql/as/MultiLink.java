@@ -1851,7 +1851,7 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 
 		// build new order
 		RQLNode pageNode = null;
-		for (int i = 1; i < allChilds.size(); i++) {
+		for (int i = 0; i < allChilds.size(); i++) {
 			pageNode = allChilds.get(i);
 			String guid = pageNode.getAttribute("guid");
 			// ignore the pages which should be moved
