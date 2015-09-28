@@ -2495,7 +2495,23 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		}
 		return result;
 	}
-
+	
+	
+	/**
+	 * Very stupid implementation: Iterates all content elements and find the one with the given name.
+	 * 
+	 * @param name element name to look for
+	 * @return null if not found.
+	 */
+	public ContentElement getContentElement(String name) throws RQLException {
+		for (ContentElement e : getContentElements(true)) {
+			if (e.getTemplateElementName().equals(name))
+				return e;
+		}
+		return null;
+	}
+	
+	
 	/**
 	 * Liefert den User, der diese Seite erstellt hat.
 	 * 
