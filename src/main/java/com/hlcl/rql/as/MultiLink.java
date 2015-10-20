@@ -739,9 +739,17 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ " <LINK action='assign' guid='" + getLinkGuid() + "'>" + "   <PAGE action='addnew' templateguid='"
-				+ template.getTemplateGuid() + "' headline='" + StringHelper.escapeHTML(headline) + "'/>" + " </LINK>" + "</IODATA>";
+		StringBuilder sb = new StringBuilder(128);
+		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='" + getSessionKey()).append("'>")
+		.append(" <LINK action='assign' guid='").append(getLinkGuid()).append("'>")
+		.append("   <PAGE action='addnew' templateguid='").append(template.getTemplateGuid()).append("'");
+		if (headline != null) {
+			sb.append(" headline='").append(StringHelper.escapeHTML(headline)).append("'");
+		}
+		sb.append("/>")
+		.append(" </LINK>")
+		.append("</IODATA>");
+		String rqlRequest = sb.toString();
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		// check link ok status

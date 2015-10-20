@@ -6272,9 +6272,16 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 			return;
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
-				+ "  <PAGE action='save' guid='" + getPageGuid() + "' headline='" + StringHelper.escapeHTML(headline) + "'/>"
-				+ "</IODATA>";
+		StringBuilder sb = new StringBuilder(128);
+		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>")
+		.append("  <PAGE action='save' guid='").append(getPageGuid()).append("' ");
+		if (headline == null) {
+			sb.append(" headline='#").append(getSessionKey()).append("'"); // TBI: still experimenting
+		} else {
+			sb.append(" headline='").append(StringHelper.escapeHTML(headline)).append("'");
+		}
+		sb.append("/></IODATA>");
+		String rqlRequest = sb.toString();
 		callCms(rqlRequest);
 
 		// reset details node cache
