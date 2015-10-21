@@ -6276,7 +6276,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>")
 		.append("  <PAGE action='save' guid='").append(getPageGuid()).append("' ");
 		if (headline == null) {
-			sb.append(" headline='#").append(getSessionKey()).append("'"); // TBI: still experimenting
+			sb.append(" headline='#").append(getSessionKey()).append("'");
 		} else {
 			sb.append(" headline='").append(StringHelper.escapeHTML(headline)).append("'");
 		}
