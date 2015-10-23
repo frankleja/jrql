@@ -485,4 +485,7 @@ public class PageSearch implements ProjectContainer {
         add(new PageSearchItem("keyword", keyword.getGuid(), "ne"));
     }
 
+    public void addCreatedByMyself() {
+    	add(new PageSearchItem("createdby", "myself", "eq"));
+    }
 }
