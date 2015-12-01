@@ -968,7 +968,7 @@ public class CmsClient {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			InputSource source = new InputSource(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 			//InputSource source = new InputSource(conn.getInputStream()); // there is no XML PI-header
-            Document soapResponse = db.parse(source);
+            Document soapResponse = db.parse(source); // SOAP XML-Problems go here
 
             // Error signaling (body may be empty)
             String rqlError = item0FirstChildValue(soapResponse.getElementsByTagName("sErrorA"), "");
@@ -1003,6 +1003,7 @@ public class CmsClient {
 		} catch (ParserConfigurationException e) {
 			throw new RQLException(e.toString(), e);
 		} catch (SAXException e) {
+			// FIXME: no way to acquire what was triggering the error?S
 			throw new RQLException(e.toString(), e);
 		} catch (IOException e) {
 			throw new RQLException(e.toString(), e);
@@ -1019,9 +1020,19 @@ public class CmsClient {
 	 * @param rqlQuery 
 	 * @return something that tells us what is going on.
 	 */
-	private String parseAction(String rqlQuery) throws ParserConfigurationException, SAXException, IOException {
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		RQLNode root = buildTree(db.parse(new InputSource(new StringReader(rqlQuery))).getDocumentElement());
+	private String parseAction(String rqlQuery) {
+		DocumentBuilder db;
+		RQLNode root;
+		try {
+			db = dbf.newDocumentBuilder();
+			root = buildTree(db.parse(new InputSource(new StringReader(rqlQuery))).getDocumentElement());
+		} catch (SAXException e) {
+			return e.toString() + ": " + rqlQuery;
+		} catch (ParserConfigurationException e) {
+			return e.toString() + ": " + rqlQuery;
+		} catch (IOException e) {
+			return e.toString() + ": " + rqlQuery;
+		}
 		StringBuilder sb = new StringBuilder(256);
 		Queue<RQLNode> q = new LinkedList<RQLNode>();
 		q.add(root); // IODATA
