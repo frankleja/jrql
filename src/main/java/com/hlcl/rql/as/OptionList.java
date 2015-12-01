@@ -94,7 +94,8 @@ public class OptionList extends Element {
 	 */
 	String convertToStringValue(Object valueObj) {
 		String v = (String) valueObj;
-		return getSelection(v).getSelectionGuid();
+		OptionListSelection s = getSelection(v); 
+		return s == null ? "" : s.getSelectionGuid(); //FIXME: "" ist geraten, um NPE zu verhindern
 	}
 
 	/**
