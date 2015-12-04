@@ -6195,7 +6195,7 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 				value = (Object) pair.getValue();
 				String newValue = element.convertToStringValue(value);
 				rqlRequest.append("<ELT guid='" + element.getElementGuid() + "' value='"
-						+ (newValue.length() == 0 ? "#" + getSessionKey() : StringHelper.escapeHTML(newValue)) + "'/>");
+						+ (newValue == null || newValue.length() == 0 ? "#" + getSessionKey() : StringHelper.escapeHTML(newValue)) + "'/>");
 			}
 
 			// add request end
