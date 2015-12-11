@@ -743,7 +743,7 @@ public abstract class MultiLink implements PageContainer, StructureElement {
 		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='" + getSessionKey()).append("'>")
 		.append(" <LINK action='assign' guid='").append(getLinkGuid()).append("'>")
 		.append("   <PAGE action='addnew' templateguid='").append(template.getTemplateGuid()).append("'");
-		if (headline == null) {
+		if (headline == null || headline.isEmpty()) {
 			sb.append(" headline='#").append(getSessionKey()).append("'");
 		} else {
 			sb.append(" headline='").append(StringHelper.escapeHTML(headline)).append("'");

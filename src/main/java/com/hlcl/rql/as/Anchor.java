@@ -110,7 +110,7 @@ public abstract class Anchor implements PageContainer, StructureElement {
 		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>")
 		.append(" <LINK action='assign' guid='").append(getAnchorGuid()).append("'>")
 		.append("   <PAGE action='addnew' templateguid='").append(template.getTemplateGuid()).append("'");
-		if (headline == null) {
+		if (headline == null || headline.isEmpty()) {
 			sb.append(" headline='#").append(getSessionKey()).append("'");
 		} else {
 			sb.append(" headline='").append(StringHelper.escapeHTML(headline)).append("'");
