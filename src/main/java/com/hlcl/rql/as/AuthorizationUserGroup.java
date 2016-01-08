@@ -1,6 +1,8 @@
 package com.hlcl.rql.as;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.ResourceBundle;
 
 /**
@@ -249,4 +251,53 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 		getAuthorizationPackage().clearCaches();
 	}
 
+	
+	public boolean isAllowed(Authorization a) {
+		return (allowed[a.getOffset()].intValue() & a.getBitmask()) != 0; 
+	}
+
+
+	public boolean isDenied(Authorization a) {
+		return (denied[a.getOffset()].intValue() & a.getBitmask()) != 0; 
+	}
+
+
+	public void collectAuthorizations(Collection<AuthorizationSet> outList, Authorization[] values, boolean filterMode) {
+		outer:
+		for (Authorization a : values) {
+			if (a.getOffset() == 0) continue; // dummy, FIXME: sollte irgendwann nicht mehr auftreten
+			
+			AuthorizationSet out = new AuthorizationSet();
+			out.authorization = a;
+			out.allowed = isAllowed(a);
+			out.denied = isDenied(a);
+			if (out.allowed || out.denied) {
+				if (filterMode) { // filter: only if there isnt anything other, yet
+					for (AuthorizationSet o : outList) {
+						if (Authorization.Fun.equals(o.authorization, a)) {
+							// this one is known already, do not add it again
+							continue outer;
+						}
+					}
+				}
+				
+				outList.add(out);
+			}
+			// else: no data
+		}
+	}
+	
+	
+	public Collection<AuthorizationSet> listAuthorizations() {
+		ArrayList<AuthorizationSet> out = new ArrayList<AuthorizationSet>(32);
+		
+		// TBI: probably only identify the relevant ones
+		collectAuthorizations(out, Authorization.Page.values(), false);
+		collectAuthorizations(out, Authorization.StructureElement.values(), false);
+		collectAuthorizations(out, Authorization.Dummy.values(), true); // anonymous
+		
+		return out;
+	}
+	
+	
 }
