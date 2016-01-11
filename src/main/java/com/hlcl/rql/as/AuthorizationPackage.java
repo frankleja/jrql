@@ -238,15 +238,17 @@ public class AuthorizationPackage implements ProjectContainer {
 	public List<AuthorizationUserGroup> getAuthorizationUserGroups() throws RQLException {
 		if (authorizationUserGroups == null) {
 			authorizationUserGroups = new ArrayList<AuthorizationUserGroup>();
-			// wrap
-			RQLNodeList authorizationUserGroupNodeList = getDetailsNode().getNodes("GROUP");
-			// check for no groups at all
-			if (authorizationUserGroupNodeList == null) {
-				return authorizationUserGroups;
+
+			RQLNodeList nl = getDetailsNode().getNodes("GROUP");
+			for (int i = 0; nl != null && i < nl.size(); i++) {
+				RQLNode node = (RQLNode) nl.get(i);
+				authorizationUserGroups.add(buildAuthorizationUserGroup(node, false));
 			}
-			for (int i = 0; i < authorizationUserGroupNodeList.size(); i++) {
-				RQLNode node = (RQLNode) authorizationUserGroupNodeList.get(i);
-				authorizationUserGroups.add(buildAuthorizationUserGroup(node));
+
+			nl = getDetailsNode().getNodes("USER");
+			for (int i = 0; nl != null && i < nl.size(); i++) {
+				RQLNode node = (RQLNode) nl.get(i);
+				authorizationUserGroups.add(buildAuthorizationUserGroup(node, true));
 			}
 		}
 		return authorizationUserGroups;
@@ -269,12 +271,12 @@ public class AuthorizationPackage implements ProjectContainer {
 	/**
 	 * Erzeugt ein AuthorizationUserGroup objekt aus dem gegebenen node.
 	 */
-	private AuthorizationUserGroup buildAuthorizationUserGroup(RQLNode node) {
-		return new AuthorizationUserGroup(this, node.getAttribute("guid"), node.getAttribute("name"), node.getAttribute("right1"), node
-				.getAttribute("right2"), node.getAttribute("right3"), node.getAttribute("right4"), node.getAttribute("right5"), node
-				.getAttribute("right6"), node.getAttribute("right7"), node.getAttribute("right8"), node.getAttribute("deny1"), node
-				.getAttribute("deny2"), node.getAttribute("deny3"), node.getAttribute("deny4"), node.getAttribute("deny5"), node
-				.getAttribute("deny6"), node.getAttribute("deny7"), node.getAttribute("deny8"));
+	private AuthorizationUserGroup buildAuthorizationUserGroup(RQLNode node, boolean singleUser) {
+		return new AuthorizationUserGroup(this, singleUser, node.getAttribute("guid"), node.getAttribute("name"),
+				node.getAttribute("right1"), node.getAttribute("right2"), node.getAttribute("right3"), node.getAttribute("right4"),
+				node.getAttribute("right5"), node.getAttribute("right6"), node.getAttribute("right7"), node.getAttribute("right8"),
+				node.getAttribute("deny1"), node.getAttribute("deny2"), node.getAttribute("deny3"), node.getAttribute("deny4"),
+				node.getAttribute("deny5"), node.getAttribute("deny6"), node.getAttribute("deny7"), node.getAttribute("deny8"));
 	}
 
 	/**

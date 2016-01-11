@@ -5,24 +5,25 @@ import java.util.Collection;
 import java.util.ResourceBundle;
 
 /**
- * Diese Klasse beschreibt Berechtigungen einer UserGroup einesBerechtigungspaketes.
- * 
- * @author LEJAFR
+ * Berechtigungen einer UserGroup oder eines Users.
  */
 public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 
 	private final AuthorizationPackage authorizationPackage;
+	private final boolean singleUser;
 	private final String userGroupGuid;
 	private final String userGroupName;
 	private final long[] allowed = new long[9];  // unsigned int
 	private final long[] denied  = new long[9];  // unsigned int
 
 	public AuthorizationUserGroup(AuthorizationPackage authorizationPackage,
+			boolean singleUser,
 			String userGroupGuid, String userGroupName,
 			String right1, String right2, String right3, String right4, String right5, String right6, String right7, String right8,
 			String deny1, String deny2, String deny3, String deny4, String deny5, String deny6, String deny7, String deny8)
 	{
 		this.authorizationPackage = authorizationPackage;
+		this.singleUser = singleUser;
 		this.userGroupGuid = userGroupGuid;
 		this.userGroupName = userGroupName;
 
@@ -44,6 +45,17 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 		denied[7] = Long.parseLong(deny7);
 		denied[8] = Long.parseLong(deny8);
 	}
+
+
+	public boolean isGroup() {
+		return !singleUser;
+	}
+
+
+	public boolean isSingleUser() {
+		return singleUser;
+	}
+
 
 	/**
 	 * Senden eine Anfrage an das CMS und liefert eine geparste Antwort zurueck.
@@ -193,7 +205,7 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 		if (isAllowed) {
 			value |= a.getBitmask();
 		} else {
-			value &= (~ a.getBitmask()) & 0xFFFF;
+			value &= (~ a.getBitmask()) & 0xFFFFFFFF;
 		}
 		save("right" + a.getOffset() + "='" + value + "'");
 		allowed[a.getOffset()] = value;
@@ -211,13 +223,13 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 		if (set.allowed) {
 			allowed[offset] |= mask;
 		} else {
-			allowed[offset] &= (~mask) & 0xFFFF;
+			allowed[offset] &= (~mask) & 0xFFFFFFFF;
 		}
 
 		if (set.denied) {
 			denied[offset] |= mask;
 		} else {
-			denied[offset] &= (~mask) & 0xFFFF;
+			denied[offset] &= (~mask) & 0xFFFFFFFF;
 		}
 	}
 	
@@ -249,12 +261,13 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 		</IODATA>
 		 */
 
+		String tag = singleUser ? "USER" : "GROUP";
 		// call CMS
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
 				+ "<AUTHORIZATION>"
 				+ "<AUTHORIZATIONPACKET action='save' guid='" + getAuthorizationPackageGuid() + "'>"
-				+ "<GROUPS><GROUP guid='" + getUserGroupGuid() + "' " + attributes + "/>"
-				+ "</GROUPS></AUTHORIZATIONPACKET></AUTHORIZATION></IODATA>";
+				+ "<"+tag+"S><"+tag+" guid='" + getUserGroupGuid() + "' " + attributes + "/>"
+				+ "</"+tag+"S></AUTHORIZATIONPACKET></AUTHORIZATION></IODATA>";
 		callCmsWithoutParsing(rqlRequest); // ignore result
 
 		// force new-read on package level
@@ -263,19 +276,20 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 
 
 	public void save() throws RQLException {
+		String tag = singleUser ? "USER" : "GROUP";
 		StringBuilder rqlRequest = new StringBuilder(128);
 		rqlRequest.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey())
 		.append("'>")
 		.append("<AUTHORIZATION>")
 		.append("<AUTHORIZATIONPACKET action='save' guid='").append(getAuthorizationPackageGuid()).append("'>")
-		.append("<GROUPS><GROUP guid='").append(getUserGroupGuid()).append("' ");
+		.append("<").append(tag).append("S><").append(tag).append(" guid='").append(getUserGroupGuid()).append("' ");
 
 		//+ attributes +
 		for (int offset = 1; offset < allowed.length; offset++) {
 			rqlRequest.append("right").append(offset).append("='").append(allowed[offset]).append("' ");
 			rqlRequest.append("deny").append(offset).append("='").append(denied[offset]).append("' ");
 		}
-		rqlRequest.append(" /></GROUPS></AUTHORIZATIONPACKET></AUTHORIZATION></IODATA>");
+		rqlRequest.append(" /></").append(tag).append("S></AUTHORIZATIONPACKET></AUTHORIZATION></IODATA>");
 		callCmsWithoutParsing(rqlRequest.toString()); // ignore result
 
 		// force new-read on package level
