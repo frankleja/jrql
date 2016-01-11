@@ -1,6 +1,5 @@
 package com.hlcl.rql.as;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ResourceBundle;
@@ -12,49 +11,38 @@ import java.util.ResourceBundle;
  */
 public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 
-	final static int RIGHT_PAGE_ASSIGN_KEYWORDS_BIT_INDEX = 6;
-	final static int RIGHT_PAGE_EDIT_HEADLINE_BIT_INDEX = 0;
-	final static int RIGHT_PAGE_LINKING_APPEARANCE_SCHEDULE_BIT_INDEX = 5;
-	final static int RIGHT_PAGE_PUBLISH_PAGE_BIT_INDEX = 13;
-	final static int RIGHT_LINKS_CONNECT_EXISTING_PAGE_BIT_INDEX = 2;
+	private final AuthorizationPackage authorizationPackage;
+	private final String userGroupGuid;
+	private final String userGroupName;
+	private final long[] allowed = new long[9];  // unsigned int
+	private final long[] denied  = new long[9];  // unsigned int
 
-	private AuthorizationPackage authorizationPackage;
-
-	private String userGroupGuid;
-	private String userGroupName;
-	private BigInteger[] allowed;
-	private BigInteger[] denied;
-
-	/**
-	 * constructor comment.
-	 */
-	public AuthorizationUserGroup(AuthorizationPackage authorizationPackage, String userGroupGuid, String userGroupName, String right1,
-			String right2, String right3, String right4, String right5, String right6, String right7, String right8, String deny1, String deny2,
-			String deny3, String deny4, String deny5, String deny6, String deny7, String deny8) {
-
+	public AuthorizationUserGroup(AuthorizationPackage authorizationPackage,
+			String userGroupGuid, String userGroupName,
+			String right1, String right2, String right3, String right4, String right5, String right6, String right7, String right8,
+			String deny1, String deny2, String deny3, String deny4, String deny5, String deny6, String deny7, String deny8)
+	{
 		this.authorizationPackage = authorizationPackage;
 		this.userGroupGuid = userGroupGuid;
 		this.userGroupName = userGroupName;
 
-		allowed = new BigInteger[9];
-		allowed[1] = new BigInteger(right1);
-		allowed[2] = new BigInteger(right2);
-		allowed[3] = new BigInteger(right3);
-		allowed[4] = new BigInteger(right4);
-		allowed[5] = new BigInteger(right5);
-		allowed[6] = new BigInteger(right6);
-		allowed[7] = new BigInteger(right7);
-		allowed[8] = new BigInteger(right8);
+		allowed[1] = Long.parseLong(right1);
+		allowed[2] = Long.parseLong(right2);
+		allowed[3] = Long.parseLong(right3);
+		allowed[4] = Long.parseLong(right4);
+		allowed[5] = Long.parseLong(right5);
+		allowed[6] = Long.parseLong(right6);
+		allowed[7] = Long.parseLong(right7);
+		allowed[8] = Long.parseLong(right8);
 
-		denied = new BigInteger[9];
-		denied[1] = new BigInteger(deny1);
-		denied[2] = new BigInteger(deny2);
-		denied[3] = new BigInteger(deny3);
-		denied[4] = new BigInteger(deny4);
-		denied[5] = new BigInteger(deny5);
-		denied[6] = new BigInteger(deny6);
-		denied[7] = new BigInteger(deny7);
-		denied[8] = new BigInteger(deny8);
+		denied[1] = Long.parseLong(deny1);
+		denied[2] = Long.parseLong(deny2);
+		denied[3] = Long.parseLong(deny3);
+		denied[4] = Long.parseLong(deny4);
+		denied[5] = Long.parseLong(deny5);
+		denied[6] = Long.parseLong(deny6);
+		denied[7] = Long.parseLong(deny7);
+		denied[8] = Long.parseLong(deny8);
 	}
 
 	/**
@@ -168,58 +156,78 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 	 * Liefert true, falls für diese Benutzergruppe das Seitenrecht publish page zugelassen ist.
 	 */
 	public boolean isPagePublisPagesAllowed() throws RQLException {
-
-		return allowed[1].testBit(RIGHT_PAGE_PUBLISH_PAGE_BIT_INDEX);
+		return isAllowed(Authorization.Page.PublishPages);
 	}
 
 	/**
 	 * Liefert true, falls für diese Benutzergruppe das Strukturelementerecht connect existing page zugelassen ist.
 	 */
 	public boolean isLinksConnectExistingPageAllowed() throws RQLException {
-
-		return allowed[2].testBit(RIGHT_LINKS_CONNECT_EXISTING_PAGE_BIT_INDEX);
+		return isAllowed(Authorization.StructureElement.ConnectToExistingPages);
 	}
 
 	/**
 	 * Ändert für diese Benutzergruppe das Linksrecht connect existing page auf den gegebenen Wert.
 	 */
 	public void setIsLinksConnectExistingPageAllowed(boolean isConnectExistingPageAllowed) throws RQLException {
-		setIsAllowed(2, RIGHT_LINKS_CONNECT_EXISTING_PAGE_BIT_INDEX, isConnectExistingPageAllowed);
+		setIsAllowedDirect(Authorization.StructureElement.ConnectToExistingPages, isConnectExistingPageAllowed);
 	}
 
 	/**
-	 * Ändert für diese Benutzergruppe das Seitenrecht publish page auf den gegebenen Wert.
+	 * Ändert für diese Benutzergruppe das Seitenrecht publish page auf den gegebenen Wert, direkt.
 	 */
 	public void setIsPagePublisPagesAllowed(boolean isPublishPageAllowed) throws RQLException {
-		setIsAllowed(1, RIGHT_PAGE_PUBLISH_PAGE_BIT_INDEX, isPublishPageAllowed);
+		setIsAllowedDirect(Authorization.Page.PublishPages, isPublishPageAllowed);
 	}
 
+
 	/**
-	 * Ändert ein Bit in einem der rightX attribute.
+	 * Set a single authorization.
+	 * 
+	 * @param a bit identifier
+	 * @param isAllowed set or clear this bit
+	 * @throws RQLException
 	 */
-	private void setIsAllowed(int allowedIndex, int bitIndex, boolean isAllowed) throws RQLException {
-		// get old value
-		BigInteger value = allowed[allowedIndex];
-		// modifiy
+	public void setIsAllowedDirect(Authorization a, boolean isAllowed) throws RQLException {
+		long value = allowed[a.getOffset()];
 		if (isAllowed) {
-			value = value.setBit(bitIndex);
+			value |= a.getBitmask();
 		} else {
-			value = value.clearBit(bitIndex);
+			value &= (~ a.getBitmask()) & 0xFFFF;
 		}
-		// save new value
-		save("right" + allowedIndex + "='" + value.toString() + "'");
-		// update cache
-		allowed[allowedIndex] = value;
+		save("right" + a.getOffset() + "='" + value + "'");
+		allowed[a.getOffset()] = value;
 	}
+	
+	
+	
+	/**
+	 * Change some bits in this set, without direct saving.
+	 */
+	public void applyAuthorization(AuthorizationSet set) {
+		int offset = set.authorization.getOffset();
+		int mask = set.authorization.getBitmask();
+		
+		if (set.allowed) {
+			allowed[offset] |= mask;
+		} else {
+			allowed[offset] &= (~mask) & 0xFFFF;
+		}
+
+		if (set.denied) {
+			denied[offset] |= mask;
+		} else {
+			denied[offset] &= (~mask) & 0xFFFF;
+		}
+	}
+	
 
 	/**
 	 * Ändert die Rechte dieser Berechtigungsbenutzergruppe.
 	 * <p>
 	 * Es wird der cache im AuthorizationPackage zurückgesetzt. Die Rechtewerte in diesem Objekt müssen selbst gesetzt werden.
-	 * 
-	 * @see #setIsAllowed(int, int, boolean)
 	 */
-	private void save(String attributes) throws RQLException {
+	public void save(String attributes) throws RQLException {
 
 		/* 
 		 V7.5 request
@@ -242,23 +250,45 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 		 */
 
 		// call CMS
-		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<AUTHORIZATION>"
-				+ "<AUTHORIZATIONPACKET action='save' guid='" + getAuthorizationPackageGuid() + "'>" + "<GROUPS><GROUP guid='" + getUserGroupGuid()
-				+ "' " + attributes + "/>" + "</GROUPS></AUTHORIZATIONPACKET></AUTHORIZATION></IODATA>";
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+				+ "<AUTHORIZATION>"
+				+ "<AUTHORIZATIONPACKET action='save' guid='" + getAuthorizationPackageGuid() + "'>"
+				+ "<GROUPS><GROUP guid='" + getUserGroupGuid() + "' " + attributes + "/>"
+				+ "</GROUPS></AUTHORIZATIONPACKET></AUTHORIZATION></IODATA>";
 		callCmsWithoutParsing(rqlRequest); // ignore result
 
 		// force new-read on package level
 		getAuthorizationPackage().clearCaches();
 	}
 
-	
+
+	public void save() throws RQLException {
+		StringBuilder rqlRequest = new StringBuilder(128);
+		rqlRequest.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey())
+		.append("'>")
+		.append("<AUTHORIZATION>")
+		.append("<AUTHORIZATIONPACKET action='save' guid='").append(getAuthorizationPackageGuid()).append("'>")
+		.append("<GROUPS><GROUP guid='").append(getUserGroupGuid()).append("' ");
+
+		//+ attributes +
+		for (int offset = 1; offset < allowed.length; offset++) {
+			rqlRequest.append("right").append(offset).append("='").append(allowed[offset]).append("' ");
+			rqlRequest.append("deny").append(offset).append("='").append(denied[offset]).append("' ");
+		}
+		rqlRequest.append(" /></GROUPS></AUTHORIZATIONPACKET></AUTHORIZATION></IODATA>");
+		callCmsWithoutParsing(rqlRequest.toString()); // ignore result
+
+		// force new-read on package level
+		getAuthorizationPackage().clearCaches();
+	}
+
 	public boolean isAllowed(Authorization a) {
-		return (allowed[a.getOffset()].intValue() & a.getBitmask()) != 0; 
+		return (allowed[a.getOffset()] & a.getBitmask()) != 0; 
 	}
 
 
 	public boolean isDenied(Authorization a) {
-		return (denied[a.getOffset()].intValue() & a.getBitmask()) != 0; 
+		return (denied[a.getOffset()] & a.getBitmask()) != 0; 
 	}
 
 
@@ -290,8 +320,7 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 	
 	public Collection<AuthorizationSet> listAuthorizations() {
 		ArrayList<AuthorizationSet> out = new ArrayList<AuthorizationSet>(32);
-		
-		// TBI: probably only identify the relevant ones
+
 		collectAuthorizations(out, Authorization.Page.values(), false);
 		collectAuthorizations(out, Authorization.StructureElement.values(), false);
 		collectAuthorizations(out, Authorization.Dummy.values(), true); // anonymous

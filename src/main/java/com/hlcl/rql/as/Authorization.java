@@ -9,18 +9,66 @@ public interface Authorization {
 	/**
 	 * Designate which of the magic attributes to use
 	 * 
-	 * @return an integer betreen 1 and 8, 0 for implementation bugs.
+	 * @return an integer between 1 and 8, 0 for implementation bugs.
 	 */
 	int getOffset();
+	
+	
+	/**
+	 * The actual permission encoded here.
+	 * @return usually a single-bit integer, but combinations are possible. 
+	 */
 	int getBitmask();
 
+	
+	/**
+	 * A prefix for the constant to make a unique, parseable name.
+	 * @return never null.
+	 */
+	String getPrefix();
+	
 	
 	/**
 	 * Whoever said there is no code in interfaces...
 	 */
 	public static class Fun {
+		
+		
+		/**
+		 * Two sets are equel of offset and bitmask are equal. No type checking.
+		 */
 		public static boolean equals(Authorization l, Authorization r) {
 			return l.getOffset() == r.getOffset() && l.getBitmask() == r.getBitmask();
+		}
+		
+		
+		/**
+		 * Parse an authorization specification.
+		 * 
+		 * @param spec Format "Prefix.Contant". 
+		 * @return null if not a known constant
+		 */
+		public static Authorization parse(String spec) {
+			int dot = spec.indexOf('.');
+			if (dot < 0)
+				return null;
+			
+			String prefix = spec.substring(0,  dot);
+			String constn = spec.substring(dot + 1);
+			
+			try {
+				if (prefix.equals("Page")) {
+					return Page.valueOf(constn);
+				} else if (prefix.equals("Link")) {
+					return StructureElement.valueOf(constn);
+				} else if (prefix.equals("Dummy")) {
+					return Dummy.valueOf(constn);
+				} else {
+					return null;
+				}
+			} catch (IllegalArgumentException e) {
+				return null;
+			}
 		}
 	}
 	
@@ -70,6 +118,11 @@ public interface Authorization {
 		public int getBitmask() {
 			return bitmask;
 		}
+		
+		@Override
+		public String getPrefix() {
+			return "List";
+		}
 	}
 	
 	
@@ -117,6 +170,11 @@ public interface Authorization {
 		@Override
 		public int getBitmask() {
 			return bitmask;
+		}
+		
+		@Override
+		public String getPrefix() {
+			return "Page";
 		}
 	}
 	
@@ -403,6 +461,11 @@ public interface Authorization {
 		@Override
 		public int getBitmask() {
 			return bitmask;
+		}
+		
+		@Override
+		public String getPrefix() {
+			return "Dummy";
 		}
 	}
 	
