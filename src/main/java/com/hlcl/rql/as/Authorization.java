@@ -28,13 +28,13 @@ public interface Authorization {
 	
 	// 11_2_SP2/10334.htm "Authorization Flag Values for Structural Elements"
 	public enum StructureElement implements Authorization {
-// TBI: ReadLinkElement()		
-		EditLinkProperties(2, 2),		
-		CreatePages(0, 2), // Create pages on a structural element
+		ReadLinkElement(2, 8388608), // Undocumented, FIXME: Test again	
+		EditLinkProperties(2, 0), // FIXME: Docs say (2, 2) Test again 		
+		CreatePages(2, 2), // FIXME: Undocumented, Create pages on a structural element
 		ConnectToExistingPages(2, 4),		
 		CopyAndConnectPagesFromClipboard(2, 8), // Connect to structural elements in clipboard
-		ReferencePage(2, 16),		
-// TBI: Reference link		
+		ReferencePage(2, 16777216), // FIXME: Documented as (2, 16)
+		ReferenceLink(2, 16), // FIXME: Test again 		
 		DeleteReference(2, 32), // Delete references		
 		AssignURL(2, 64),		
 		AssignAuthorizations(2, 128),		
@@ -45,13 +45,13 @@ public interface Authorization {
 		AssignTargetContainer(2, 4096),		
 		EditPublicationSettings(2, 16384),		
 		PublishPages(2, 32768),		
-		ExpandORDeleteDynamicLinks(2, 65536),
+		ExpandOrDeleteDynamicLinks(2, 65536),
 		EditDynamicLinkOrder(2, 131072), // Edit order of dynamic links		
 		EditSortOrderSettings(2, 262144),
 		EditKeywordAssignment(2, 524288), // Edit key word linking		
-		ShowReferenceList(2, 2097152)
-// TBI: Remove items from list		
-// Full control
+		ShowReferenceList(2, 2097152),
+		RemoveItemsFromList(2, 4194304), // Undocumented		
+// 	Full control: Slot2Bit0, Slot2Bit13, Slot2Bit20, Slot2Bit22, Slot2Bit23, Slot2Bit24
 		;
 		
 		StructureElement(int offset, int bitmask) {
@@ -78,7 +78,7 @@ public interface Authorization {
 		// * Pages and Instances (in general)
 		Read(1, 16),		
 		Delete(1, 256),
-		// Full control
+		// Full control: Read / Delete / ShowInformation / Slot1Bit1
 
 		// * Pages and Instances (in detail)
 		EditHeadlines(1, 1),		
@@ -93,12 +93,12 @@ public interface Authorization {
 		ReleasePages(1, 4096),		
 		PublishPages(1, 8192),		
 		EditNotes(1, 262144),		
-		// TBI: Connect to links in Clipboard		
-		ShowInformation(1, 4194306),		
+		ConnectToLinksInClipboard(1, 2097152), // Undocumented: 1, Bit 21
+		ShowInformation(1, 4194304), // FIXME: Test again		
 		ShowReferenceList(1, 8388608),		
 		ShowVersions(1, 16777216),		
 		SubmitForTranslation(1, 536870912)		
-		// Full control
+		// Full control: All of the above, plus Slot1Bit19, Slot1Bit20, Slot1Bit21, Slot1Bit22, FIXME: Test again
 		;
 		
 		Page(int offset, int bitmask) {
