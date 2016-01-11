@@ -28,19 +28,18 @@ public interface Authorization {
 	
 	// 11_2_SP2/10334.htm "Authorization Flag Values for Structural Elements"
 	public enum StructureElement implements Authorization {
-		ReadLinkElement(2, 8388608), // Undocumented, FIXME: Test again	
-		EditLinkProperties(2, 0), // FIXME: Docs say (2, 2) Test again 		
-		CreatePages(2, 2), // FIXME: Undocumented, Create pages on a structural element
+		ReadLinkElement(2, 8388608), // Undocumented	
+		EditLinkProperties(2, 1), // FIXME: Docs say (2, 2) Test again 		
+		CreatePages(2, 2), // Undocumented, Create pages on a structural element
 		ConnectToExistingPages(2, 4),		
 		CopyAndConnectPagesFromClipboard(2, 8), // Connect to structural elements in clipboard
-		ReferencePage(2, 16777216), // FIXME: Documented as (2, 16)
-		ReferenceLink(2, 16), // FIXME: Test again 		
+		ReferencePage(2, 16777216), // Documented as (2, 16)
+		ReferenceLink(2, 16), //  		
 		DeleteReference(2, 32), // Delete references		
 		AssignURL(2, 64),		
 		AssignAuthorizations(2, 128),		
 		DefineVariants(2, 256),		
 		DefineWorkflow(2, 512),		
-		ConnectWorkflowFromClipboard(2, 1024), // Connect to workflow in clipboard		
 		EditTargetContainer(2, 2048),		
 		AssignTargetContainer(2, 4096),		
 		EditPublicationSettings(2, 16384),		
