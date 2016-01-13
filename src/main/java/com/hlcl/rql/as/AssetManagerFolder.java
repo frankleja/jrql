@@ -259,4 +259,49 @@ public class AssetManagerFolder extends Folder {
 				+ "   <FILE action='update' sourcename='" + filename + "' />" + "  </FOLDER>" + " </MEDIA>" + "</IODATA>";
 		callCmsWithoutParsing(rqlRequest);
 	}
+	
+	
+	public java.util.List<FileAttribute> getCatalogAttributes() throws RQLException {
+		 String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+				 + "<MEDIA><FOLDER guid='"+getFolderGuid()+"'><CATALOGATTRIBUTES action='list' /></FOLDER></MEDIA>"
+				 + "</IODATA>";
+		 RQLNode rs = callCms(rqlRequest);
+		 RQLNodeList nl = rs.getNodesRecursive("FILEATTRIBUTE");
+		 ArrayList<FileAttribute> out = new ArrayList<FileAttribute>(nl.size());
+
+		 for (RQLNode n : nl) {
+			 out.add(new FileAttribute(this, n));
+		 }
+		 
+		 return out;
+	}
+	
+	
+	@Override
+	public java.util.List<File> searchFiles(String pattern, String suffixes, String exceptionSuffix) throws RQLException {
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+				+ "<MEDIA>" + "<FOLDER guid='" + getFolderGuid() + "'>" + "<FILES action='list' searchtext='" + pattern;
+		if (suffixes != null && suffixes.trim().length() > 0) {
+			rqlRequest = rqlRequest + "' pattern='" + suffixes;
+		}
+		rqlRequest = rqlRequest + "' maxcount='999999' startcount='1' />" + "</FOLDER>" + "</MEDIA>"
+				+ "</IODATA>";
+		RQLNode rqlResponse = callCms(rqlRequest);
+		RQLNodeList fileNodeList = rqlResponse.getNodesRecursive("FILE");
+		java.util.List<File> files = new ArrayList<File>(fileNodeList.size());
+
+		for (int i = 0; i < fileNodeList.size(); i++) {
+			RQLNode fileNode = fileNodeList.get(i);
+			String filename = fileNode.getAttribute("name");
+			if (exceptionSuffix != null && filename.substring(filename.lastIndexOf(".") + 1).equals(exceptionSuffix)) {
+				continue;
+			}
+			// reverse engineering shows that the file guid is hidden in a wrongly documented field. "guid" is missing
+			files.add(new File(this, filename,
+						fileNode.getAttribute("date"),
+						fileNode.getAttribute(fileNode.hasAttribute("guid") ? "guid" : "thumbguid")));
+		}
+		return files;
+	}
+
 }

@@ -60,6 +60,10 @@ class RQLTextNode extends RQLNode {
 	public String getAttribute(String key) {
 		return null;
 	}
+	
+	public boolean hasAttribute(String key) {
+		return false;
+	}
 
 	/**
 	 * Diese Methode liefert null.

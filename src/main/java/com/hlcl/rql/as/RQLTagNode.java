@@ -76,6 +76,11 @@ class RQLTagNode extends RQLNode {
 		return (String) attributes.get(key);
 	}
 
+	
+	public boolean hasAttribute(String key) {
+		return attributes != null && attributes.containsKey(key);
+	}
+	
 	/**
 	 * Deliver all attribute key values of this tag.
 	 */

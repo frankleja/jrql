@@ -63,6 +63,13 @@ public abstract class RQLNode {
 	 */
 	public abstract String getAttribute(String key);
 
+	
+	/**
+	 * @return true wenn das attribute definiert ist (auch leer).
+	 */
+	public abstract boolean hasAttribute(String key);
+	
+	
 	/**
 	 * Diese Methode liefert die children dieses RQLNodes in Form einer
 	 * RQLNodeList.

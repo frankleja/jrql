@@ -3,8 +3,10 @@ package com.hlcl.rql.as;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -17,6 +19,8 @@ public class File implements FolderContainer {
 	private Folder folder;
 	private String filename;
 	private ReddotDate date;
+	private String guid;
+	
 
 	/**
 	 * FileElement constructor comment.
@@ -29,11 +33,12 @@ public class File implements FolderContainer {
 	 *            Datum als String wie von RedDot geliefert
 	 * @see <code>parseDate</code>
 	 */
-	public File(Folder folder, String filename, String date) throws RQLException {
+	public File(Folder folder, String filename, String date, String guid) throws RQLException {
 
 		this.folder = folder;
 		this.filename = filename;
 		this.date = parseDate(date);
+		this.guid = guid;
 	}
 
 	/**
@@ -66,7 +71,16 @@ public class File implements FolderContainer {
 	public String getFilename() {
 		return filename;
 	}
+	
+	
+	/**
+	 * @return null if the file has no guid in this context.
+	 */
+	public String getFileGuid() {
+		return guid;
+	}
 
+	
 	/**
 	 * Liefert den Folder aus dem das File stammt.
 	 */
@@ -400,4 +414,78 @@ public class File implements FolderContainer {
 		getFolder().refreshFileInformation(this);
 	}
 
+	
+	
+	public Map<FileAttribute, String> getFileAttributes() throws RQLException {
+		Map<FileAttribute, String> out = new HashMap<FileAttribute, String>();
+		
+		// TBI: Does not work for subdirs, I guess
+		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>"
+		 + "<MEDIA><FOLDER guid='"+folder.getFolderGuid()+"' subdirguid=''>"
+		 + "<FILE guid='"+getFileGuid()+"'>"
+		 + "<FILEATTRIBUTES action='list' />"
+		 +"</FILE></FOLDER></MEDIA></IODATA>";
+		
+		RQLNode rs = callCms(rqlRequest);
+		for (RQLNode n : rs.getNodesRecursive("FILEATTRIBUTE")) {
+			FileAttribute fa = new FileAttribute(folder, n);
+			String value = n.getAttribute("value"); // possibly null
+			out.put(fa, value);
+		}
+		return out;
+	}
+	
+	
+	private Map<String, String> editAttributesBuffer = null;
+	
+	
+	/**
+	 * Start editing file attributes.
+	 * 
+	 * @return a writeable map of guid to value.
+	 */
+	public Map<String, String> editFileAttributes() throws RQLException {
+		this.editAttributesBuffer = new HashMap<String, String>();
+		
+		for (Map.Entry<FileAttribute, String> e : getFileAttributes().entrySet()) {
+			editAttributesBuffer.put(e.getKey().getFileAttributeGuid(), e.getValue());
+		}
+		
+		return editAttributesBuffer;
+	}
+	
+	
+	public String setAttribute(String guid, String value) {
+		if (editAttributesBuffer == null) throw new IllegalStateException("editFileAttributes() first!");
+		return editAttributesBuffer.put(guid, value);
+	}
+
+	
+	public String setAttribute(FileAttribute fa, String value) {
+		return setAttribute(fa.getFileAttributeGuid(), value);
+	}
+
+	
+	public void saveFileAttributes() throws RQLException {
+		if (editAttributesBuffer == null) throw new IllegalStateException("editFileAttributes() first!");
+		
+		StringBuilder sb = new StringBuilder(64 * editAttributesBuffer.size() + 32);
+		sb.append("<IODATA loginguid='").append(getLogonGuid()).append("' sessionkey='").append(getSessionKey()).append("'>")
+			.append("<MEDIA><FOLDER guid='").append(getFolderGuid()).append("'>")
+			.append("<FILE guid='").append(guid).append("'><FILEATTRIBUTES action='save'>");
+		
+		for (Map.Entry<String, String> e : editAttributesBuffer.entrySet()) {
+			String newValue = e.getValue();
+			sb.append("<FILEATTRIBUTE guid='").append(e.getKey()).append("' ");
+			// The empty-value delete is guessed
+			sb.append(" value='")
+			.append((newValue == null || newValue.length() == 0 ? "#" + getSessionKey() : StringHelper.escapeHTML(newValue)))
+			.append("' />");
+		}
+
+		sb.append("</FILEATTRIBUTES></FILE></FOLDER></MEDIA></IODATA>");
+		callCmsWithoutParsing(sb.toString());
+		editAttributesBuffer = null;
+	}
+	
 }

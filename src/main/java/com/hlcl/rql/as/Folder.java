@@ -437,7 +437,7 @@ public abstract class Folder implements ProjectContainer {
 			if (exceptionSuffix != null && filename.substring(filename.lastIndexOf(".") + 1).equals(exceptionSuffix)) {
 				continue;
 			}
-			files.add(new File(this, filename, fileNode.getAttribute("date")));
+			files.add(new File(this, filename, fileNode.getAttribute("date"), fileNode.getAttribute("guid")));
 		}
 		return files;
 	}
