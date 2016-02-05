@@ -59,7 +59,7 @@ public interface Authorization {
 			try {
 				if (prefix.equals("Page")) {
 					return Page.valueOf(constn);
-				} else if (prefix.equals("Link")) {
+				} else if (prefix.equals("Link") || prefix.equals("List")) {
 					return StructureElement.valueOf(constn);
 				} else if (prefix.equals("Dummy")) {
 					return Dummy.valueOf(constn);
