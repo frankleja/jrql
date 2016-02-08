@@ -306,16 +306,16 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 	}
 
 
-	public void collectAuthorizations(Collection<AuthorizationSet> outList, Authorization[] values, boolean filterMode) {
+	public void collectAuthorizations(Collection<AuthorizationSet> outList, Authorization[] values, boolean filterMode, boolean withEmpty) {
 		outer:
 		for (Authorization a : values) {
-			if (a.getOffset() == 0) continue; // dummy, FIXME: sollte irgendwann nicht mehr auftreten
+			if (a.getOffset() == 0) continue; // Dev-Dummy, should not happen anymore
 			
 			AuthorizationSet out = new AuthorizationSet();
 			out.authorization = a;
 			out.allowed = isAllowed(a);
 			out.denied = isDenied(a);
-			if (out.allowed || out.denied) {
+			if (withEmpty || out.allowed || out.denied) {
 				if (filterMode) { // filter: only if there isnt anything other, yet
 					for (AuthorizationSet o : outList) {
 						if (Authorization.Fun.equals(o.authorization, a)) {
@@ -326,21 +326,50 @@ public class AuthorizationUserGroup implements AuthorizationPackageContainer {
 				}
 				
 				outList.add(out);
-			}
-			// else: no data
+			} // else: no bit is set
 		}
 	}
 	
 	
+	/**
+	 * Lists only the authorizations that define anything, no "__"-Versions.
+	 */
 	public Collection<AuthorizationSet> listAuthorizations() {
 		ArrayList<AuthorizationSet> out = new ArrayList<AuthorizationSet>(32);
 
-		collectAuthorizations(out, Authorization.Page.values(), false);
-		collectAuthorizations(out, Authorization.StructureElement.values(), false);
-		collectAuthorizations(out, Authorization.Dummy.values(), true); // anonymous
+		collectAuthorizations(out, Authorization.Page.values(), false, false);
+		collectAuthorizations(out, Authorization.StructureElement.values(), false, false);
+		collectAuthorizations(out, Authorization.Dummy.values(), true, false); // anonymous
 		
 		return out;
 	}
+
 	
+	/**
+	 * List all known authorizations, including the cleared bits ("__"-Versions), but not the dummy bits.
+	 */
+	public Collection<AuthorizationSet> listKnownAuthorizations() {
+		ArrayList<AuthorizationSet> out = new ArrayList<AuthorizationSet>(32);
+
+		collectAuthorizations(out, Authorization.Page.values(), false, true);
+		collectAuthorizations(out, Authorization.StructureElement.values(), false, true);
+		
+		return out;
+	}
+
+
+	/**
+	 * List all known authorizations, including the cleared bits ("__"-Versions), including the dumy bits.
+	 */
+	public Collection<AuthorizationSet> listAllAuthorizations() {
+		ArrayList<AuthorizationSet> out = new ArrayList<AuthorizationSet>(32);
+
+		collectAuthorizations(out, Authorization.Page.values(), false, true);
+		collectAuthorizations(out, Authorization.StructureElement.values(), false, true);
+		collectAuthorizations(out, Authorization.Dummy.values(), true, true); // anonymous
+		
+		return out;
+	}
+
 	
 }
