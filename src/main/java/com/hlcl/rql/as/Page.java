@@ -4807,9 +4807,14 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		} else if (isInStateWaitingForRelease()) {
 			result = "waiting for release";
 		}
-		// TODO check, if Translation Editor licencse is available
-		if (isInStateWaitingToBeTranslated()) {
-			result = result += ", waiting to be translated";
+		
+		try {
+			// TODO check, if Translation Editor licencse is available
+			if (isInStateWaitingToBeTranslated()) {
+				result += ", waiting to be translated";
+			}
+		} catch (RQLException e) {
+			result += " (translation state unavailabe, CMS bug?)"; 
 		}
 		return result;
 	}
