@@ -9,6 +9,7 @@ import com.hlcl.rql.as.PasswordAuthentication;
 import com.hlcl.rql.as.Project;
 import com.hlcl.rql.as.RQLException;
 import com.hlcl.rql.as.StringHelper;
+import org.apache.log4j.Logger;
 
 /**
  * @author lejafr
@@ -40,7 +41,10 @@ public class BatchProgrammingConnectWithUserAndPassword {
 
 			for (int i = 0; i < projectNames.length; i++) {
 				String projectName = projectNames[i];
+                                System.out. println("# projectName" +projectName);
+                                Logger.getLogger("# projectName" +projectName);
 				Project project = client.getProjectByName(projectName);
+                                    //project.
 
 				// do what you want
 			}
