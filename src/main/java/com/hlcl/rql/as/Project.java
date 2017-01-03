@@ -2179,9 +2179,9 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		</IODATA>
 		 */
 
-		// call CMS
+		// call CMS, foldertype='0' earlier 
 		String rqlRequest = "<IODATA loginguid='" + getLogonGuid() + "' sessionkey='" + getSessionKey() + "'>" + "<PROJECT>"
-				+ "   <FOLDERS action='list' foldertype='0'/>" + " </PROJECT>" + "</IODATA>";
+				+ "   <FOLDERS action='list' />" + " </PROJECT>" + "</IODATA>";
 		RQLNode rqlResponse = callCms(rqlRequest);
 
 		return rqlResponse.getNodes("FOLDER");
