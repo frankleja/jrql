@@ -14,6 +14,7 @@ public abstract class Folder implements ProjectContainer {
 	private boolean isAvailableInTextEditor;
 	private String path;
 	private int saveType;
+	private int folderType;
 
 	// data storage constants
 	private final int SAVE_TYPE_INTERNAL_DATABASE = 0;
@@ -26,7 +27,7 @@ public abstract class Folder implements ProjectContainer {
 	/**
 	 * Folder constructor comment.
 	 */
-	public Folder(Project project, String name, String folderGuid, String hideInTextEditor, String saveType, String path) {
+	public Folder(Project project, String name, String folderGuid, String hideInTextEditor, String saveType, String path, String folderType) {
 		super();
 
 		this.project = project;
@@ -34,8 +35,9 @@ public abstract class Folder implements ProjectContainer {
 		this.folderGuid = folderGuid;
 
 		this.isAvailableInTextEditor = "0".equals(hideInTextEditor);
-		this.saveType = Integer.parseInt(saveType);
+		this.saveType = Integer.parseInt(saveType, 10);
 		this.path = path;
+		this.folderType = Integer.parseInt(folderType, 10);
 	}
 
 	/**
@@ -51,6 +53,7 @@ public abstract class Folder implements ProjectContainer {
 		this.isAvailableInTextEditor = false;
 		this.saveType = SAVE_TYPE_FILE_SYSTEM; // only asset managers in file system can have sub-folders
 		this.path = null; // unused, path come from AssetManager folder, not sub-folder
+		this.folderType = 0; // wild guess: File folder
 	}
 
 	/**
@@ -483,4 +486,18 @@ public abstract class Folder implements ProjectContainer {
 	 */
 	public void refreshFileInformation(File file) throws RQLException {
 	}
+	
+	
+	/**
+	 * Documented types are: 
+	 * 0 = File folder
+	 * 1 = Content class folder
+	 * 4 = External system folder
+	 * 5 = Folder for CCS (No longer supported)
+	 * @return hopefully one of these values
+	 */
+	public int getFolderType() {
+		return folderType;
+	}
+
 }

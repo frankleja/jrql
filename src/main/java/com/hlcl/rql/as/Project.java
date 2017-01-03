@@ -368,11 +368,12 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		String hide = folderNode.getAttribute("hideintexteditor");
 		String saveType = folderNode.getAttribute("savetype");
 		String path = folderNode.getAttribute("path");
-
+		String folderType = folderNode.getAttribute("foldertype");
+		
 		if (folderNode.getAttribute("catalog").equals("1")) {
-			folder = new AssetManagerFolder(this, name, guid, hide, saveType, path);
+			folder = new AssetManagerFolder(this, name, guid, hide, saveType, path, folderType);
 		} else {
-			folder = new FileFolder(this, name, guid, hide, saveType, path);
+			folder = new FileFolder(this, name, guid, hide, saveType, path, folderType);
 		}
 		return folder;
 	}
@@ -1737,7 +1738,8 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 		RQLNode folderNode = findFolderNodeByName(assetManagerFolderName);
 		if (folderNode.getAttribute("catalog").equals("1")) {
 			return new AssetManagerFolder(this, folderNode.getAttribute("name"), folderNode.getAttribute("guid"), folderNode
-					.getAttribute("hideintexteditor"), folderNode.getAttribute("savetype"), folderNode.getAttribute("path"));
+					.getAttribute("hideintexteditor"), folderNode.getAttribute("savetype"), folderNode.getAttribute("path"),
+					folderNode.getAttribute("foldertype"));
 		}
 		return null;
 	}

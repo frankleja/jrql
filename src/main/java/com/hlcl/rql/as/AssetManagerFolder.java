@@ -28,8 +28,8 @@ public class AssetManagerFolder extends Folder {
 	 * @param path
 	 *            path in file system, if saveType=2
 	 */
-	public AssetManagerFolder(Project project, String name, String folderGuid, String hideInTextEditor, String saveType, String path) {
-		super(project, name, folderGuid, hideInTextEditor, saveType, path);
+	public AssetManagerFolder(Project project, String name, String folderGuid, String hideInTextEditor, String saveType, String path, String folderType) {
+		super(project, name, folderGuid, hideInTextEditor, saveType, path, folderType);
 	}
 
 	/**

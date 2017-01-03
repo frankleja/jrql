@@ -15,8 +15,8 @@ public class FileFolder extends Folder {
 	 * @param saveType	number between 0 and 3 where the folder content is stored
 	 * @param path	path in file system, if saveType=2
 	 */
-	public FileFolder(Project project, String name, String folderGuid, String hideInTextEditor, String saveType, String path) {
-		super(project, name, folderGuid, hideInTextEditor, saveType, path);
+	public FileFolder(Project project, String name, String folderGuid, String hideInTextEditor, String saveType, String path, String folderType) {
+		super(project, name, folderGuid, hideInTextEditor, saveType, path, folderType);
 	}
 	/**
 	 * Liefert true, weil dieser folder ein einfacher FileFolder ist.
