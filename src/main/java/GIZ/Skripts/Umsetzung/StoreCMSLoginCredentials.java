@@ -35,8 +35,8 @@ public class StoreCMSLoginCredentials {
 	
 	public static void main(String[] args) 
 		throws IOException{
-		String username = new String("salazar");
-		String password = new String("locket");
+		String username = new String("red-neusta1");
+		String password = new String("aendern");
 		
 		if(!targetFile.exists())
 			targetFile.createNewFile();

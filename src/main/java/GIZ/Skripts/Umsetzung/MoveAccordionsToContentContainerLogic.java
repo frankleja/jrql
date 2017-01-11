@@ -1,3 +1,7 @@
+/*
+PLEASE DO NOT RUN THIS FILE
+USED FOR NOTES ONLY
+*/
 package GIZ.Skripts.Umsetzung;
 
 import com.hlcl.rql.as.CmsClient;
