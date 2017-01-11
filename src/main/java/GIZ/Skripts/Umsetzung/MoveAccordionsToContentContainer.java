@@ -1,8 +1,5 @@
 package GIZ.Skripts.Umsetzung;
 
-/**
- *
- */
 import com.hlcl.rql.as.CmsClient;
 import com.hlcl.rql.as.Container;
 import com.hlcl.rql.as.Page;
@@ -21,7 +18,7 @@ import java.util.Properties;
  * @author Ibrahim Sawadogo
  *
  */
-public class BatchProgrammingConnectWithUserAndPassword {
+public class MoveAccordionsToContentContainer {
 
     private static File targetFile;
     private static Properties properties;
@@ -40,12 +37,6 @@ public class BatchProgrammingConnectWithUserAndPassword {
         }
     }
 
-    /*
-     user = key;
-
-   pw = properties.getProperty(key);
-   
-     */
     //private HashMap<String, String> AllProjectNamesAndGuid = new HashMap<>();
     /**
      * @param projects
