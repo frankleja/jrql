@@ -11,7 +11,6 @@ import com.hlcl.rql.util.as.PageArrayList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -19,7 +18,7 @@ import java.util.Properties;
  * @author Ibrahim Sawadogo
  *
  */
-public class MoveAccordionsToContentContainer {
+public class MoveAccordionsToContentContainerLogic {
 
     private static File targetFile;
     private static Properties properties;
@@ -64,7 +63,7 @@ public class MoveAccordionsToContentContainer {
         PageArrayList pgInQContainerChildPages;
 
         Project project = null;
-
+        
         //load CMS login Credentials from File
         for (String key : properties.stringPropertyNames()) {
             user = key;
@@ -90,32 +89,28 @@ public class MoveAccordionsToContentContainer {
 
             /* loop over "pgInQContainerChildPages" if > 0 */
             pgInQContainerChildPages = firstPage.getContainerChildPages(moveFromConNameInQ);
+
             Container moveToCon = firstPage.getContainer(moveToConNameInQ);
 
             /* if size is = 0 goto next "allPagesInTemplate" */
             System.out.println("#pgInQContainerChildPages Size " + pgInQContainerChildPages.size());
-            
-            ArrayList<Page> pgToReconnect = new ArrayList();
-            for (int ccp = pgInQContainerChildPages.size() - 1; ccp >= 0; ccp--) {
-                /* if size is > 0 loop over "pgInQContainerChildPages" */
 
-                Page firstChildPgOfCon = pgInQContainerChildPages.getPage(ccp);
-                System.out.println("#isBasedOnTemplate " + firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn));
-                if (!firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn)) {
-                    break;
-                }
-                pgToReconnect.add(firstChildPgOfCon);
+            /* if size is > 0 loop over "pgInQContainerChildPages" */
+            Page firstChildPgOfCon = pgInQContainerChildPages.getPage(0);
 
-                firstChildPgOfCon.disconnectFromAllMultiLinks();
+            /* if tmplName is <> "Accordion" loop "pgInQContainerChildPages" */
+            String firstChildPgOfConTmpName = firstChildPgOfCon.getTemplateName();
 
-            } //ccp
+            /* if tmplName is = "Accordion" disconnet from link (move)*/
+            System.out.println("#isBasedOnTemplate " + firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn));
+            //firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn);
+            firstChildPgOfCon.disconnectFromAllMultiLinks();
 
-            for (int i = pgToReconnect.size() - 1; i >= 0; i--) {
-                Page page = pgToReconnect.get(i);
-                moveToCon.connectToExistingPage(page, true, true);
-            }
+            /* set break to false. meaning the move continues */
+ /* connect to "moveToConNameInQ" */
+            moveToCon.connectToExistingPage(firstChildPgOfCon, true, true); //re-connect logic is correct
+
             /* end of logic */
-
         } catch (RQLException ex) {
             String error = "";
             Throwable re = ex.getReason();
