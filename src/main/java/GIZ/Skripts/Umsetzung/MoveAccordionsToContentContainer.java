@@ -14,6 +14,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * @author Ibrahim Sawadogo
@@ -21,6 +25,8 @@ import java.util.Properties;
  */
 public class MoveAccordionsToContentContainer {
 
+    private static Logger logger = Logger.getLogger("ibrahim");
+    
     static CmsClient client = null;
     private static File targetFile;
     private static Properties properties;
@@ -64,6 +70,15 @@ public class MoveAccordionsToContentContainer {
         PageArrayList pgInQContainerChildPages;
 
         Project project = null;
+        
+        try {
+            FileHandler fh = new FileHandler("log.txt");
+            Logger.getLogger("ibrahim").addHandler(fh);
+        } catch (IOException ex) {
+            Logger.getLogger(MoveAccordionsToContentContainer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(MoveAccordionsToContentContainer.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //load CMS login Credentials from File
         for (String key : properties.stringPropertyNames()) {
@@ -82,6 +97,7 @@ public class MoveAccordionsToContentContainer {
             template = project.getTemplateByName(templateFolderName, templateNameInQ);
 
             allPagesInTemplate = project.getAllPagesBasedOn(template, 99);
+            logger.log(Level.INFO, "#allPagesInTemplate size {0}", allPagesInTemplate.size());
             System.out.println("#allPagesInTemplate size " + allPagesInTemplate.size());
 
             /* loop over "allPagesInTemplate" */
@@ -126,6 +142,7 @@ public class MoveAccordionsToContentContainer {
             /* end of logic */
 
         } catch (RQLException ex) {
+            logger.log(Level.WARNING, "Got exception", ex);
             String error = "";
             Throwable re = ex.getReason();
             if (re != null) {
@@ -138,6 +155,7 @@ public class MoveAccordionsToContentContainer {
         //listAllProjectNames(client.getAllProjects());
         //listAllTEmplateNames(client.getProject(sessionKey, projectGuid)); //works
         client.disconnect();
+        logger.info("End of Java Program");
     }
 
     public static void listAllProjectNames(List projects) throws RQLException {
