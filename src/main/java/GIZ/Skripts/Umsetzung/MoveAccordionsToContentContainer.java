@@ -21,6 +21,7 @@ import java.util.Properties;
  */
 public class MoveAccordionsToContentContainer {
 
+    static CmsClient client = null;
     private static File targetFile;
     private static Properties properties;
     private static String newLine = System.lineSeparator();
@@ -47,7 +48,6 @@ public class MoveAccordionsToContentContainer {
         String user = "";
         String pw = "";
 
-        CmsClient client = null;
         String logonGuid = "";
         String sessionKey = "";
         String projectGuid = "";
@@ -81,39 +81,48 @@ public class MoveAccordionsToContentContainer {
 
             template = project.getTemplateByName(templateFolderName, templateNameInQ);
 
-            /* loop over "allPagesInTemplate" */
             allPagesInTemplate = project.getAllPagesBasedOn(template, 99);
+            System.out.println("#allPagesInTemplate size " + allPagesInTemplate.size());
 
-            Page firstPage = allPagesInTemplate.get(1);
+            /* loop over "allPagesInTemplate" */
+            for (int pit = 0; pit < allPagesInTemplate.size(); pit++) {
+                Page pageInTemplate = allPagesInTemplate.get(pit);
 
-            System.out.println("#firstPageID " + firstPage.getPageId());
+                System.out.println("\n##Pages in Template ID " + pageInTemplate.getPageId());
+                /*perform checks on page that could cause ERRORS */
+                errorPreventionChecks(pageInTemplate);
 
-            /* loop over "pgInQContainerChildPages" if > 0 */
-            pgInQContainerChildPages = firstPage.getContainerChildPages(moveFromConNameInQ);
-            Container moveToCon = firstPage.getContainer(moveToConNameInQ);
+                pgInQContainerChildPages = pageInTemplate.getContainerChildPages(moveFromConNameInQ);
+                Container moveToCon = pageInTemplate.getContainer(moveToConNameInQ);
 
-            /* if size is = 0 goto next "allPagesInTemplate" */
-            System.out.println("#pgInQContainerChildPages Size " + pgInQContainerChildPages.size());
-            
-            ArrayList<Page> pgToReconnect = new ArrayList();
-            for (int ccp = pgInQContainerChildPages.size() - 1; ccp >= 0; ccp--) {
-                /* if size is > 0 loop over "pgInQContainerChildPages" */
+                System.out.println("##pgInQContainerChildPages Size " + pgInQContainerChildPages.size());
 
-                Page firstChildPgOfCon = pgInQContainerChildPages.getPage(ccp);
-                System.out.println("#isBasedOnTemplate " + firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn));
-                if (!firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn)) {
-                    break;
-                }
-                pgToReconnect.add(firstChildPgOfCon);
+                ArrayList<Page> pgToReconnect = new ArrayList();
 
-                firstChildPgOfCon.disconnectFromAllMultiLinks();
+                /* loop over pages in the container BUT from the bottom up */
+                for (int ccp = pgInQContainerChildPages.size() - 1; ccp >= 0; ccp--) {
 
-            } //ccp
+                    Page firstChildPgOfCon = pgInQContainerChildPages.getPage(ccp);
+                    System.out.println("##isBasedOnTemplate " + firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn) + " + ID: " + firstChildPgOfCon.getPageId());
 
-            for (int i = pgToReconnect.size() - 1; i >= 0; i--) {
-                Page page = pgToReconnect.get(i);
-                moveToCon.connectToExistingPage(page, true, true);
-            }
+                    if (!firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn)) {
+                        break;
+                    }
+
+                    pgToReconnect.add(firstChildPgOfCon);
+                    //firstChildPgOfCon.disconnectFromAllMultiLinks(); //dryRun
+                } //ccp
+
+                /* reconnect pages to new container WHILE maintaining previous order */
+                System.out.println("##pages To Reconnect size " + pgToReconnect.size());
+                for (int i = pgToReconnect.size() - 1; i >= 0; i--) {
+                    Page page = pgToReconnect.get(i);
+                    System.out.println("##pages To Reconnect ID " + pgToReconnect.get(i).getPageId());
+                    errorPreventionChecks(page);
+                    //moveToCon.connectToExistingPage(page, true, true); //dryRun
+                } //i
+                //break; //working with just 1 page for now
+            } //pit
             /* end of logic */
 
         } catch (RQLException ex) {
@@ -128,8 +137,6 @@ public class MoveAccordionsToContentContainer {
 
         //listAllProjectNames(client.getAllProjects());
         //listAllTEmplateNames(client.getProject(sessionKey, projectGuid)); //works
-        /*get the template*/
-        // project.lo
         client.disconnect();
     }
 
@@ -159,5 +166,48 @@ public class MoveAccordionsToContentContainer {
             }
         } catch (RQLException rQLException) {
         }
+    }
+
+    private static void errorPreventionChecks(Page pageInTemplate) throws RQLException {
+
+        if (pageInTemplate.isInRecycleBin()) {
+            System.out.println("###page is in RecycleBin");
+        }
+        if (pageInTemplate.isInStateReleased()) {
+            System.out.println("###page is released ^^");
+        }
+        if (pageInTemplate.isInStateSavedAsDraft()) {
+            System.out.println("###page is in state saved as draft");
+        }
+        if (pageInTemplate.isInStateSavedAsDraftChanged()) {
+            System.out.println("###page is in state saved as Draft changed ");
+        }
+        if (pageInTemplate.isInStateSavedAsDraftNew()) {
+            System.out.println("###page is in state saved as draft new");
+        }
+        if (pageInTemplate.isInStateWaitingForCorrection()) {
+            System.out.println("###page is in state waiting for correction");
+        }
+        if (pageInTemplate.isInStateWaitingForRelease()) {
+            System.out.println("###page is in state waiting for release");
+            pageInTemplate.release();
+        }
+        if (pageInTemplate.isInStateWaitingToBeTranslated()) {
+            System.out.println("###page is in state waiting to be translated");
+        }
+        if (pageInTemplate.isLanguageVariantDependent()) {
+            System.out.println("###page is laguage variant dependant ^^");
+        }
+        if (pageInTemplate.isLanguageVariantIndependent()) {
+            System.out.println("###page is laguage variant independant ^^");
+        }
+        if (pageInTemplate.isUnlinked()) {
+            System.out.println("###page is unlinked");
+        }
+        /*if (!pageInTemplate.isLocked()) {
+        System.out.println("# page is locked by :"+pageInTemplate.getLockedByUserName()+" ^^");
+        //pageInTemplate.switchUserTo(client.getConnectedUser());
+        }*/
+        System.out.println("###page is locked by :" + pageInTemplate.getLockedByUserName() + " ^^");
     }
 }
