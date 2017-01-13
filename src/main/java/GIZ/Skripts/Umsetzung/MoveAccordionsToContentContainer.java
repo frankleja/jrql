@@ -59,7 +59,7 @@ public class MoveAccordionsToContentContainer {
         String sessionKey = "";
         String projectGuid = "";
 
-        String projectNameInQ = "GIZ_INTERNET";
+        String projectNameInQ = "Sandbox2_GIZ_INTERNET";
         String templateNameInQ = "Worldwide Text";
         String templateFolderName = "Masterpages - special";
         String moveFromConNameInQ = "CON_toolbox";
@@ -98,7 +98,8 @@ public class MoveAccordionsToContentContainer {
             allLanVariants = project.getAllLanguageVariants();
 
             /* set language variant */
-            for (int alv = 0; alv < allLanVariants.size(); alv++) {
+            int allLanVariantsSize = allLanVariants.size();
+            for (int alv = 0; alv < allLanVariantsSize; alv++) {
                 project.setCurrentLanguageVariant(allLanVariants.get(alv));
                 logger.log(Level.INFO, "#set Current Language Variant to {0}", allLanVariants.get(alv).getName());
                 System.out.println("\n\n#set Current Language Variant to " + allLanVariants.get(alv).getName());
@@ -114,7 +115,7 @@ public class MoveAccordionsToContentContainer {
 
                 int counter = 0;
                 /* loop over "allPagesInTemplate" */
-                for (int pit = 0; pit < allPagesInTemplate.size(); pit++) {
+                for (int pit = 0; pit < allPagesInTemplateSize; pit++) {
                     Page pageInTemplate = allPagesInTemplate.get(pit);
                     counter++;
                     String currPageID = pageInTemplate.getPageId();
@@ -128,26 +129,33 @@ public class MoveAccordionsToContentContainer {
                         //errorPreventionChecks(pageInTemplate); //not necessary for this page
                         pgInQContainerChildPages = pageInTemplate.getContainerChildPages(moveFromConNameInQ);
                         Container moveToCon = pageInTemplate.getContainer(moveToConNameInQ);
-
-                        System.out.println("##pgInQContainerChildPages Size " + pgInQContainerChildPages.size());
+                        Container mvFromCon = pageInTemplate.getContainer(moveFromConNameInQ);
+                        int pgInQContainerChildPagesSize = pgInQContainerChildPages.size();
+                        System.out.println("##pgInQContainerChildPages Size " + pgInQContainerChildPagesSize);
 
                         ArrayList<Page> pgToReconnect = new ArrayList();
 
                         /* loop over pages in the container BUT from the bottom up */
-                        for (int ccp = pgInQContainerChildPages.size() - 1; ccp >= 0; ccp--) {
+                        for (int ccp = pgInQContainerChildPagesSize - 1; ccp >= 0; ccp--) {
 
-                            Page firstChildPgOfCon = pgInQContainerChildPages.getPage(ccp);
-                            if (firstChildPgOfCon.existsInCurrentLanguageVariant()) {
+                            Page ChildPgOfConInWorking = pgInQContainerChildPages.getPage(ccp);
+                            if (ChildPgOfConInWorking.existsInCurrentLanguageVariant()) {
 
-                                System.out.println("##isBasedOnTemplate " + firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn) + " + ID: " + firstChildPgOfCon.getPageId());
+                                System.out.println("##isBasedOnTemplate " + ChildPgOfConInWorking.isBasedOnTemplate(moveTmplToBeBasedOn) + " + ID: " + ChildPgOfConInWorking.getPageId());
 
-                                if (!firstChildPgOfCon.isBasedOnTemplate(moveTmplToBeBasedOn)) {
+                                if (!ChildPgOfConInWorking.isBasedOnTemplate(moveTmplToBeBasedOn)) {
                                     break;
                                 }
 
-                                pgToReconnect.add(firstChildPgOfCon);
+                                pgToReconnect.add(ChildPgOfConInWorking);
                                 //firstChildPgOfCon.disconnectFromAllMultiLinks(); //dryRun
+                                /*<test>*/
+                                mvFromCon.disconnectChild(ChildPgOfConInWorking);
+                                 /*</test>*/
                             } // exisit in current lang variant
+                            else{
+                                System.out.println("##page does not exist in current lang variant°°");
+                            }
                         } //ccp
 
                         /* reconnect pages to new container WHILE maintaining previous order */
@@ -158,7 +166,7 @@ public class MoveAccordionsToContentContainer {
                             if (!errorPreventionChecks(page)) {
                                 break;
                             }
-                            //moveToCon.connectToExistingPage(page, true, true); //dryRun
+                            moveToCon.connectToExistingPage(page, true, true); //dryRun
                         } //i
                         //break; //working with just 1 page for now
                     } // exisit in current lang variant
@@ -255,10 +263,11 @@ public class MoveAccordionsToContentContainer {
         //pageInTemplate.switchUserTo(client.getConnectedUser());
         }*/
         //System.out.println("###page is locked by :" + pageInTemplate.getLockedByUserName() + " ^^");
+        /*
         if (pageInTemplate.isInRecycleBin()) {
             System.out.println("###page is in RecycleBin... no need to move it°°");
             returnValue = false;
-        }
+        }*/
         return returnValue;
     }
 }
