@@ -138,19 +138,19 @@ public class MoveAccordionsToContentContainer {
                         /* loop over pages in the container BUT from the bottom up */
                         for (int ccp = pgInQContainerChildPagesSize - 1; ccp >= 0; ccp--) {
 
-                            Page ChildPgOfConInWorking = pgInQContainerChildPages.getPage(ccp);
-                            if (ChildPgOfConInWorking.existsInCurrentLanguageVariant()) {
+                            Page ChildPgOfConInProgress = pgInQContainerChildPages.getPage(ccp);
+                            if (ChildPgOfConInProgress.existsInCurrentLanguageVariant()) {
 
-                                System.out.println("##isBasedOnTemplate " + ChildPgOfConInWorking.isBasedOnTemplate(moveTmplToBeBasedOn) + " + ID: " + ChildPgOfConInWorking.getPageId());
+                                System.out.println("##isBasedOnTemplate " + ChildPgOfConInProgress.isBasedOnTemplate(moveTmplToBeBasedOn) + " + ID: " + ChildPgOfConInProgress.getPageId());
 
-                                if (!ChildPgOfConInWorking.isBasedOnTemplate(moveTmplToBeBasedOn)) {
+                                if (!ChildPgOfConInProgress.isBasedOnTemplate(moveTmplToBeBasedOn)) {
                                     break;
                                 }
 
-                                pgToReconnect.add(ChildPgOfConInWorking);
+                                pgToReconnect.add(ChildPgOfConInProgress);
                                 //firstChildPgOfCon.disconnectFromAllMultiLinks(); //dryRun
                                 /*<test>*/
-                                mvFromCon.disconnectChild(ChildPgOfConInWorking);
+                                mvFromCon.disconnectChild(ChildPgOfConInProgress);
                                  /*</test>*/
                             } // exisit in current lang variant
                             else{
