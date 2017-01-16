@@ -6994,4 +6994,8 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
     	// are there more?
     	throw new WrongTypeException("Not a StructureElement: " + name);
     }
+
+    public String getS(String locale) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
