@@ -16,10 +16,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 /**
  * @author Ibrahim Sawadogo
@@ -27,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class convertStrongToH2 {
 
-    //private static final Logger logger = Logger.getLogger("convertStrongToH2");
+    private static final Logger logger = Logger.getLogger(convertStrongToH2.class);
 
     public static List<String> collectedPgIds = new LinkedList<String>();
     public static List<String> progressStatus = new LinkedList<String>();
@@ -49,7 +48,7 @@ public class convertStrongToH2 {
     }
 
     /**
-     * @param projects
+     * @param args
      * @throws RQLException
      */
     public static void main(String[] args) throws RQLException {
@@ -64,14 +63,16 @@ public class convertStrongToH2 {
         PageArrayList allPagesInCurrentTemplate;
         Project project = null;
 
+        /*
         try {
-            FileHandler fh = new FileHandler("log1.txt");
-            Logger.getLogger("convertStrongToH2").addHandler(fh);
+        FileHandler fh = new FileHandler("log1.txt");
+        Logger.getLogger().addHandler(fh);
         } catch (IOException ex) {
-            Logger.getLogger(convertStrongToH2.class.getName()).log(Level.SEVERE, null, ex);
+        logger.error(null, ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(convertStrongToH2.class.getName()).log(Level.SEVERE, null, ex);
+        logger.error(null, ex);
         }
+         */
 
         //load CMS login Credentials from File
         for (String key : properties.stringPropertyNames()) {
@@ -92,21 +93,6 @@ public class convertStrongToH2 {
             for (int alv = 0; alv < allLanVariantsSize; alv++) {
                 project.setCurrentLanguageVariant(allLangVariants.get(alv));
 
-                logger.trace("Trace Message!", "val1");
-                LogRecord logs = null;
-                        logs.setMessage(Message.format("#set Current Language Variant to {0}", allLangVariants.get(alv).getName()));
-                logger.log(logs);
-                
-                  int val1 = 10, val2 = 11, val3 = 12;
-
-                  private static final Logger logger = LogManager.getLogger();
-  logger.trace("val1={}, val2={}, val3={}", val1, val2, val3);
-  logger.debug("val1={}, val2={}, val3={}", val1, val2, val3);
-  logger.info("val1={}, val2={}, val3={}", val1, val2, val3);
-  logger.warn("val1={}, val2={}, val3={}", val1, val2, val3);
-  logger.error("val1={}, val2={}, val3={}", val1, val2, val3);
-  logger.fatal("val1={}, val2={}, val3={}", val1, val2, val3);
-                
                 System.out.println("\n\n#set Current Language Variant to " + allLangVariants.get(alv).getName());
 
                 List<Template> allTemplatesInProject = project.getAllTemplates();
@@ -169,4 +155,24 @@ public class convertStrongToH2 {
 
         return text;
     }
+    
+    	public static void save2File(List<String> contentData, String filename) throws IOException {
+		String outputfilename = filename+".txt";
+		File out = new File(outputfilename);
+		FileUtils.writeLines(out, contentData);
+	}
+        
+        /*
+        			for (String glc : gameListContent) {
+				Page currentPg = project.getPageById("1998");
+				PageArrayList listChildren = currentPg.getListChildPages(glc);
+				collectedPgIds.addAll(UtilityTools
+						.PgArrList2LnkList(listChildren));
+			}
+
+			UtilityTools.save2FileAllGamesPageIds(collectedPgIds,
+					"allOldPageIDs");
+        
+        
+        */
 }
