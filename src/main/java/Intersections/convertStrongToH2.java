@@ -1,6 +1,5 @@
 package Intersections;
 
-import com.hlcl.rql.as.TextElement;
 import com.hlcl.rql.as.CmsClient;
 import com.hlcl.rql.as.LanguageVariant;
 import com.hlcl.rql.as.Page;
@@ -8,15 +7,18 @@ import com.hlcl.rql.as.PasswordAuthentication;
 import com.hlcl.rql.as.Project;
 import com.hlcl.rql.as.RQLException;
 import com.hlcl.rql.as.Template;
+import com.hlcl.rql.as.TextElement;
 import com.hlcl.rql.util.as.PageArrayList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -25,7 +27,10 @@ import java.util.logging.Logger;
  */
 public class convertStrongToH2 {
 
-    private static Logger logger = Logger.getLogger("ibrahim");
+    //private static final Logger logger = Logger.getLogger("convertStrongToH2");
+
+    public static List<String> collectedPgIds = new LinkedList<String>();
+    public static List<String> progressStatus = new LinkedList<String>();
 
     static CmsClient client = null;
     private static File targetFile;
@@ -36,8 +41,7 @@ public class convertStrongToH2 {
         properties = new Properties();
         try {
             properties.load(
-                    new FileInputStream(
-                            targetFile.getAbsolutePath()));
+                    new FileInputStream(targetFile.getAbsolutePath()));
         } catch (IOException ioe) {
             System.err.println(
                     "Unable to read file.");
@@ -61,8 +65,8 @@ public class convertStrongToH2 {
         Project project = null;
 
         try {
-            FileHandler fh = new FileHandler("log.txt");
-            Logger.getLogger("ibrahim").addHandler(fh);
+            FileHandler fh = new FileHandler("log1.txt");
+            Logger.getLogger("convertStrongToH2").addHandler(fh);
         } catch (IOException ex) {
             Logger.getLogger(convertStrongToH2.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
@@ -88,7 +92,21 @@ public class convertStrongToH2 {
             for (int alv = 0; alv < allLanVariantsSize; alv++) {
                 project.setCurrentLanguageVariant(allLangVariants.get(alv));
 
-                logger.log(Level.INFO, "#set Current Language Variant to {0}", allLangVariants.get(alv).getName());
+                logger.trace("Trace Message!", "val1");
+                LogRecord logs = null;
+                        logs.setMessage(Message.format("#set Current Language Variant to {0}", allLangVariants.get(alv).getName()));
+                logger.log(logs);
+                
+                  int val1 = 10, val2 = 11, val3 = 12;
+
+                  private static final Logger logger = LogManager.getLogger();
+  logger.trace("val1={}, val2={}, val3={}", val1, val2, val3);
+  logger.debug("val1={}, val2={}, val3={}", val1, val2, val3);
+  logger.info("val1={}, val2={}, val3={}", val1, val2, val3);
+  logger.warn("val1={}, val2={}, val3={}", val1, val2, val3);
+  logger.error("val1={}, val2={}, val3={}", val1, val2, val3);
+  logger.fatal("val1={}, val2={}, val3={}", val1, val2, val3);
+                
                 System.out.println("\n\n#set Current Language Variant to " + allLangVariants.get(alv).getName());
 
                 List<Template> allTemplatesInProject = project.getAllTemplates();
