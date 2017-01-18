@@ -9,15 +9,15 @@ import com.hlcl.rql.as.RQLException;
 import com.hlcl.rql.as.Template;
 import com.hlcl.rql.as.TextElement;
 import com.hlcl.rql.util.as.PageArrayList;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -27,9 +27,6 @@ import org.apache.log4j.Logger;
 public class convertStrongToH2 {
 
     private static final Logger logger = Logger.getLogger(convertStrongToH2.class);
-
-    public static List<String> collectedPgIds = new LinkedList<String>();
-    public static List<String> progressStatus = new LinkedList<String>();
 
     static CmsClient client = null;
     private static File targetFile;
@@ -48,41 +45,31 @@ public class convertStrongToH2 {
     }
 
     /**
-     * @param args
      * @throws RQLException
      */
     public static void main(String[] args) throws RQLException {
         String user = "";
         String pw = "";
 
+        String logonGuid = "";
         String sessionKey = "";
-        String projectGuid = "";
+        String projectGuid = "";;
         String projectName = "GIZ Master";
 
         List<LanguageVariant> allLangVariants = new ArrayList();
         PageArrayList allPagesInCurrentTemplate;
         Project project = null;
 
-        /*
-        try {
-        FileHandler fh = new FileHandler("log1.txt");
-        Logger.getLogger().addHandler(fh);
-        } catch (IOException ex) {
-        logger.error(null, ex);
-        } catch (SecurityException ex) {
-        logger.error(null, ex);
-        }
-         */
-
         //load CMS login Credentials from File
         for (String key : properties.stringPropertyNames()) {
             user = key;
             pw = properties.getProperty(key);
         }
-
+        
         try {
             client = new CmsClient(new PasswordAuthentication(user, pw));
             client.changeCurrentProjectByName(projectName);
+            logonGuid = client.getLogonGuid();
             projectGuid = client.getCurrentProjectGuid();
 
             project = client.getProject(sessionKey, projectGuid);
@@ -93,19 +80,24 @@ public class convertStrongToH2 {
             for (int alv = 0; alv < allLanVariantsSize; alv++) {
                 project.setCurrentLanguageVariant(allLangVariants.get(alv));
 
-                System.out.println("\n\n#set Current Language Variant to " + allLangVariants.get(alv).getName());
+                String CurrentLanguageVariantName = allLangVariants.get(alv).getName();
+                System.out.println("\n\n#Language Variant " + CurrentLanguageVariantName);
+                appendToFile(MessageFormat.format("##Language Variant {0}\n", CurrentLanguageVariantName), "beforeChange.txt");
+                appendToFile(MessageFormat.format("##Language Variant {0}\n", CurrentLanguageVariantName), "afterChange.txt");
 
                 List<Template> allTemplatesInProject = project.getAllTemplates();
 
                 int allTemplatesInProjectSize = allTemplatesInProject.size();
-                logger.log(Level.INFO, "##allTemplatesInProjectSize {0}", allTemplatesInProjectSize);
+                logger.info(MessageFormat.format("##allTemplatesInProjectSize {0}", allTemplatesInProjectSize));
+                appendToFile(MessageFormat.format("##allTemplatesInProjectSize {0}\n", allTemplatesInProjectSize), "beforeChange.txt");
+                appendToFile(MessageFormat.format("##allTemplatesInProjectSize {0}\n", allTemplatesInProjectSize), "afterChange.txt");
 
                 /* loop over "all Templates In 1 Project" */
                 for (Template nextTemplate : allTemplatesInProject) {
                     allPagesInCurrentTemplate = nextTemplate.getAllPages(9999);
 
                     int allPagesInCurrentTemplateSize = allPagesInCurrentTemplate.size();
-                    logger.log(Level.INFO, "###allPagesInCurrentTemplateSize {0}", allPagesInCurrentTemplateSize);
+                    logger.info(MessageFormat.format("###allPagesInCurrentTemplateSize {0}\n", allPagesInCurrentTemplateSize));
 
                     /* loop over "all Pages in 1 Template" */
                     for (int pit = 0; pit < allPagesInCurrentTemplateSize; pit++) {
@@ -113,19 +105,25 @@ public class convertStrongToH2 {
                         String currentPgInCurrentTemplatePageId = currentPgInCurrentTemplate.getPageId();
 
                         if (currentPgInCurrentTemplate.existsInCurrentLanguageVariant()) {
-                            logger.log(Level.INFO, "####PageID in current Template {0}", currentPgInCurrentTemplatePageId);
+                            logger.info(MessageFormat.format("####PageID in current Template {0}", currentPgInCurrentTemplatePageId));
+                            appendToFile(MessageFormat.format("##PageID {0}\n", currentPgInCurrentTemplatePageId), "beforeChange.txt");
+                            appendToFile(MessageFormat.format("##PageID {0}\n", currentPgInCurrentTemplatePageId), "afterChange.txt");
+
                             List<TextElement> filledTextElements = currentPgInCurrentTemplate.getFilledTextElements();
 
                             /* loop over "filled TextElements in 1 page" */
                             for (TextElement filledElement : filledTextElements) {
 
                                 //string.setText(findAndReplaceAll(string.getText())); //dryrun
-                                logger.log(Level.INFO, "\n####{0}", findAndReplaceAll(filledElement.getText()));
-
+                                //logger.info(MessageFormat.format("\n####{0}", findAndReplaceAll(filledElement.getName(), filledElement.getText())));
+                                findAndReplaceAll(filledElement.getName(), filledElement.getText());
+                                
                             } //filledTextElements
                         } //exisit in current lang variant of currentPgInCurrentTemplate
                         else {
-                            logger.log(Level.INFO, "####PageID {0} does not exist in current lang variant", currentPgInCurrentTemplatePageId);
+                            logger.info(MessageFormat.format("####PageID {0} does not exist in current lang variant", currentPgInCurrentTemplatePageId));
+                            appendToFile(MessageFormat.format("##does not exist in current lang variant {0}\n", currentPgInCurrentTemplatePageId), "beforeChange.txt");
+                            appendToFile(MessageFormat.format("##does not exist in current lang variant {0}\n", currentPgInCurrentTemplatePageId), "afterChange.txt");
                         }
 
                     } //pit
@@ -135,7 +133,7 @@ public class convertStrongToH2 {
             /* end of logic */
 
         } catch (RQLException ex) {
-            logger.log(Level.WARNING, "Got exception", ex);
+            logger.warn(MessageFormat.format("Got exception", ex));
             String error = "";
             Throwable re = ex.getReason();
             if (re != null) {
@@ -148,31 +146,68 @@ public class convertStrongToH2 {
         logger.info("End of Java Program");
     }
 
-    private static String findAndReplaceAll(String text) {
+    private static String findAndReplaceAll(String name, String text) {
+
+        appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "beforeChange.txt");
+        //appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "afterChange.txt");
 
         text = text.replaceAll("<strong>", "<h2>").replaceAll("<h2><h2>", "<h2><b>");
         text = text.replaceAll("</strong>", "</h2>").replaceAll("</h2></h2>", "</b></h2>");
 
+        //appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "beforeChange.txt");
+        appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "afterChange.txt");
+
         return text;
     }
-    
-    	public static void save2File(List<String> contentData, String filename) throws IOException {
-		String outputfilename = filename+".txt";
-		File out = new File(outputfilename);
-		FileUtils.writeLines(out, contentData);
-	}
-        
-        /*
-        			for (String glc : gameListContent) {
-				Page currentPg = project.getPageById("1998");
-				PageArrayList listChildren = currentPg.getListChildPages(glc);
-				collectedPgIds.addAll(UtilityTools
-						.PgArrList2LnkList(listChildren));
-			}
 
-			UtilityTools.save2FileAllGamesPageIds(collectedPgIds,
-					"allOldPageIDs");
-        
-        
-        */
+    public static void appendToFile(String content, String filename) {
+
+        String FILENAME = filename;
+
+        BufferedWriter bw = null;
+        FileWriter fw = null;
+
+        try {
+
+            String data = content;
+
+            File file = new File(FILENAME);
+
+            // if file doesnt exists, then create it
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            // true = append file
+            fw = new FileWriter(file.getAbsoluteFile(), true);
+            bw = new BufferedWriter(fw);
+
+            bw.write(data);
+
+            //System.out.println("Done");
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            try {
+
+                if (bw != null) {
+                    bw.close();
+                }
+
+                if (fw != null) {
+                    fw.close();
+                }
+
+            } catch (IOException ex) {
+
+                ex.printStackTrace();
+
+            }
+        }
+
+    }
+
 }
