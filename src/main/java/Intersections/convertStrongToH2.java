@@ -139,17 +139,7 @@ public class convertStrongToH2 {
             if (re != null) {
                 logger.error(MessageFormat.format("Reason: {0}\n Message: {1}\n", re, re.getMessage()));
             }
-        } finally {
-            try {
-                client.disconnect();
-            } catch (RQLException ex) {
-                logger.error(MessageFormat.format("Exception: {0}\n", ex));
-                Throwable re = ex.getReason();
-                if (re != null) {
-                    logger.error(MessageFormat.format("Reason: {0}\n Message: {1}\n", re, re.getMessage()));
-                }
-            }
-        }
+        } finally {}
         client.disconnect();
         logger.info("End of Java Program");
     }
@@ -201,5 +191,5 @@ public class convertStrongToH2 {
                 ex.printStackTrace();
             }
         }
-    }
+    } //appendToFile
 } //end if class
