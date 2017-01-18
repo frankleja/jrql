@@ -31,6 +31,7 @@ public class convertStrongToH2 {
     static CmsClient client = null;
     private static File targetFile;
     private static Properties properties;
+    static boolean dryRun = true;
 
     static {
         targetFile = new File("./password.txt");
@@ -65,7 +66,7 @@ public class convertStrongToH2 {
             user = key;
             pw = properties.getProperty(key);
         }
-        
+
         try {
             client = new CmsClient(new PasswordAuthentication(user, pw));
             client.changeCurrentProjectByName(projectName);
@@ -113,19 +114,19 @@ public class convertStrongToH2 {
 
                             /* loop over "filled TextElements in 1 page" */
                             for (TextElement filledElement : filledTextElements) {
+                                if (dryRun) {
+                                    findAndReplaceAll(filledElement.getName(), filledElement.getText());
+                                } else {
+                                    filledElement.setText(findAndReplaceAll(filledElement.getName(), filledElement.getText())); //dryrun
+                                }
 
-                                //string.setText(findAndReplaceAll(string.getText())); //dryrun
-                                //logger.info(MessageFormat.format("\n####{0}", findAndReplaceAll(filledElement.getName(), filledElement.getText())));
-                                findAndReplaceAll(filledElement.getName(), filledElement.getText());
-                                
                             } //filledTextElements
                         } //exisit in current lang variant of currentPgInCurrentTemplate
                         else {
                             logger.info(MessageFormat.format("####PageID {0} does not exist in current lang variant", currentPgInCurrentTemplatePageId));
-                            appendToFile(MessageFormat.format("##does not exist in current lang variant {0}\n", currentPgInCurrentTemplatePageId), "beforeChange.txt");
-                            appendToFile(MessageFormat.format("##does not exist in current lang variant {0}\n", currentPgInCurrentTemplatePageId), "afterChange.txt");
+                            appendToFile(MessageFormat.format("##PageID {0} does not exist in current lang variant\n", currentPgInCurrentTemplatePageId), "beforeChange.txt");
+                            appendToFile(MessageFormat.format("##PageID {0} does not exist in current lang variant\n", currentPgInCurrentTemplatePageId), "afterChange.txt");
                         }
-
                     } //pit
                     allPagesInCurrentTemplate.clear();
                 } //lang variant
@@ -133,14 +134,21 @@ public class convertStrongToH2 {
             /* end of logic */
 
         } catch (RQLException ex) {
-            logger.warn(MessageFormat.format("Got exception", ex));
-            String error = "";
+            logger.error(MessageFormat.format("Exception: {0}\n", ex));
             Throwable re = ex.getReason();
             if (re != null) {
-                error += re.getMessage();
+                logger.error(MessageFormat.format("Reason: {0}\n Message: {1}\n", re, re.getMessage()));
             }
         } finally {
-            //client.disconnect();
+            try {
+                client.disconnect();
+            } catch (RQLException ex) {
+                logger.error(MessageFormat.format("Exception: {0}\n", ex));
+                Throwable re = ex.getReason();
+                if (re != null) {
+                    logger.error(MessageFormat.format("Reason: {0}\n Message: {1}\n", re, re.getMessage()));
+                }
+            }
         }
         client.disconnect();
         logger.info("End of Java Program");
@@ -149,12 +157,10 @@ public class convertStrongToH2 {
     private static String findAndReplaceAll(String name, String text) {
 
         appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "beforeChange.txt");
-        //appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "afterChange.txt");
 
         text = text.replaceAll("<strong>", "<h2>").replaceAll("<h2><h2>", "<h2><b>");
         text = text.replaceAll("</strong>", "</h2>").replaceAll("</h2></h2>", "</b></h2>");
 
-        //appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "beforeChange.txt");
         appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "afterChange.txt");
 
         return text;
@@ -163,14 +169,11 @@ public class convertStrongToH2 {
     public static void appendToFile(String content, String filename) {
 
         String FILENAME = filename;
-
         BufferedWriter bw = null;
         FileWriter fw = null;
 
         try {
-
             String data = content;
-
             File file = new File(FILENAME);
 
             // if file doesnt exists, then create it
@@ -181,33 +184,22 @@ public class convertStrongToH2 {
             // true = append file
             fw = new FileWriter(file.getAbsoluteFile(), true);
             bw = new BufferedWriter(fw);
-
             bw.write(data);
 
             //System.out.println("Done");
         } catch (IOException e) {
-
             e.printStackTrace();
-
         } finally {
-
             try {
-
                 if (bw != null) {
                     bw.close();
                 }
-
                 if (fw != null) {
                     fw.close();
                 }
-
             } catch (IOException ex) {
-
                 ex.printStackTrace();
-
             }
         }
-
     }
-
-}
+} //end if class
