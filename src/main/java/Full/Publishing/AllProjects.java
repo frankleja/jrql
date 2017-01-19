@@ -1,9 +1,7 @@
 package Full.Publishing;
 
 import com.hlcl.rql.as.CmsClient;
-import com.hlcl.rql.as.LanguageVariant;
 import com.hlcl.rql.as.Page;
-import com.hlcl.rql.as.PageAlreadyInPublishingQueueException;
 import com.hlcl.rql.as.PasswordAuthentication;
 import com.hlcl.rql.as.Project;
 import com.hlcl.rql.as.ProjectVariant;
@@ -21,18 +19,23 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Ibrahim Sawadogo (http://IbrahimSawadogo.pro)
+ * 
+ * this script publishes all pages in all projects on the server.
  *
  */
 public class AllProjects {
 
     private static final Logger logger = Logger.getLogger(AllProjects.class);
 
-    static boolean logIt = false;
-    static boolean dryRun = false;
-
     static CmsClient client = null;
     private static File targetFile;
     private static Properties properties;
+
+    static boolean logIt = true;
+    static boolean dryRun = true;
+
+    static String beforeFilename = "b4.txt";
+    static String afterFilename = "af.txt";
 
     static {
         targetFile = new File("./password.txt");
@@ -78,6 +81,9 @@ public class AllProjects {
                 project = client.getProject(sessionKey, projectGuid);
                 String projectName = project.getName();
                 logger.info(MessageFormat.format("\n\n#Project Name: {0}", projectName));
+                if (logIt) {
+                    appendToFile(MessageFormat.format("\n\n#Project Name: {0}", projectName), afterFilename);
+                }
 
                 String seperator = ":";
                 String allProjectVariantGuids = getAllProjectVariantGuids(project, seperator);
@@ -86,25 +92,30 @@ public class AllProjects {
 
                 try {
                     PageArrayList allPagesWithFilename = project.getAllPagesWithFilename();
-                    //allPagesWithFilename.releaseAll();
 
                     for (Page PageWithFilename : allPagesWithFilename) {
                         String pageWithFilenamePgID = PageWithFilename.getPageId();
 
                         logger.info(MessageFormat.format("#Publishing PageID {0}", pageWithFilenamePgID));
-                        if (dryRun) {
-                            //do nothing
-                        } else {
+                        if (logIt) {
+                            appendToFile(MessageFormat.format("##Publishing PageID {0}", pageWithFilenamePgID), afterFilename);
+                        }
+                        if (!dryRun) {
                             try {
-                                PageWithFilename.publishAllCombinationsAllLanguageVariants(withFollowingPages, allProjectVariantGuids, seperator, checkInPublicationPackage);
-                            }catch (RQLException ex) {
+                                PageWithFilename.publishAllCombinationsAllLanguageVariants(withFollowingPages, allProjectVariantGuids, seperator, checkInPublicationPackage); //dryRun
+                            } catch (RQLException ex) {
                                 logger.error(MessageFormat.format("Exception: {0}\n", ex));
+                                if (logIt) {
+                                    appendToFile(MessageFormat.format("###PageID {0} has an error {1}", pageWithFilenamePgID, ex), afterFilename);
+                                }
                                 Throwable re = ex.getCause();
                                 if (re != null) {
                                     logger.error(MessageFormat.format("Reason: {0}\n Message: {1}\n", re, re.getMessage()));
                                 }
                             } //catch
-                         } //else
+                        } else {
+                            //do nothing
+                        } //else
                     } //PageWithFilename
 
                 } catch (Exception ex) {

@@ -62,6 +62,7 @@ public class MoveAccordionsToContentContainer {
         String moveFromConNameInQ = "CON_toolbox";
         String moveToConNameInQ = "CON_content";
         String moveTmplToBeBasedOn = "TOOLBOX Content";
+        
         List<LanguageVariant> allLanVariants = new ArrayList();
 
         Template template;

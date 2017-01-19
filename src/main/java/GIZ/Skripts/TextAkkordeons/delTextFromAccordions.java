@@ -38,8 +38,8 @@ public class delTextFromAccordions {
     static boolean logIt = true;
     static boolean dryRun = true;
 
-    static String beforeFilename = "dtaB4file";
-    static String afterFilename = "dtaAfile";
+    static String beforeFilename = "dtaB4file.txt";
+    static String afterFilename = "dtaAfile.txt";
 
     static {
         targetFile = new File("./password.txt");

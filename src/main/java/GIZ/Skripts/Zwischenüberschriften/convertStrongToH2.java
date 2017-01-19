@@ -22,11 +22,10 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Ibrahim Sawadogo (http://IbrahimSawadogo.pro)
- * 
- * The purpose of this script is to loop through
- * a given project, all of its pages and fetch all
- * filled text. Then again go through this text,
- * "search and replace" all <strong> with <h2>.
+ *
+ * The purpose of this script is to loop through a given project, all of its
+ * pages and fetch all filled text. Then again go through this text, "search and
+ * replace" all <strong> with <h2>.
  *
  */
 public class convertStrongToH2 {
@@ -36,8 +35,12 @@ public class convertStrongToH2 {
     static CmsClient client = null;
     private static File targetFile;
     private static Properties properties;
-    
+
+    static boolean logIt = true;
     static boolean dryRun = true;
+
+    static String beforeFilename = "dtaB4file.txt";
+    static String afterFilename = "dtaAfile.txt";
 
     static {
         targetFile = new File("./password.txt");
@@ -118,12 +121,11 @@ public class convertStrongToH2 {
 
                             /* loop over "filled TextElements in 1 page" */
                             for (TextElement filledElement : filledTextElements) {
-                                if (dryRun) {
-                                    findAndReplaceAll(filledElement.getName(), filledElement.getText());
-                                } else {
+                                if (!dryRun) {
                                     filledElement.setText(findAndReplaceAll(filledElement.getName(), filledElement.getText())); //dryrun
+                                } else {
+                                    findAndReplaceAll(filledElement.getName(), filledElement.getText());
                                 }
-
                             } //filledTextElements
                         } //exisit in current lang variant of currentPgInCurrentTemplate
                         else {
@@ -143,7 +145,8 @@ public class convertStrongToH2 {
             if (re != null) {
                 logger.error(MessageFormat.format("Reason: {0}\n Message: {1}\n", re, re.getMessage()));
             }
-        } finally {}
+        } finally {
+        }
         client.disconnect();
         logger.info("End of Java Program");
     }
