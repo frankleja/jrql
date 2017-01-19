@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
  * @author Ibrahim Sawadogo
  *
  */
-public class perProject {
+public class PerProject {
 
-    private static final Logger logger = Logger.getLogger(perProject.class);
+    private static final Logger logger = Logger.getLogger(PerProject.class);
 
     static CmsClient client = null;
     private static File targetFile;

@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
  * @author Ibrahim Sawadogo
  *
  */
-public class perTemplate {
+public class PerTemplate {
 
-    private static final Logger logger = Logger.getLogger(perTemplate.class);
+    private static final Logger logger = Logger.getLogger(PerTemplate.class);
     boolean logIt = false;
 
     static CmsClient client = null;
