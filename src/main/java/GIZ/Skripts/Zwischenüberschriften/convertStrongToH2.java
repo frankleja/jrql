@@ -1,4 +1,4 @@
-package Intersections;
+package GIZ.Skripts.Zwischenüberschriften;
 
 import com.hlcl.rql.as.CmsClient;
 import com.hlcl.rql.as.LanguageVariant;
@@ -21,7 +21,12 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 /**
- * @author Ibrahim Sawadogo
+ * @author Ibrahim Sawadogo (http://IbrahimSawadogo.pro)
+ * 
+ * The purpose of this script is to loop through
+ * a given project, all of its pages and fetch all
+ * filled text. Then again go through this text,
+ * "search and replace" all <strong> with <h2>.
  *
  */
 public class convertStrongToH2 {
@@ -31,6 +36,7 @@ public class convertStrongToH2 {
     static CmsClient client = null;
     private static File targetFile;
     private static Properties properties;
+    
     static boolean dryRun = true;
 
     static {
@@ -52,7 +58,6 @@ public class convertStrongToH2 {
         String user = "";
         String pw = "";
 
-        String logonGuid = "";
         String sessionKey = "";
         String projectGuid = "";;
         String projectName = "GIZ Master";
@@ -70,7 +75,6 @@ public class convertStrongToH2 {
         try {
             client = new CmsClient(new PasswordAuthentication(user, pw));
             client.changeCurrentProjectByName(projectName);
-            logonGuid = client.getLogonGuid();
             projectGuid = client.getCurrentProjectGuid();
 
             project = client.getProject(sessionKey, projectGuid);

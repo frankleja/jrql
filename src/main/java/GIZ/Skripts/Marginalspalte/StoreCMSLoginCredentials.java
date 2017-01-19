@@ -1,4 +1,4 @@
-package GIZ.Skripts.Umsetzung;
+package GIZ.Skripts.Marginalspalte;
 
 import java.io.BufferedWriter;
 import java.io.File;

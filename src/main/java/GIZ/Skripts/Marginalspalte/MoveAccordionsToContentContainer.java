@@ -1,4 +1,4 @@
-package GIZ.Skripts.Umsetzung;
+package GIZ.Skripts.Marginalspalte;
 
 import com.hlcl.rql.as.CmsClient;
 import com.hlcl.rql.as.Container;
@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author Ibrahim Sawadogo
+ * @author Ibrahim Sawadogo (http://IbrahimSawadogo.pro)
  *
  */
 public class MoveAccordionsToContentContainer {
@@ -31,7 +31,6 @@ public class MoveAccordionsToContentContainer {
     static CmsClient client = null;
     private static File targetFile;
     private static Properties properties;
-    private static String newLine = System.lineSeparator();
 
     static {
         targetFile = new File("./password.txt");
@@ -46,7 +45,6 @@ public class MoveAccordionsToContentContainer {
         }
     }
 
-    //private HashMap<String, String> AllProjectNamesAndGuid = new HashMap<>();
     /**
      * @param projects
      * @throws RQLException
@@ -55,7 +53,6 @@ public class MoveAccordionsToContentContainer {
         String user = "";
         String pw = "";
 
-        String logonGuid = "";
         String sessionKey = "";
         String projectGuid = "";
 
@@ -91,7 +88,6 @@ public class MoveAccordionsToContentContainer {
         try {
             client = new CmsClient(new PasswordAuthentication(user, pw));
             client.changeCurrentProjectByName(projectNameInQ);
-            logonGuid = client.getLogonGuid();
             projectGuid = client.getCurrentProjectGuid();
 
             project = client.getProject(sessionKey, projectGuid);
@@ -148,10 +144,9 @@ public class MoveAccordionsToContentContainer {
                                 }
 
                                 pgToReconnect.add(ChildPgOfConInProgress);
-                                //firstChildPgOfCon.disconnectFromAllMultiLinks(); //dryRun
-                                /*<test>*/
-                                mvFromCon.disconnectChild(ChildPgOfConInProgress);
-                                 /*</test>*/
+
+                                mvFromCon.disconnectChild(ChildPgOfConInProgress); //dryrun
+                                 
                             } // exisit in current lang variant
                             else{
                                 System.out.println("##page does not exist in current lang variant°°");

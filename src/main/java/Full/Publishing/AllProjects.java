@@ -20,7 +20,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 /**
- * @author Ibrahim Sawadogo
+ * @author Ibrahim Sawadogo (http://IbrahimSawadogo.pro)
  *
  */
 public class AllProjects {

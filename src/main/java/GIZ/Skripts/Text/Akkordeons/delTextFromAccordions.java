@@ -1,4 +1,4 @@
-package Full.Publishing;
+package GIZ.Skripts.Text.Akkordeons;
 
 import com.hlcl.rql.as.CmsClient;
 import com.hlcl.rql.as.LanguageVariant;
@@ -21,16 +21,23 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 /**
- * @author Ibrahim Sawadogo
+ * @author Ibrahim Sawadogo (http://IbrahimSawadogo.pro)
+ * 
+ * The purpose of this script is to loop through
+ * a given project, all of its pages and fetch all
+ * filled text. Then again go through this text,
+ * "search and replace" all <strong> with <h2>.
  *
  */
-public class perProject {
+public class delTextFromAccordions {
 
-    private static final Logger logger = Logger.getLogger(perProject.class);
+    private static final Logger logger = Logger.getLogger(delTextFromAccordions.class);
 
     static CmsClient client = null;
     private static File targetFile;
     private static Properties properties;
+    
+    static boolean dryRun = true;
 
     static {
         targetFile = new File("./password.txt");
@@ -51,7 +58,6 @@ public class perProject {
         String user = "";
         String pw = "";
 
-        String logonGuid = "";
         String sessionKey = "";
         String projectGuid = "";;
         String projectName = "GIZ Master";
@@ -65,11 +71,10 @@ public class perProject {
             user = key;
             pw = properties.getProperty(key);
         }
-        
+
         try {
             client = new CmsClient(new PasswordAuthentication(user, pw));
             client.changeCurrentProjectByName(projectName);
-            logonGuid = client.getLogonGuid();
             projectGuid = client.getCurrentProjectGuid();
 
             project = client.getProject(sessionKey, projectGuid);
@@ -113,19 +118,19 @@ public class perProject {
 
                             /* loop over "filled TextElements in 1 page" */
                             for (TextElement filledElement : filledTextElements) {
+                                if (dryRun) {
+                                    findAndReplaceAll(filledElement.getName(), filledElement.getText());
+                                } else {
+                                    filledElement.setText(findAndReplaceAll(filledElement.getName(), filledElement.getText())); //dryrun
+                                }
 
-                                //string.setText(findAndReplaceAll(string.getText())); //dryrun
-                                //logger.info(MessageFormat.format("\n####{0}", findAndReplaceAll(filledElement.getName(), filledElement.getText())));
-                                findAndReplaceAll(filledElement.getName(), filledElement.getText());
-                                
                             } //filledTextElements
                         } //exisit in current lang variant of currentPgInCurrentTemplate
                         else {
                             logger.info(MessageFormat.format("####PageID {0} does not exist in current lang variant", currentPgInCurrentTemplatePageId));
-                            appendToFile(MessageFormat.format("##does not exist in current lang variant {0}\n", currentPgInCurrentTemplatePageId), "beforeChange.txt");
-                            appendToFile(MessageFormat.format("##does not exist in current lang variant {0}\n", currentPgInCurrentTemplatePageId), "afterChange.txt");
+                            appendToFile(MessageFormat.format("##PageID {0} does not exist in current lang variant\n", currentPgInCurrentTemplatePageId), "beforeChange.txt");
+                            appendToFile(MessageFormat.format("##PageID {0} does not exist in current lang variant\n", currentPgInCurrentTemplatePageId), "afterChange.txt");
                         }
-
                     } //pit
                     allPagesInCurrentTemplate.clear();
                 } //lang variant
@@ -133,15 +138,12 @@ public class perProject {
             /* end of logic */
 
         } catch (RQLException ex) {
-            logger.warn(MessageFormat.format("Got exception", ex));
-            String error = "";
+            logger.error(MessageFormat.format("Exception: {0}\n", ex));
             Throwable re = ex.getReason();
             if (re != null) {
-                error += re.getMessage();
+                logger.error(MessageFormat.format("Reason: {0}\n Message: {1}\n", re, re.getMessage()));
             }
-        } finally {
-            //client.disconnect();
-        }
+        } finally {}
         client.disconnect();
         logger.info("End of Java Program");
     }
@@ -149,12 +151,10 @@ public class perProject {
     private static String findAndReplaceAll(String name, String text) {
 
         appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "beforeChange.txt");
-        //appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "afterChange.txt");
 
         text = text.replaceAll("<strong>", "<h2>").replaceAll("<h2><h2>", "<h2><b>");
         text = text.replaceAll("</strong>", "</h2>").replaceAll("</h2></h2>", "</b></h2>");
 
-        //appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "beforeChange.txt");
         appendToFile(MessageFormat.format("{0}\n {1}\n\n", name, text), "afterChange.txt");
 
         return text;
@@ -163,14 +163,11 @@ public class perProject {
     public static void appendToFile(String content, String filename) {
 
         String FILENAME = filename;
-
         BufferedWriter bw = null;
         FileWriter fw = null;
 
         try {
-
             String data = content;
-
             File file = new File(FILENAME);
 
             // if file doesnt exists, then create it
@@ -181,33 +178,22 @@ public class perProject {
             // true = append file
             fw = new FileWriter(file.getAbsoluteFile(), true);
             bw = new BufferedWriter(fw);
-
             bw.write(data);
 
             //System.out.println("Done");
         } catch (IOException e) {
-
             e.printStackTrace();
-
         } finally {
-
             try {
-
                 if (bw != null) {
                     bw.close();
                 }
-
                 if (fw != null) {
                     fw.close();
                 }
-
             } catch (IOException ex) {
-
                 ex.printStackTrace();
-
             }
         }
-
-    }
-
-}
+    } //appendToFile
+} //end if class
