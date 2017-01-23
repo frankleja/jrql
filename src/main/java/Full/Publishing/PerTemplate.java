@@ -20,9 +20,8 @@ import org.apache.log4j.Logger;
 /**
  * @author Ibrahim Sawadogo (http://IbrahimSawadogo.pro)
  *
- * this script publishes 
- * all pages based on a template 
- * in a project on the server.
+ * this script publishes all pages based on a template in a project on the
+ * server.
  *
  */
 public class PerTemplate {
@@ -34,7 +33,7 @@ public class PerTemplate {
     private static Properties properties;
 
     static boolean logIt = true;
-    static boolean dryRun = true;
+    static boolean dryRun = false;
 
     static String beforeFilename = "PerTemplate-b4.txt";
     static String afterFilename = "PerTemplate-af.txt";
@@ -61,6 +60,8 @@ public class PerTemplate {
         String sessionKey = "";
         String projectGuid = "";;
         String projectName = "GIZ Master";
+        String templateName = "Worldwide Text";
+        String templateFolderName = "Masterpages - special";
 
         Project project = null;
 
@@ -76,7 +77,6 @@ public class PerTemplate {
             projectGuid = client.getCurrentProjectGuid();
 
             project = client.getProject(sessionKey, projectGuid);
-            projectName = project.getName();
             logger.info(MessageFormat.format("\n#Project Name: {0}", projectName));
             if (logIt) {
                 appendToFile(MessageFormat.format("#Project Name: {0}\n", projectName), afterFilename);
@@ -87,42 +87,31 @@ public class PerTemplate {
             boolean withFollowingPages = true;
             boolean checkInPublicationPackage = false;
 
-            try {
-                PageArrayList allPagesWithFilename = project.getAllPagesWithFilename();
+            PageArrayList allPagesBasedOn = project.getAllPagesBasedOn(templateFolderName, templateName, 9999);
+            for (Page pageBasedOn : allPagesBasedOn) {
+                String pageWithFilenamePgID = pageBasedOn.getPageId();
 
-                for (Page PageWithFilename : allPagesWithFilename) {
-                    String pageWithFilenamePgID = PageWithFilename.getPageId();
-
-                    logger.info(MessageFormat.format("#Publishing PageID {0}", pageWithFilenamePgID));
-                    if (logIt) {
-                        appendToFile(MessageFormat.format("##Publishing PageID {0}\n", pageWithFilenamePgID), afterFilename);
-                    }
-                    if (!dryRun) {
-                        try {
-                            PageWithFilename.publishAllCombinationsAllLanguageVariants(withFollowingPages, allProjectVariantGuids, seperator, checkInPublicationPackage); //dryRun
-                        } catch (RQLException ex) {
-                            logger.error(MessageFormat.format("\nException: {0}", ex));
-                            if (logIt) {
-                                appendToFile(MessageFormat.format("\n###PageID {0} has an error {1}", pageWithFilenamePgID, ex), afterFilename);
-                            }
-                            Throwable re = ex.getCause();
-                            if (re != null) {
-                                logger.error(MessageFormat.format("\nReason: {0}\n Message: {1}", re, re.getMessage()));
-                            }
-                        } //catch
-                    } else {
-                        //do nothing
-                    } //else
-                } //PageWithFilename
-
-            } catch (Exception ex) {
-                logger.error(MessageFormat.format("\nException: {0}", ex));
-                Throwable re = ex.getCause();
-                if (re != null) {
-                    logger.error(MessageFormat.format("\nReason: {0}\n Message: {1}", re, re.getMessage()));
+                logger.info(MessageFormat.format("#Publishing PageID {0}", pageWithFilenamePgID));
+                if (logIt) {
+                    appendToFile(MessageFormat.format("##Publishing PageID {0}\n", pageWithFilenamePgID), afterFilename);
                 }
-            }
-
+                if (!dryRun) {
+                    try {
+                        pageBasedOn.publishAllCombinationsAllLanguageVariants(withFollowingPages, allProjectVariantGuids, seperator, checkInPublicationPackage); //dryRun
+                    } catch (RQLException ex) {
+                        logger.error(MessageFormat.format("\nException: {0}", ex));
+                        if (logIt) {
+                            appendToFile(MessageFormat.format("\n###PageID {0} has an error {1}", pageWithFilenamePgID, ex), afterFilename);
+                        }
+                        Throwable re = ex.getCause();
+                        if (re != null) {
+                            logger.error(MessageFormat.format("\nReason: {0}\n Message: {1}", re, re.getMessage()));
+                        }
+                    } //catch
+                } else {
+                    //do nothing
+                } //else
+            } //for pageBasedOn
 
             /* end of logic */
         } catch (RQLException ex) {
