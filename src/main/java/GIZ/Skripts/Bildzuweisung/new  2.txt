@@ -1,0 +1,7 @@
+http://localhost/CMS/plugins/valuetoplaceholder/valuetoplaceholder.asp?placeholder=0B9D7E67C7BE42FC9D30BE50A7BFB4F6&value=LAYERS:
+
+
+
+/CMS/plugins/valuetoplaceholder/valuetoplaceholder.asp?placeholder=<%!! Context:CurrentPage.GetElementByName(std_AvaliableLayers).Id.ToString(N).ToUpper() !!%>&value=<% response.write("LAYERS: " & layers)%>" " method="post">
+
+

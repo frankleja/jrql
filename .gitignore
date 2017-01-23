@@ -3,4 +3,5 @@
 *~
 /.idea
 *.iml
-/src/main/java/pinuts/examples/*
+password.txt
+mothership

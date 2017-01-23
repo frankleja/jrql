@@ -15,7 +15,8 @@ public class URLTest {
 	 * @throws MalformedURLException 
 	 */
 	public static void main(String[] args) throws MalformedURLException {
-		URL url = new URL("http://reddot.hlcl.com:8081/cms/hlclRemote.asp");
+		//URL url = new URL("http://reddot.hlcl.com:8081/cms/hlclRemote.asp");
+                URL url = new URL("http://localhost:80/cms/hlclRemote.asp");
 		System.out.println(url.getHost());
 		System.out.println(url.getProtocol());
 		System.out.println(url.getPort());

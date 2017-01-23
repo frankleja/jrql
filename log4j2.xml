@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="MyApp" packages="">
+ <Appenders>
+  <File name="my_file_appender" fileName="log4jlogs.csv">
+   <CsvParameterLayout delimiter=","/>
+  </File>
+ </Appenders>
+
+ <Loggers>
+  <Root level="info">
+   <AppenderRef ref="my_file_appender" />
+  </Root>
+ </Loggers>
+</Configuration>
