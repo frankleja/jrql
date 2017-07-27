@@ -6994,4 +6994,14 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
     	// are there more?
     	throw new WrongTypeException("Not a StructureElement: " + name);
     }
+    
+
+    /**
+     * Find the instance element GUID of the given template element.
+     */ 
+	public String getElementGuid(TemplateElement templateElement) throws RQLException {
+		RQLNode elementNode = findElementNode(templateElement);
+		return elementNode.getAttribute("guid");
+	}
+
 }
