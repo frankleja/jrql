@@ -4216,7 +4216,7 @@ public class Project extends RqlKeywordObject implements CmsClientContainer {
 	 * <p>
 	 * Achtung: Nur als Administrator aufrufbar!
 	 */
-	void referenceElement(String sourceElementGuid, String targetElementGuid, String referenceType) throws RQLException {
+	public void referenceElement(String sourceElementGuid, String targetElementGuid, String referenceType) throws RQLException {
 		// das clipboard muss aber nicht mit diesem element gefüllt sein, sehr praktisch
 		/* 
 		V7.5 request
