@@ -7004,4 +7004,13 @@ public class Page extends RqlKeywordObject implements ProjectContainer {
 		return elementNode.getAttribute("guid");
 	}
 
+	
+    /**
+     * Find the instance link GUID of the given template element.
+     */ 
+	public String getLinkElementGuid(TemplateElement templateElement) throws RQLException {
+		RQLNode elementNode = findLinkNode(templateElement); 
+		return elementNode.getAttribute("guid");
+	}
+
 }
